@@ -33,6 +33,7 @@ const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" :
                   <details class="sub">
                     <summary>{label}<ChevronDown size={18} aria-hidden="true" /></summary>
                     <ul>
+                      <li><a href="/boutique/">Toute la boutique</a></li>
                       {SHOP_SHELVES.map((shelf) => (
                         <li><a href={`/boutique/#type=${shelf.id}`}>{shelf.label}</a></li>
                       ))}
@@ -62,6 +63,7 @@ const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" :
               <a href={href} aria-current={current(href)}>{label}</a>
               {href === "/boutique/" && (
                 <ul class="dropdown">
+                  <li><a href="/boutique/">Toute la boutique</a></li>
                   {SHOP_SHELVES.map((shelf) => (
                     <li><a href={`/boutique/#type=${shelf.id}`}>{shelf.label}</a></li>
                   ))}
