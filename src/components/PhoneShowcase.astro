@@ -1,0 +1,302 @@
+---
+import { Award, CalendarDays, ChartLine, Compass, Zap } from "@lucide/astro";
+
+/**
+ * Écrans de l'appli, dans public/appli/ : pour une vraie capture, remplacer le fichier de même nom
+ * (ou changer ici son extension si la capture n'est pas un SVG). Format conseillé : 1080 × 2340.
+ */
+const ECRANS = [
+  {
+    image: "/appli/accueil-serie.svg",
+    title: "Votre série",
+    text: "Voyez votre progression d'un coup d'œil.",
+    Icon: ChartLine,
+    color: "var(--success)",
+  },
+  {
+    image: "/appli/calendrier.svg",
+    title: "Votre calendrier",
+    text: "Retrouvez votre parcours, jour après jour.",
+    Icon: CalendarDays,
+    color: "var(--primary)",
+  },
+  {
+    image: "/appli/envie.svg",
+    title: "Une aide immédiate",
+    text: "Une activité, un quiz ou un mini-jeu quand une envie arrive.",
+    Icon: Zap,
+    color: "var(--chart-3)",
+  },
+  {
+    image: "/appli/badges.svg",
+    title: "Vos badges",
+    text: "Célébrez chaque étape franchie.",
+    Icon: Award,
+    color: "var(--success)",
+  },
+  {
+    image: "/appli/addictforms.svg",
+    title: "AddictForms",
+    text: "Des vidéos, des conseils et des numéros d'aide vérifiés.",
+    Icon: Compass,
+    color: "var(--primary)",
+  },
+];
+
+// `start` : écran de départ de chaque téléphone. Le premier écran est répété en fin de boucle pour un retour sans saut.
+const TELEPHONES = [
+  { position: "left", start: 1 },
+  { position: "center", start: 0 },
+  { position: "right", start: 3 },
+];
+---
+
+<div class="scene" role="img" aria-label="Maquettes de l'appli Addictive sur téléphone, avec des écrans provisoires. Captures à venir.">
+  {
+    TELEPHONES.map(({ position, start }) => (
+      <div class:list={["float", position]} style={`--start: ${start}`}>
+        <div class="phone">
+          <div class="screen">
+            <span class="island" />
+            <div class="track">
+              {[...ECRANS, ECRANS[0]].map((ecran) => (
+                <img src={ecran.image} width="360" height="780" alt="" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<ul class="benefits">
+  {
+    ECRANS.map(({ title, text, Icon, color }) => (
+      <li>
+        <Icon size={24} color={color} aria-hidden="true" />
+        <strong>{title}</strong>
+        <p>{text}</p>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  /* Tailles en % : les téléphones ne suivent pas la taille du texte et n'élargissent jamais la page. */
+  .scene {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-block: 1.5rem 2.5rem;
+    overflow-x: clip;
+  }
+
+  .float {
+    flex: none;
+    width: min(60%, 15rem);
+  }
+
+  .left,
+  .right {
+    display: none;
+  }
+
+  .phone {
+    position: relative;
+    padding: 3.2%;
+    border-radius: 14% / 6.6%;
+    background: linear-gradient(135deg, oklch(0.5 0.03 258), oklch(0.26 0.03 264) 45%, oklch(0.4 0.03 258));
+    box-shadow:
+      inset 0 0 0 1px oklch(0.62 0.03 258 / 0.7),
+      5px 4px 0 oklch(0.2 0.03 264),
+      12px 22px 34px oklch(0 0 0 / 0.55),
+      24px 44px 70px oklch(0 0 0 / 0.4);
+    transform: perspective(1100px) rotateX(4deg) rotateY(-14deg) rotateZ(1deg);
+  }
+
+  /* Boutons sur la tranche. */
+  .phone::before,
+  .phone::after {
+    content: "";
+    position: absolute;
+    left: -1.2%;
+    width: 1.4%;
+    border-radius: 2px 0 0 2px;
+    background: oklch(0.42 0.03 258);
+  }
+
+  .phone::before {
+    top: 17%;
+    height: 6%;
+  }
+
+  .phone::after {
+    top: 25%;
+    height: 11%;
+  }
+
+  .screen {
+    position: relative;
+    aspect-ratio: 360 / 780;
+    overflow: hidden;
+    border-radius: 11% / 5.2%;
+    background: var(--background);
+  }
+
+  .island {
+    position: absolute;
+    top: 1.6%;
+    left: 50%;
+    z-index: 1;
+    width: 30%;
+    height: 3.4%;
+    border-radius: 999px;
+    background: oklch(0.08 0.01 264);
+    transform: translateX(-50%);
+  }
+
+  .track {
+    display: flex;
+    flex-direction: column;
+    height: 600%;
+    /* Sans animation, chaque téléphone reste sur un écran différent. */
+    transform: translateY(calc(var(--start) * -16.6667%));
+  }
+
+  .track img {
+    width: 100%;
+    height: calc(100% / 6);
+    object-fit: cover;
+  }
+
+  .benefits {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .benefits li {
+    min-width: 0;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+
+  .benefits strong {
+    display: block;
+    margin-top: 0.5rem;
+  }
+
+  .benefits p {
+    margin-top: 0.125rem;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  @media (min-width: 600px) {
+    .benefits {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 768px) {
+    .scene {
+      padding-block: 2rem 3.5rem;
+    }
+
+    .float {
+      width: min(29%, 18rem);
+    }
+
+    .left,
+    .right {
+      display: block;
+      width: min(25%, 15rem);
+    }
+
+    .left {
+      margin-top: 5%;
+      margin-right: -3%;
+    }
+
+    .right {
+      margin-top: 3%;
+      margin-left: -3%;
+    }
+
+    .center {
+      position: relative;
+      z-index: 1;
+    }
+
+    .left .phone {
+      transform: perspective(1100px) rotateX(3deg) rotateY(22deg) rotateZ(-3deg);
+    }
+
+    .right .phone {
+      transform: perspective(1100px) rotateX(3deg) rotateY(-22deg) rotateZ(3deg);
+    }
+  }
+
+  @media (min-width: 1000px) {
+    .benefits {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  /* Animation seulement si la personne n'a pas activé « réduire les animations ». */
+  @media (prefers-reduced-motion: no-preference) {
+    .float {
+      animation: float 7s ease-in-out infinite;
+      animation-delay: calc(var(--start) * -1.5s);
+    }
+
+    .track {
+      animation: screens 30s ease-in-out infinite;
+      animation-delay: calc(var(--start) * -6s);
+    }
+
+    .scene:hover .float,
+    .scene:hover .track {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes float {
+    50% {
+      transform: translateY(-2%);
+    }
+  }
+
+  @keyframes screens {
+    0%,
+    16% {
+      transform: translateY(0);
+    }
+
+    20%,
+    36% {
+      transform: translateY(-16.6667%);
+    }
+
+    40%,
+    56% {
+      transform: translateY(-33.3333%);
+    }
+
+    60%,
+    76% {
+      transform: translateY(-50%);
+    }
+
+    80%,
+    96% {
+      transform: translateY(-66.6667%);
+    }
+
+    100% {
+      transform: translateY(-83.3333%);
+    }
+  }
+</style>

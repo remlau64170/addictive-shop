@@ -1,6 +1,6 @@
 ---
-import { Menu, Search, ShoppingCart, X } from "@lucide/astro";
-import { SHOP_NEEDS, SHOP_SHELVES } from "../data/site";
+import { ChevronDown, Menu, Search, ShoppingCart, X } from "@lucide/astro";
+import { SHOP_SHELVES } from "../data/site";
 
 const MENU = [
   { href: "/boutique/", label: "Boutique" },
@@ -26,12 +26,26 @@ const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" :
         </p>
         <ul>
           <li><a href="/" aria-current={path === "/" ? "page" : undefined}>Accueil</a></li>
-          {MENU.map(({ href, label }) => <li><a href={href} aria-current={current(href)}>{label}</a></li>)}
+          {
+            MENU.map(({ href, label }) => (
+              <li>
+                {href === "/boutique/" ? (
+                  <details class="sub">
+                    <summary>{label}<ChevronDown size={18} aria-hidden="true" /></summary>
+                    <ul>
+                      {SHOP_SHELVES.map((shelf) => (
+                        <li><a href={`/boutique/#type=${shelf.id}`}>{shelf.label}</a></li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : (
+                  <a href={href} aria-current={current(href)}>{label}</a>
+                )}
+              </li>
+            ))
+          }
         </ul>
-        <p class="panel-title">Rayons de la boutique</p>
-        <ul>
-          {SHOP_SHELVES.map((shelf) => <li><a href={`/boutique/#type=${shelf.id}`}>{shelf.label}</a></li>)}
-        </ul>
+        <p class="panel-help"><a href="/aide/">Besoin d'aide ?</a></p>
       </nav>
     </details>
 
@@ -47,24 +61,11 @@ const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" :
             <li class:list={{ "has-menu": href === "/boutique/" }}>
               <a href={href} aria-current={current(href)}>{label}</a>
               {href === "/boutique/" && (
-                <div class="dropdown">
-                  <div>
-                    <p>Rayons</p>
-                    <ul>
-                      {SHOP_SHELVES.map((shelf) => (
-                        <li><a href={`/boutique/#type=${shelf.id}`}>{shelf.label}</a></li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <p>Besoins</p>
-                    <ul>
-                      {SHOP_NEEDS.map((need) => (
-                        <li><a href={`/boutique/#besoin=${need.id}`}>{need.label}</a></li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+                <ul class="dropdown">
+                  {SHOP_SHELVES.map((shelf) => (
+                    <li><a href={`/boutique/#type=${shelf.id}`}>{shelf.label}</a></li>
+                  ))}
+                </ul>
               )}
             </li>
           ))
@@ -119,7 +120,7 @@ const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" :
   }
 
   .icon,
-  summary,
+  .burger > summary,
   .close {
     display: flex;
     align-items: center;
@@ -144,7 +145,7 @@ const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" :
   }
 
   /* Le voile derrière le panneau ferme le menu au toucher, même sans JavaScript. */
-  .burger[open] summary::before {
+  .burger[open] > summary::before {
     content: "";
     position: fixed;
     inset: 0;
@@ -177,13 +178,20 @@ const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" :
     cursor: pointer;
   }
 
-  .panel-title {
-    margin-top: 1.25rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-    color: var(--muted-foreground);
-    font-size: 0.875rem;
+  .sub summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3rem;
     font-weight: 600;
+  }
+
+  .sub[open] summary :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  .sub ul {
+    padding-left: 1rem;
   }
 
   .panel a {
@@ -193,6 +201,21 @@ const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" :
     color: var(--foreground);
     font-weight: 600;
     text-decoration: none;
+  }
+
+  .sub a {
+    font-weight: 500;
+  }
+
+  .panel .panel-help {
+    margin-top: 1.25rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .panel-help a {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
   }
 
   .panel a[aria-current="page"] {
@@ -252,9 +275,8 @@ const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" :
       left: 0;
       z-index: 50;
       display: none;
-      grid-template-columns: 9rem 14rem;
-      gap: 1.5rem;
-      padding: 1rem 1.25rem;
+      min-width: 13rem;
+      padding: 0.75rem 1.25rem;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       background: var(--card);
@@ -263,14 +285,7 @@ const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" :
 
     .has-menu:hover .dropdown,
     .has-menu:focus-within .dropdown {
-      display: grid;
-    }
-
-    .dropdown p {
-      margin-bottom: 0.25rem;
-      color: var(--muted-foreground);
-      font-size: 0.75rem;
-      font-weight: 600;
+      display: block;
     }
 
     .dropdown a {

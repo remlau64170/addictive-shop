@@ -24,8 +24,8 @@ export const ARTICLE_CATEGORIES = [
 ] as const;
 
 export const SHOP_SHELVES = [
-  { id: "numerique", label: "Numérique" },
-  { id: "objets", label: "Objets" },
+  { id: "numeriques", label: "Produits numériques" },
+  { id: "physiques", label: "Produits physiques" },
 ] as const;
 
 /** Besoins de la boutique : les catégories d'articles, sans les témoignages. */

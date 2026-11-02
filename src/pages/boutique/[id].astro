@@ -3,6 +3,7 @@ import { render } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import ProductCard from "../../components/ProductCard.astro";
+import { SHOP_SHELVES } from "../../data/site";
 import { formatPrice, getProduits, productName } from "../../lib/produits";
 
 export async function getStaticPaths() {
@@ -13,6 +14,7 @@ export async function getStaticPaths() {
 const { produit, produits } = Astro.props;
 const { Content } = await render(produit);
 const name = productName(produit);
+const shelf = SHOP_SHELVES.find((item) => item.id === produit.data.shelf);
 // Produits liés : ceux du même rayon d'abord.
 const liees = produits
   .filter((item) => item.id !== produit.id)
@@ -22,7 +24,14 @@ const liees = produits
 
 <Base title={name} description={produit.data.summary} wide>
   <div class="wrap fiche">
-    <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Boutique", href: "/boutique/" }, { label: name }]} />
+    <Breadcrumb
+      items={[
+        { label: "Accueil", href: "/" },
+        { label: "Boutique", href: "/boutique/" },
+        { label: shelf?.label ?? "", href: `/boutique/#type=${produit.data.shelf}` },
+        { label: name },
+      ]}
+    />
 
     <div class="top">
       <div class="visual">

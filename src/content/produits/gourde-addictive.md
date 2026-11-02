@@ -1,7 +1,7 @@
 ---
 title: "Addictive"
 kind: Gourde
-shelf: objets
+shelf: physiques
 summary: "Une gourde pour vous accompagner au quotidien."
 image: /visuels/gourde.svg
 needs: [sport-corps]

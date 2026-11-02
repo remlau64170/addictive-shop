@@ -1,7 +1,7 @@
 ---
 title: "Sois addict à ta sobriété"
 kind: T-shirt
-shelf: objets
+shelf: physiques
 summary: "Le slogan d'Addictive à porter fièrement."
 image: /visuels/tshirt.svg
 needs: [mental-discipline]

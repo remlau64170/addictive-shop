@@ -19,7 +19,7 @@ const produits = defineCollection({
   schema: z.object({
     title: z.string(),
     kind: z.string(),
-    shelf: z.enum(["numerique", "objets"]),
+    shelf: z.enum(["numeriques", "physiques"]),
     summary: z.string(),
     /** Visuel provisoire, dans public/visuels/. */
     image: z.string(),

@@ -1,9 +1,7 @@
 ---
 import {
   ArrowRight,
-  Award,
   Brain,
-  ChartLine,
   Download,
   Dumbbell,
   Hammer,
@@ -13,29 +11,26 @@ import {
   ShieldCheck,
   Sparkles,
   Sprout,
-  Zap,
 } from "@lucide/astro";
 import Base from "../layouts/Base.astro";
 import ProductCard from "../components/ProductCard.astro";
-import { ARTICLE_CATEGORIES } from "../data/site";
+import PhoneShowcase from "../components/PhoneShowcase.astro";
+import { ARTICLE_CATEGORIES, SHOP_SHELVES } from "../data/site";
 import { getVisibleArticles } from "../lib/articles";
 import { getProduits } from "../lib/produits";
 
 const produits = await getProduits();
 const derniers = (await getVisibleArticles()).slice(0, 3);
 
-const AVANTAGES = [
-  { text: "Le suivi de vos séries, jour après jour", Icon: ChartLine, color: "var(--success)" },
-  { text: "De l'aide quand une envie arrive", Icon: Zap, color: "var(--primary)" },
-  { text: "Des badges pour célébrer vos progrès", Icon: Award, color: "var(--chart-3)" },
-];
 
 const ENGAGEMENTS = [
   { title: "Contenus vérifiés", text: "Nos ressources sont vérifiées avant publication.", Icon: ShieldCheck },
   { title: "Téléchargement immédiat", text: "Pour les produits numériques.", Icon: Download },
-  { title: "Fabrication à la demande", text: "Pour les objets.", Icon: Hammer },
+  { title: "Fabrication à la demande", text: "Pour les produits physiques.", Icon: Hammer },
   { title: "Paiement sécurisé", text: "Dès l'ouverture de la boutique.", Icon: Lock },
 ];
+
+const SHELF_ICONS = { numeriques: Sparkles, physiques: Package };
 
 const CATEGORY_ICONS = {
   "sortir-addiction": Sprout,
@@ -45,8 +40,13 @@ const CATEGORY_ICONS = {
 };
 
 const TUILES = [
-  { href: "/boutique/#type=numerique", label: "Numérique", note: "Rayon", Icon: Sparkles, color: "var(--success)" },
-  { href: "/boutique/#type=objets", label: "Objets", note: "Rayon", Icon: Package, color: "var(--success)" },
+  ...SHOP_SHELVES.map((shelf) => ({
+    href: `/boutique/#type=${shelf.id}`,
+    label: shelf.label,
+    note: "Rayon",
+    Icon: SHELF_ICONS[shelf.id],
+    color: "var(--success)",
+  })),
   ...ARTICLE_CATEGORIES.map((category) => ({
     href: `/articles/#${category.id}`,
     label: category.label,
@@ -90,31 +90,10 @@ const TUILES = [
   </section>
 
   <section class="band app" aria-labelledby="app-title">
-    <div class="wrap app-grid">
-      <div>
-        <h2 id="app-title">Suivez votre progression avec Addictive</h2>
-        <ul class="perks">
-          {
-            AVANTAGES.map(({ text, Icon, color }) => (
-              <li>
-                <Icon size={22} color={color} aria-hidden="true" />
-                {text}
-              </li>
-            ))
-          }
-        </ul>
-        <button class="button" type="button" disabled>Bientôt disponible</button>
-      </div>
-      <div class="visual phone">
-        <img
-          src="/visuels/telephone.svg"
-          width="300"
-          height="600"
-          loading="lazy"
-          alt="Maquette provisoire de l'appli Addictive sur un téléphone"
-        />
-        <span class="badge badge-violet">Maquette provisoire</span>
-      </div>
+    <div class="wrap">
+      <h2 id="app-title">Suivez votre progression avec Addictive</h2>
+      <PhoneShowcase />
+      <p class="app-action"><button class="button" type="button" disabled>Bientôt disponible</button></p>
     </div>
   </section>
 
@@ -239,30 +218,14 @@ const TUILES = [
     );
   }
 
-  .app-grid {
-    display: grid;
-    gap: 1.5rem;
-  }
 
-  .perks {
-    margin-block: 1rem 1.25rem;
-  }
 
-  .perks li {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding-block: 0.375rem;
-    font-weight: 500;
-  }
 
-  .phone {
-    width: min(60%, 15rem);
-    margin-inline: auto;
-  }
 
-  .phone img {
-    border-radius: 0;
+
+  .app h2,
+  .app-action {
+    text-align: center;
   }
 
   .pledges {
@@ -369,15 +332,7 @@ const TUILES = [
       margin-block: 1.25rem 0;
     }
 
-    .app-grid {
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 3rem;
-    }
 
-    .phone {
-      width: 13rem;
-    }
 
     .pledges-grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
