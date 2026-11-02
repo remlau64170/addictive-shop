@@ -1,82 +1,88 @@
 ---
-import { ExternalLink, Phone, TriangleAlert } from "@lucide/astro";
+import { ChevronDown, ExternalLink, Phone, TriangleAlert } from "@lucide/astro";
 import { EMERGENCY, HELPLINES, telHref } from "../data/helplines";
 import { LEGAL_PAGES } from "../data/site";
 ---
 
 <footer>
   <div class="inner">
-    <section aria-labelledby="help-title">
-      <h2 id="help-title">Besoin d'aide ?</h2>
-      <p class="intro">Ces services vous écoutent, vous informent et vous orientent.</p>
+    <h2>Besoin d'aide ?</h2>
+    <p class="intro">Ces services vous écoutent, vous informent et vous orientent.</p>
 
-      <div class="emergency">
-        <h3><TriangleAlert size={16} aria-hidden="true" />{EMERGENCY.title}</h3>
-        <ul>
-          {
-            EMERGENCY.lines.map((line) => (
-              <li>
-                <p>{line.text}</p>
-                <div class="calls">
-                  {line.calls.map((call) => (
-                    <a href={telHref(call.phoneHref)}>
-                      <Phone size={16} aria-hidden="true" />
-                      Appeler le {call.label}
-                    </a>
-                  ))}
-                </div>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-
-      <ul class="helplines">
+    <!-- Les urgences restent toujours visibles : elles ne sont jamais dans une colonne repliable. -->
+    <section class="emergency" aria-labelledby="emergency-title">
+      <h3 id="emergency-title"><TriangleAlert size={16} aria-hidden="true" />{EMERGENCY.title}</h3>
+      <ul>
         {
-          HELPLINES.map((helpline) => (
+          EMERGENCY.lines.map((line) => (
             <li>
-              <h3>{helpline.name}</h3>
-              <a
-                class="number"
-                href={telHref(helpline.phoneHref)}
-                aria-label={`Appeler ${helpline.name}, ${helpline.phone}`}
-              >
-                <Phone size={18} aria-hidden="true" />
-                {helpline.phone}
-              </a>
-              <p class="hours">
-                {helpline.hours}
-                {helpline.details ? ` · ${helpline.details}` : ""}
-              </p>
-              {helpline.site && (
-                <a
-                  class="site"
-                  href={helpline.site.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${helpline.site.label} (s'ouvre dans un nouvel onglet)`}
-                >
-                  {helpline.site.label}
-                  <ExternalLink size={14} aria-hidden="true" />
-                </a>
-              )}
+              <p>{line.text}</p>
+              <div class="calls">
+                {line.calls.map((call) => (
+                  <a href={telHref(call.phoneHref)}>
+                    <Phone size={16} aria-hidden="true" />
+                    Appeler le {call.label}
+                  </a>
+                ))}
+              </div>
             </li>
           ))
         }
       </ul>
     </section>
 
-    <nav aria-label="Informations légales">
-      <ul>
-        {
-          LEGAL_PAGES.map((page) => (
-            <li>
-              <a href={`/${page.slug}/`}>{page.label}</a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
+    <div class="columns">
+      <details open>
+        <summary>Numéros d'aide<ChevronDown size={18} aria-hidden="true" /></summary>
+        <ul class="helplines">
+          {
+            HELPLINES.map((helpline) => (
+              <li>
+                <h3>{helpline.name}</h3>
+                <a
+                  class="number"
+                  href={telHref(helpline.phoneHref)}
+                  aria-label={`Appeler ${helpline.name}, ${helpline.phone}`}
+                >
+                  <Phone size={18} aria-hidden="true" />
+                  {helpline.phone}
+                </a>
+                <p class="hours">
+                  {helpline.hours}
+                  {helpline.details ? ` · ${helpline.details}` : ""}
+                </p>
+                {helpline.site && (
+                  <a
+                    class="site"
+                    href={helpline.site.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${helpline.site.label} (s'ouvre dans un nouvel onglet)`}
+                  >
+                    {helpline.site.label}
+                    <ExternalLink size={14} aria-hidden="true" />
+                  </a>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </details>
+
+      <details>
+        <summary>Informations<ChevronDown size={18} aria-hidden="true" /></summary>
+        <ul class="links">
+          {
+            LEGAL_PAGES.map((page) => (
+              <li>
+                <a href={`/${page.slug}/`}>{page.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </details>
+    </div>
+
     <p class="note">© 2026 Addictive. Nos contenus ne remplacent pas l'avis d'un professionnel de santé.</p>
   </div>
 </footer>
@@ -88,7 +94,7 @@ import { LEGAL_PAGES } from "../data/site";
   }
 
   .inner {
-    max-width: 42rem;
+    max-width: 72rem;
     margin-inline: auto;
     padding: 2rem 1rem;
   }
@@ -145,8 +151,39 @@ import { LEGAL_PAGES } from "../data/site";
     text-decoration: none;
   }
 
-  .helplines li {
+  .columns {
+    margin-top: 1rem;
+  }
+
+  details {
+    border-bottom: 1px solid var(--border);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3rem;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details[open] summary :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  .helplines li + li {
     margin-top: 1.25rem;
+  }
+
+  .helplines,
+  .links {
+    padding-bottom: 1rem;
   }
 
   .helplines h3 {
@@ -174,19 +211,7 @@ import { LEGAL_PAGES } from "../data/site";
     overflow-wrap: anywhere;
   }
 
-  nav {
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-  }
-
-  nav ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 1.25rem;
-  }
-
-  nav a {
+  .links a {
     display: inline-flex;
     align-items: center;
     min-height: 2.75rem;
@@ -194,14 +219,51 @@ import { LEGAL_PAGES } from "../data/site";
   }
 
   .note {
-    margin-top: 0.75rem;
+    margin-top: 1rem;
   }
 
-  @media (min-width: 640px) {
-    .helplines {
+  @media (min-width: 768px) {
+    .emergency ul {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 0 1.5rem;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: 2rem;
+    }
+
+    details {
+      border: 0;
+    }
+
+    .helplines {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem 1.5rem;
+    }
+
+    .helplines li + li {
+      margin-top: 0;
+    }
+
+    /* Sur ordinateur, les colonnes sont toujours ouvertes. Navigateur trop ancien : elles restent simplement repliables. */
+    @supports selector(::details-content) {
+      details::details-content {
+        display: block;
+        content-visibility: visible;
+        height: auto;
+      }
+
+      summary {
+        pointer-events: none;
+      }
+
+      summary :global(svg) {
+        display: none;
+      }
     }
   }
 </style>

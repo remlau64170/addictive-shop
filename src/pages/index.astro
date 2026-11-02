@@ -1,72 +1,479 @@
 ---
-import { Newspaper, ShoppingBag, Smartphone } from "@lucide/astro";
+import { getCollection } from "astro:content";
+import {
+  ArrowRight,
+  Award,
+  Brain,
+  ChartLine,
+  Download,
+  Dumbbell,
+  Hammer,
+  Lock,
+  MessageCircle,
+  Package,
+  ShieldCheck,
+  Sparkles,
+  Sprout,
+  Zap,
+} from "@lucide/astro";
 import Base from "../layouts/Base.astro";
+import { ARTICLE_CATEGORIES } from "../data/site";
+import { getVisibleArticles } from "../lib/articles";
 
-const LINKS = [
-  {
-    href: "/articles/",
-    title: "Articles",
-    text: "Des conseils, des repères et des témoignages pour vous accompagner.",
-    Icon: Newspaper,
-    color: "var(--success)",
-  },
-  {
-    href: "/boutique/",
-    title: "Boutique",
-    text: "Des programmes numériques et des objets pour rester motivé·e.",
-    Icon: ShoppingBag,
-    color: "var(--primary)",
-  },
-  {
-    href: "/appli/",
-    title: "L'appli",
-    text: "Suivez votre progression au quotidien avec Addictive.",
-    Icon: Smartphone,
+const produits = (await getCollection("produits")).sort((a, b) => a.data.order - b.data.order);
+const derniers = (await getVisibleArticles()).slice(0, 3);
+
+const AVANTAGES = [
+  { text: "Le suivi de vos séries, jour après jour", Icon: ChartLine, color: "var(--success)" },
+  { text: "De l'aide quand une envie arrive", Icon: Zap, color: "var(--primary)" },
+  { text: "Des badges pour célébrer vos progrès", Icon: Award, color: "var(--chart-3)" },
+];
+
+const ENGAGEMENTS = [
+  { title: "Contenus vérifiés", text: "Nos ressources sont vérifiées avant publication.", Icon: ShieldCheck },
+  { title: "Téléchargement immédiat", text: "Pour les produits numériques.", Icon: Download },
+  { title: "Fabrication à la demande", text: "Pour les objets.", Icon: Hammer },
+  { title: "Paiement sécurisé", text: "Dès l'ouverture de la boutique.", Icon: Lock },
+];
+
+const CATEGORY_ICONS = {
+  "sortir-addiction": Sprout,
+  "mental-discipline": Brain,
+  "sport-corps": Dumbbell,
+  temoignages: MessageCircle,
+};
+
+const TUILES = [
+  { href: "/boutique/#numerique", label: "Numérique", note: "Rayon", Icon: Sparkles, color: "var(--success)" },
+  { href: "/boutique/#objets", label: "Objets", note: "Rayon", Icon: Package, color: "var(--success)" },
+  ...ARTICLE_CATEGORIES.map((category) => ({
+    href: `/articles/#${category.id}`,
+    label: category.label,
+    note: "Articles",
+    Icon: CATEGORY_ICONS[category.id],
     color: "var(--chart-3)",
-  },
+  })),
 ];
 ---
 
-<Base title="Accueil">
+<Base title="Accueil" wide>
   <section class="hero">
-    <img src="/icon-only-192.png" width="96" height="96" alt="" />
-    <h1>Sois addict à <span class="nowrap">ta sobriété</span></h1>
-    <p class="lead">Chaque pas compte. Avancez à votre rythme : nous sommes là pour vous encourager.</p>
+    <div class="wrap hero-grid">
+      <div>
+        <h1>Sois addict à <span class="nowrap">ta sobriété</span></h1>
+        <p class="subtitle">Des outils pour avancer, jour après jour.</p>
+        <p class="hero-actions">
+          <a class="button" href="/boutique/">Voir la boutique</a>
+          <a class="button button-secondary" href="/appli/">Découvrir l'appli</a>
+        </p>
+      </div>
+      <div class="visual">
+        <img
+          src="/visuels/produits.svg"
+          width="800"
+          height="300"
+          alt="Visuel provisoire des quatre produits : programme, kit, t-shirt et gourde"
+        />
+        <span class="badge badge-violet">Visuel provisoire</span>
+      </div>
+    </div>
   </section>
 
-  <ul class="stack section">
-    {
-      LINKS.map(({ href, title, text, Icon, color }) => (
-        <li>
-          <a class="card" href={href}>
-            <h2 class="card-title">
-              <Icon size={22} color={color} aria-hidden="true" />
-              {title}
-            </h2>
-            <p>{text}</p>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
+  <section class="band" aria-labelledby="phares-title">
+    <div class="wrap">
+      <h2 id="phares-title">Produits phares</h2>
+    </div>
+    <ul class="products" tabindex="0" aria-labelledby="phares-title">
+      {
+        produits.map((produit) => (
+          <li class="product">
+            <div class="visual">
+              <img
+                src={produit.data.image}
+                width="400"
+                height="400"
+                loading="lazy"
+                alt={`Visuel provisoire : ${produit.data.kind.toLowerCase()}`}
+              />
+              <span class="badge badge-violet">Visuel provisoire</span>
+            </div>
+            <h3>{produit.data.kind} « {produit.data.title} »</h3>
+            <p class="price">Prix à définir</p>
+            <a class="button" href={`/boutique/${produit.id}/`}>Voir le produit</a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="band app" aria-labelledby="app-title">
+    <div class="wrap app-grid">
+      <div>
+        <h2 id="app-title">Suivez votre progression avec Addictive</h2>
+        <ul class="perks">
+          {
+            AVANTAGES.map(({ text, Icon, color }) => (
+              <li>
+                <Icon size={22} color={color} aria-hidden="true" />
+                {text}
+              </li>
+            ))
+          }
+        </ul>
+        <button class="button" type="button" disabled>Bientôt disponible</button>
+      </div>
+      <div class="visual phone">
+        <img
+          src="/visuels/telephone.svg"
+          width="300"
+          height="600"
+          loading="lazy"
+          alt="Maquette provisoire de l'appli Addictive sur un téléphone"
+        />
+        <span class="badge badge-violet">Maquette provisoire</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="band pledges" aria-label="Nos engagements">
+    <ul class="wrap pledges-grid">
+      {
+        ENGAGEMENTS.map(({ title, text, Icon }) => (
+          <li>
+            <Icon size={24} color="var(--success)" aria-hidden="true" />
+            <div>
+              <strong>{title}</strong>
+              <p>{text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="band" aria-labelledby="tuiles-title">
+    <div class="wrap">
+      <h2 id="tuiles-title">Explorer</h2>
+      <ul class="tiles">
+        {
+          TUILES.map(({ href, label, note, Icon, color }) => (
+            <li>
+              <a class="card tile" href={href}>
+                <Icon size={24} color={color} aria-hidden="true" />
+                <span class="tile-note">{note}</span>
+                <span class="tile-label">{label}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="articles-title">
+    <div class="wrap">
+      <h2 id="articles-title">Derniers articles</h2>
+      {
+        derniers.length === 0 ? (
+          <p class="card">Les premiers articles arrivent bientôt.</p>
+        ) : (
+          <ul class="latest">
+            {derniers.map((article) => (
+              <li>
+                <a class="card" href={`/articles/${article.id}/`}>
+                  {article.data.draft && <span class="badge badge-violet">Brouillon</span>}
+                  <h3>{article.data.title}</h3>
+                  <p>{article.data.description}</p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      <a class="more" href="/articles/">Tous les articles<ArrowRight size={16} aria-hidden="true" /></a>
+    </div>
+  </section>
 </Base>
 
 <style>
+  .wrap {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  .band {
+    padding-block: 1.5rem;
+  }
+
+  .band h2 {
+    margin-bottom: 0.75rem;
+  }
+
+  /* Haut de page resserré : les produits phares restent visibles dès le premier écran sur téléphone. */
   .hero {
-    padding-block: 1rem;
+    padding-top: 1rem;
     text-align: center;
   }
 
-  .hero img {
-    margin: 0 auto 1.25rem;
-    border-radius: 1.5rem;
+  .hero h1 {
+    font-size: 1.75rem;
   }
 
-  h1 .nowrap {
+  .nowrap {
     white-space: nowrap;
     background: linear-gradient(90deg, var(--success), var(--primary), var(--chart-3));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+  }
+
+  .subtitle {
+    margin-top: 0.375rem;
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+
+  .hero-actions .button {
+    flex: 1;
+    min-width: 0;
+    padding-inline: 0.5rem;
+    font-size: 0.9375rem;
+    text-align: center;
+  }
+
+  .hero + .band {
+    padding-top: 1rem;
+  }
+
+  .visual {
+    position: relative;
+  }
+
+  .visual img {
+    width: 100%;
+    height: auto;
+    border-radius: calc(var(--radius) + 4px);
+  }
+
+  .visual .badge {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    font-size: 0.6875rem;
+  }
+
+  .products {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 62%;
+    gap: 0.75rem;
+    padding: 0.25rem 1rem 0.75rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 1rem;
+  }
+
+  .products:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: -2px;
+  }
+
+  .product {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem;
+    border-radius: calc(var(--radius) + 8px);
+    background: var(--card);
+    box-shadow: var(--shadow-card);
+    scroll-snap-align: start;
+  }
+
+  .product h3 {
+    margin-top: 0.75rem;
+    font-size: 0.9375rem;
+  }
+
+  .price {
+    margin-block: 0.25rem 0.75rem;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .product .button {
+    margin-top: auto;
+    font-size: 0.9375rem;
+  }
+
+  .app {
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--success-soft) 45%, transparent),
+      color-mix(in oklch, var(--accent) 55%, transparent)
+    );
+  }
+
+  .app-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .perks {
+    margin-block: 1rem 1.25rem;
+  }
+
+  .perks li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-block: 0.375rem;
+    font-weight: 500;
+  }
+
+  .phone {
+    width: min(60%, 15rem);
+    margin-inline: auto;
+  }
+
+  .phone img {
+    border-radius: 0;
+  }
+
+  .pledges {
+    border-block: 1px solid var(--border);
+  }
+
+  .pledges-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .pledges-grid li {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .pledges-grid p {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .tiles li {
+    display: grid;
+  }
+
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem;
+  }
+
+  .tile-note {
+    margin-top: 0.25rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+  }
+
+  .tile-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .latest {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .latest .badge {
+    margin-bottom: 0.5rem;
+  }
+
+  .latest li {
+    display: grid;
+  }
+
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+
+  @media (min-width: 768px) {
+    .band {
+      padding-block: 2.5rem;
+    }
+
+    .hero {
+      padding-block: 2.5rem 1rem;
+      text-align: left;
+    }
+
+    .hero h1 {
+      font-size: 2.75rem;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    .subtitle {
+      font-size: 1.0625rem;
+    }
+
+    .hero-actions {
+      margin-block: 1.25rem 0;
+    }
+
+    .products {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      max-width: 72rem;
+      margin-inline: auto;
+      overflow: visible;
+    }
+
+    .app-grid {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 3rem;
+    }
+
+    .phone {
+      width: 13rem;
+    }
+
+    .pledges-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .tiles {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .latest {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 </style>

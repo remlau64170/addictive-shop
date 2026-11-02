@@ -1,10 +1,10 @@
 ---
-import { House, Info, Newspaper, ShoppingBag, Smartphone } from "@lucide/astro";
+import { House, Info, Newspaper, Search, ShoppingBag, ShoppingCart, Smartphone } from "@lucide/astro";
 
 const TABS = [
   { href: "/", label: "Accueil", Icon: House },
-  { href: "/articles/", label: "Articles", Icon: Newspaper },
   { href: "/boutique/", label: "Boutique", Icon: ShoppingBag },
+  { href: "/articles/", label: "Articles", Icon: Newspaper },
   { href: "/appli/", label: "L'appli", Icon: Smartphone },
   { href: "/a-propos/", label: "À propos", Icon: Info },
 ];
@@ -14,29 +14,38 @@ const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWit
 ---
 
 <header>
-  <a class="brand" href="/">
-    <img src="/icon-only-192.png" width="32" height="32" alt="" />
-    Addictive
-  </a>
   <nav aria-label="Navigation principale">
     {
       TABS.map(({ href, label, Icon }) => (
-        <a href={href} aria-current={isActive(href) ? "page" : undefined}>
+        <a href={href} aria-current={isActive(href) ? "page" : undefined} class:list={{ home: href === "/" }}>
           <Icon size={20} aria-hidden="true" />
           {label}
         </a>
       ))
     }
   </nav>
+  <a class="brand" href="/">
+    <img src="/icon-only-192.png" width="32" height="32" alt="" />
+    Addictive
+  </a>
+  <div class="actions">
+    <a href="/recherche/" aria-label="Recherche"><Search size={22} aria-hidden="true" /></a>
+    <a href="/panier/" aria-label="Panier"><ShoppingCart size={22} aria-hidden="true" /></a>
+  </div>
 </header>
 
 <style>
   header {
-    padding: 0.75rem 1rem;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
     border-bottom: 1px solid var(--border);
   }
 
   .brand {
+    grid-column: 2;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -48,6 +57,25 @@ const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWit
 
   .brand img {
     border-radius: 0.5rem;
+  }
+
+  .actions {
+    grid-column: 3;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .actions a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    color: var(--foreground);
+  }
+
+  .actions a:hover {
+    color: var(--primary);
   }
 
   /* Comme la barre d'onglets de l'appli : fixe en bas sur téléphone. */
@@ -88,14 +116,12 @@ const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWit
 
   @media (min-width: 768px) {
     header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
       padding-inline: 1.5rem;
     }
 
     nav {
+      grid-column: 1;
+      grid-row: 1;
       position: static;
       display: flex;
       gap: 0.25rem;
@@ -104,12 +130,20 @@ const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWit
       background: none;
     }
 
+    /* Sur ordinateur, le logo central mène à l'accueil. */
+    nav a.home {
+      display: none;
+    }
+
     nav a {
       flex-direction: row;
-      gap: 0.5rem;
       min-height: 2.75rem;
-      padding-inline: 0.75rem;
+      padding-inline: 0.5rem;
       font-size: 0.875rem;
+    }
+
+    nav a :global(svg) {
+      display: none;
     }
   }
 </style>

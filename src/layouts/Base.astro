@@ -6,9 +6,11 @@ import "../styles/global.css";
 interface Props {
   title: string;
   description?: string;
+  /** Page en pleine largeur (accueil) : chaque section gère sa propre largeur. */
+  wide?: boolean;
 }
 
-const { title, description = "Articles, boutique et appli pour vous accompagner vers la sobriété." } = Astro.props;
+const { title, description = "Articles, boutique et appli pour vous accompagner vers la sobriété.", wide = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -30,8 +32,9 @@ const { title, description = "Articles, boutique et appli pour vous accompagner 
     />
   </head>
   <body>
+    <p class="announce">La boutique Addictive ouvre bientôt</p>
     <Header />
-    <main class="page">
+    <main class:list={wide ? "page-wide" : "page"}>
       <slot />
     </main>
     <Footer />
