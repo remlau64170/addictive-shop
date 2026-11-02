@@ -67,7 +67,7 @@ export type State = {
     place: string | null;
     before: string | null;
     remaining: number;
-    mode: "activity" | "quiz";
+    mode: "activity" | "quiz" | null;
     activity: number;
     question: number;
     picked: number | null;
@@ -82,7 +82,7 @@ export const initialCraving = (addiction: Addiction["id"] = "tabac"): State["cra
   place: null,
   before: null,
   remaining: 180,
-  mode: "activity",
+  mode: null,
   activity: 0,
   question: 0,
   picked: null,
@@ -430,6 +430,33 @@ function quizBlock(state: State) {
   </div>`;
 }
 
+/** Écran de choix de l'appli, avec la carte repliée « Ça peut aider maintenant » : rien n'est chargé, même à l'ouverture. */
+function helpNowCard(addiction: Addiction) {
+  const conseil = addiction.id === "tabac" ? CONSEILS[0] : undefined;
+  return `<details class="helpnow">
+    <summary>${icon("lifeBuoy", 16, "primary")} Ça peut aider maintenant</summary>
+    <div class="stack mt12">
+      <div><p class="text-sm b">Cohérence cardiaque : exercice de respiration anti-stress (5 min)</p>
+        <button class="video-box mt8" type="button" data-toast aria-label="Lancer la vidéo">${icon("play", 28)}</button></div>
+      ${conseil ? `<div><p class="text-sm b">${conseil.title}</p><p class="text-sm muted mt4">${conseil.text}</p>
+        ${toastButton("Lire le conseil", "btn outline auto sm mt12", "externalLink")}</div>` : ""}
+    </div>
+  </details>`;
+}
+
+function chooser(addiction: Addiction) {
+  return `<div class="mt24">
+    <p class="center b">Comment voulez-vous passer ces 3 minutes ?</p>
+    <div class="stack mt16">
+      <button class="btn primary choice" type="button" data-mode="activity">${icon("brain")} Faire une activité</button>
+      <button class="btn secondary choice" type="button" data-mode="quiz">${icon("target")} Me distraire avec un quiz</button>
+      <button class="btn secondary choice col" type="button" data-go="game"><span class="choice-title">${icon("gamepad")} Jouer à un mini-jeu</span>
+        <span class="small muted">Faites voler votre personnage le plus longtemps possible.</span></button>
+    </div>
+    ${helpNowCard(addiction)}
+  </div>`;
+}
+
 function session(state: State) {
   const addiction = addictionById(state.craving.addiction);
   const elapsed = Math.round(((180 - state.craving.remaining) / 180) * 100);
@@ -439,7 +466,7 @@ function session(state: State) {
       <p class="timer" data-timer>${formatCountdown(state.craving.remaining)}</p>
       <div class="timer-bar"><span data-timer-bar style="width:${elapsed}%"></span></div>
     </div>
-    ${state.craving.mode === "quiz" ? quizBlock(state) : activityBlock(state)}
+    ${state.craving.mode === "quiz" ? quizBlock(state) : state.craving.mode === "activity" ? activityBlock(state) : chooser(addiction)}
     <button class="ended" type="button" data-ended>L'envie est déjà passée</button>
     ${helpNumbers}
   </div>`;

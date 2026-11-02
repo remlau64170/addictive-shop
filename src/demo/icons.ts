@@ -1,6 +1,7 @@
 import arrowLeft from "lucide-static/icons/arrow-left.svg?raw";
 import bell from "lucide-static/icons/bell.svg?raw";
 import bookmark from "lucide-static/icons/bookmark.svg?raw";
+import brain from "lucide-static/icons/brain.svg?raw";
 import calendarDays from "lucide-static/icons/calendar-days.svg?raw";
 import check from "lucide-static/icons/check.svg?raw";
 import chevronLeft from "lucide-static/icons/chevron-left.svg?raw";
@@ -12,6 +13,7 @@ import flame from "lucide-static/icons/flame.svg?raw";
 import gamepad from "lucide-static/icons/gamepad-2.svg?raw";
 import handMetal from "lucide-static/icons/hand-metal.svg?raw";
 import heartPulse from "lucide-static/icons/heart-pulse.svg?raw";
+import lifeBuoy from "lucide-static/icons/life-buoy.svg?raw";
 import lightbulb from "lucide-static/icons/lightbulb.svg?raw";
 import lock from "lucide-static/icons/lock.svg?raw";
 import mapPin from "lucide-static/icons/map-pin.svg?raw";
@@ -19,12 +21,14 @@ import messageCircle from "lucide-static/icons/message-circle.svg?raw";
 import newspaper from "lucide-static/icons/newspaper.svg?raw";
 import pause from "lucide-static/icons/pause.svg?raw";
 import phone from "lucide-static/icons/phone.svg?raw";
+import play from "lucide-static/icons/play.svg?raw";
 import plus from "lucide-static/icons/plus.svg?raw";
 import refresh from "lucide-static/icons/refresh-cw.svg?raw";
 import search from "lucide-static/icons/search.svg?raw";
 import settings from "lucide-static/icons/settings.svg?raw";
 import share from "lucide-static/icons/share-2.svg?raw";
 import sparkles from "lucide-static/icons/sparkles.svg?raw";
+import target from "lucide-static/icons/target.svg?raw";
 import thumbsUp from "lucide-static/icons/thumbs-up.svg?raw";
 import trophy from "lucide-static/icons/trophy.svg?raw";
 import userPlus from "lucide-static/icons/user-plus.svg?raw";
@@ -36,6 +40,7 @@ const ICONS = {
   arrowLeft,
   bell,
   bookmark,
+  brain,
   calendarDays,
   check,
   chevronLeft,
@@ -47,6 +52,7 @@ const ICONS = {
   gamepad,
   handMetal,
   heartPulse,
+  lifeBuoy,
   lightbulb,
   lock,
   mapPin,
@@ -54,12 +60,14 @@ const ICONS = {
   newspaper,
   pause,
   phone,
+  play,
   plus,
   refresh,
   search,
   settings,
   share,
   sparkles,
+  target,
   thumbsUp,
   trophy,
   userPlus,
