@@ -13,7 +13,7 @@ npm run dev
   `npm run dev` et reste absent du site construit.
 - Produits : un fichier Markdown dans `src/content/produits/`. Dès qu'un `price:` (en euros) est renseigné, le tri et
   le filtre par prix de la boutique s'activent ; `needs:` donne les besoins du produit.
-- Écrans de l'appli : `public/appli/` (accueil-serie, calendrier, envie, badges, addictforms), liste dans
-  `src/components/PhoneShowcase.astro`. Remplacez un écran provisoire par la vraie capture sous le même nom.
+- Démo de l'appli (`src/demo/`) : écrans en HTML/CSS repris de l'appli, données 100 % fictives (`data.ts`), aucun appel
+  réseau. Le code n'est chargé que lorsque le téléphone arrive à l'écran.
 - Charte (`src/styles/global.css`, police de `public/fonts/`) et numéros d'aide (`src/data/helplines.ts`) : copies de
   l'appli. Toute correction part de l'appli, puis est recopiée ici.

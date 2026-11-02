@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.12",
+    "lucide-static": "1.66.0",
     "typescript": "6.0.3"
   }
 }
