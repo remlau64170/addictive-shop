@@ -1,0 +1,47 @@
+---
+import { getCollection } from "astro:content";
+import { Package, Sparkles } from "@lucide/astro";
+import Base from "../../layouts/Base.astro";
+import { SHOP_SHELVES } from "../../data/site";
+
+const produits = (await getCollection("produits")).sort((a, b) => a.data.order - b.data.order);
+const ICONS = { numerique: Sparkles, objets: Package };
+---
+
+<Base title="Boutique" description="Boutique Addictive : programmes numériques et objets, bientôt disponibles.">
+  <h1>Boutique</h1>
+  <p class="lead">La boutique se prépare. Voici un aperçu des premiers produits, encore provisoires.</p>
+
+  {
+    SHOP_SHELVES.map((shelf) => {
+      const Icon = ICONS[shelf.id];
+      return (
+        <section class="section" id={shelf.id}>
+          <h2 class="card-title">
+            <Icon size={20} color="var(--success)" aria-hidden="true" />
+            {shelf.label}
+          </h2>
+          <ul class="stack">
+            {produits
+              .filter((produit) => produit.data.shelf === shelf.id)
+              .map((produit) => (
+                <li>
+                  <a class="card" href={`/boutique/${produit.id}/`}>
+                    <span class="badge">{produit.data.kind}</span>
+                    <h3>{produit.data.title}</h3>
+                    <p>{produit.data.summary}</p>
+                  </a>
+                </li>
+              ))}
+          </ul>
+        </section>
+      );
+    })
+  }
+</Base>
+
+<style>
+  .card h3 {
+    margin-top: 0.5rem;
+  }
+</style>

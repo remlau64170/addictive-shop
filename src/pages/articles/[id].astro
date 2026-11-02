@@ -1,0 +1,37 @@
+---
+import { ArrowLeft } from "@lucide/astro";
+import { render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { ARTICLE_CATEGORIES } from "../../data/site";
+import { getVisibleArticles } from "../../lib/articles";
+
+export async function getStaticPaths() {
+  const articles = await getVisibleArticles();
+  return articles.map((article) => ({ params: { id: article.id }, props: { article } }));
+}
+
+const { article } = Astro.props;
+const { Content } = await render(article);
+const category = ARTICLE_CATEGORIES.find((item) => item.id === article.data.category);
+---
+
+<Base title={article.data.title} description={article.data.description}>
+  <a class="back" href="/articles/"><ArrowLeft size={16} aria-hidden="true" />Tous les articles</a>
+  <article>
+    <p class="meta">
+      <span class="badge">{category?.label}</span>
+      {article.data.draft && <span class="badge badge-violet">Brouillon</span>}
+    </p>
+    <h1>{article.data.title}</h1>
+    <div class="prose"><Content /></div>
+  </article>
+</Base>
+
+<style>
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.5rem 0.75rem;
+  }
+</style>

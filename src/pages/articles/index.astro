@@ -1,0 +1,49 @@
+---
+import Base from "../../layouts/Base.astro";
+import { ARTICLE_CATEGORIES } from "../../data/site";
+import { getVisibleArticles } from "../../lib/articles";
+
+const articles = await getVisibleArticles();
+---
+
+<Base title="Articles" description="Articles Addictive : sortir d'une addiction, mental, sport et témoignages.">
+  <h1>Articles</h1>
+  <p class="lead">Des lectures pour vous soutenir, à votre rythme.</p>
+
+  {
+    ARTICLE_CATEGORIES.map((category) => {
+      const inCategory = articles.filter((article) => article.data.category === category.id);
+      return (
+        <section class="section" id={category.id}>
+          <h2>{category.label}</h2>
+          <p class="lead intro">{category.intro}</p>
+          {inCategory.length === 0 ? (
+            <p class="card">Les premiers articles arrivent bientôt.</p>
+          ) : (
+            <ul class="stack">
+              {inCategory.map((article) => (
+                <li>
+                  <a class="card" href={`/articles/${article.id}/`}>
+                    {article.data.draft && <span class="badge badge-violet">Brouillon</span>}
+                    <h3>{article.data.title}</h3>
+                    <p>{article.data.description}</p>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      );
+    })
+  }
+</Base>
+
+<style>
+  .intro {
+    margin: 0 0 0.75rem;
+  }
+
+  .card .badge {
+    margin-bottom: 0.5rem;
+  }
+</style>

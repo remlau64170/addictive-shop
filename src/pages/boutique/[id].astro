@@ -1,0 +1,42 @@
+---
+import { getCollection, render } from "astro:content";
+import { ArrowLeft } from "@lucide/astro";
+import Base from "../../layouts/Base.astro";
+import { SHOP_SHELVES } from "../../data/site";
+
+export async function getStaticPaths() {
+  const produits = await getCollection("produits");
+  return produits.map((produit) => ({ params: { id: produit.id }, props: { produit } }));
+}
+
+const { produit } = Astro.props;
+const { Content } = await render(produit);
+const shelf = SHOP_SHELVES.find((item) => item.id === produit.data.shelf);
+---
+
+<Base title={`${produit.data.kind} « ${produit.data.title} »`} description={produit.data.summary}>
+  <a class="back" href="/boutique/"><ArrowLeft size={16} aria-hidden="true" />Toute la boutique</a>
+  <p class="meta">
+    <span class="badge">{shelf?.label}</span>
+    <span class="badge badge-violet">Fiche provisoire</span>
+  </p>
+  <h1>{produit.data.kind} « {produit.data.title} »</h1>
+  <p class="lead">{produit.data.summary}</p>
+  <div class="prose"><Content /></div>
+  <p class="price">Prix à définir</p>
+  <button class="button" type="button" disabled>Bientôt disponible</button>
+</Base>
+
+<style>
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.5rem 0.75rem;
+  }
+
+  .price {
+    margin-block: 1.5rem 0.75rem;
+    font-weight: 600;
+  }
+</style>
