@@ -1,0 +1,115 @@
+---
+import { House, Info, Newspaper, ShoppingBag, Smartphone } from "@lucide/astro";
+
+const TABS = [
+  { href: "/", label: "Accueil", Icon: House },
+  { href: "/articles/", label: "Articles", Icon: Newspaper },
+  { href: "/boutique/", label: "Boutique", Icon: ShoppingBag },
+  { href: "/appli/", label: "L'appli", Icon: Smartphone },
+  { href: "/a-propos/", label: "À propos", Icon: Info },
+];
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href.slice(0, -1)));
+---
+
+<header>
+  <a class="brand" href="/">
+    <img src="/icon-only-192.png" width="32" height="32" alt="" />
+    Addictive
+  </a>
+  <nav aria-label="Navigation principale">
+    {
+      TABS.map(({ href, label, Icon }) => (
+        <a href={href} aria-current={isActive(href) ? "page" : undefined}>
+          <Icon size={20} aria-hidden="true" />
+          {label}
+        </a>
+      ))
+    }
+  </nav>
+</header>
+
+<style>
+  header {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    color: var(--foreground);
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .brand img {
+    border-radius: 0.5rem;
+  }
+
+  /* Comme la barre d'onglets de l'appli : fixe en bas sur téléphone. */
+  nav {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid var(--border);
+    background: var(--card);
+  }
+
+  nav a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    min-height: 4rem;
+    padding: 0.25rem;
+    color: var(--muted-foreground);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--foreground);
+  }
+
+  nav a[aria-current="page"] {
+    color: var(--primary);
+  }
+
+  @media (min-width: 768px) {
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-inline: 1.5rem;
+    }
+
+    nav {
+      position: static;
+      display: flex;
+      gap: 0.25rem;
+      padding: 0;
+      border: 0;
+      background: none;
+    }
+
+    nav a {
+      flex-direction: row;
+      gap: 0.5rem;
+      min-height: 2.75rem;
+      padding-inline: 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+</style>

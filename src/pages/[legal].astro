@@ -1,0 +1,15 @@
+---
+import Base from "../layouts/Base.astro";
+import { LEGAL_PAGES } from "../data/site";
+
+export function getStaticPaths() {
+  return LEGAL_PAGES.map((page) => ({ params: { legal: page.slug }, props: { label: page.label } }));
+}
+
+const { label } = Astro.props;
+---
+
+<Base title={label}>
+  <h1>{label}</h1>
+  <p class="section"><span class="badge badge-violet">À rédiger</span></p>
+</Base>

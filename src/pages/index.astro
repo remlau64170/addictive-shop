@@ -1,0 +1,71 @@
+---
+import { Newspaper, ShoppingBag, Smartphone } from "@lucide/astro";
+import Base from "../layouts/Base.astro";
+
+const LINKS = [
+  {
+    href: "/articles/",
+    title: "Articles",
+    text: "Des conseils, des repères et des témoignages pour vous accompagner.",
+    Icon: Newspaper,
+    color: "var(--success)",
+  },
+  {
+    href: "/boutique/",
+    title: "Boutique",
+    text: "Des programmes numériques et des objets pour rester motivé·e.",
+    Icon: ShoppingBag,
+    color: "var(--primary)",
+  },
+  {
+    href: "/appli/",
+    title: "L'appli",
+    text: "Suivez votre progression au quotidien avec Addictive.",
+    Icon: Smartphone,
+    color: "var(--chart-3)",
+  },
+];
+---
+
+<Base title="Accueil">
+  <section class="hero">
+    <img src="/icon-only-192.png" width="96" height="96" alt="" />
+    <h1>Sois addict à <span>ta sobriété</span></h1>
+    <p class="lead">Chaque pas compte. Avancez à votre rythme : nous sommes là pour vous encourager.</p>
+  </section>
+
+  <ul class="stack section">
+    {
+      LINKS.map(({ href, title, text, Icon, color }) => (
+        <li>
+          <a class="card" href={href}>
+            <h2 class="card-title">
+              <Icon size={22} color={color} aria-hidden="true" />
+              {title}
+            </h2>
+            <p>{text}</p>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Base>
+
+<style>
+  .hero {
+    padding-block: 1rem;
+    text-align: center;
+  }
+
+  .hero img {
+    margin: 0 auto 1.25rem;
+    border-radius: 1.5rem;
+  }
+
+  h1 span {
+    background: linear-gradient(90deg, var(--success), var(--primary), var(--chart-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+</style>

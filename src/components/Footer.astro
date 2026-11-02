@@ -1,0 +1,207 @@
+---
+import { ExternalLink, Phone, TriangleAlert } from "@lucide/astro";
+import { EMERGENCY, HELPLINES, telHref } from "../data/helplines";
+import { LEGAL_PAGES } from "../data/site";
+---
+
+<footer>
+  <div class="inner">
+    <section aria-labelledby="help-title">
+      <h2 id="help-title">Besoin d'aide ?</h2>
+      <p class="intro">Ces services vous écoutent, vous informent et vous orientent.</p>
+
+      <div class="emergency">
+        <h3><TriangleAlert size={16} aria-hidden="true" />{EMERGENCY.title}</h3>
+        <ul>
+          {
+            EMERGENCY.lines.map((line) => (
+              <li>
+                <p>{line.text}</p>
+                <div class="calls">
+                  {line.calls.map((call) => (
+                    <a href={telHref(call.phoneHref)}>
+                      <Phone size={16} aria-hidden="true" />
+                      Appeler le {call.label}
+                    </a>
+                  ))}
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <ul class="helplines">
+        {
+          HELPLINES.map((helpline) => (
+            <li>
+              <h3>{helpline.name}</h3>
+              <a
+                class="number"
+                href={telHref(helpline.phoneHref)}
+                aria-label={`Appeler ${helpline.name}, ${helpline.phone}`}
+              >
+                <Phone size={18} aria-hidden="true" />
+                {helpline.phone}
+              </a>
+              <p class="hours">
+                {helpline.hours}
+                {helpline.details ? ` · ${helpline.details}` : ""}
+              </p>
+              {helpline.site && (
+                <a
+                  class="site"
+                  href={helpline.site.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${helpline.site.label} (s'ouvre dans un nouvel onglet)`}
+                >
+                  {helpline.site.label}
+                  <ExternalLink size={14} aria-hidden="true" />
+                </a>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <nav aria-label="Informations légales">
+      <ul>
+        {
+          LEGAL_PAGES.map((page) => (
+            <li>
+              <a href={`/${page.slug}/`}>{page.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <p class="note">© 2026 Addictive. Nos contenus ne remplacent pas l'avis d'un professionnel de santé.</p>
+  </div>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--border);
+    background: var(--card);
+  }
+
+  .inner {
+    max-width: 42rem;
+    margin-inline: auto;
+    padding: 2rem 1rem;
+  }
+
+  .intro,
+  .hours,
+  .note {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .intro {
+    margin-top: 0.25rem;
+  }
+
+  .emergency {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid color-mix(in oklch, var(--danger) 40%, transparent);
+    border-radius: calc(var(--radius) + 8px);
+    background: color-mix(in oklch, var(--danger-soft) 40%, transparent);
+  }
+
+  .emergency h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--danger);
+    font-size: 0.875rem;
+  }
+
+  .emergency li {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .calls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .calls a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.25rem 1rem;
+    border: 1px solid color-mix(in oklch, var(--danger) 50%, transparent);
+    border-radius: 1rem;
+    color: var(--foreground);
+    text-decoration: none;
+  }
+
+  .helplines li {
+    margin-top: 1.25rem;
+  }
+
+  .helplines h3 {
+    font-size: 0.9375rem;
+  }
+
+  .number {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    color: var(--foreground);
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+  }
+
+  .site {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    font-size: 0.875rem;
+    overflow-wrap: anywhere;
+  }
+
+  nav {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+  }
+
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: 0.875rem;
+  }
+
+  .note {
+    margin-top: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .helplines {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 1.5rem;
+    }
+  }
+</style>

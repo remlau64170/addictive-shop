@@ -1,0 +1,32 @@
+---
+import { ChartLine, Compass, Zap } from "@lucide/astro";
+import Base from "../layouts/Base.astro";
+
+const FEATURES = [
+  { title: "Votre progression", text: "Suivez vos addictions et vos séries, jour après jour.", Icon: ChartLine, color: "var(--success)" },
+  { title: "« J'ai une envie maintenant »", text: "Un appui immédiat quand une envie se présente.", Icon: Zap, color: "var(--primary)" },
+  { title: "AddictForms", text: "Des vidéos, des conseils et des numéros d'aide vérifiés.", Icon: Compass, color: "var(--chart-3)" },
+];
+---
+
+<Base title="L'appli" description="Addictive, l'application pour suivre votre progression vers la sobriété.">
+  <h1>L'appli Addictive</h1>
+  <p class="lead">Un soutien au quotidien pour reprendre la main, à votre rythme.</p>
+
+  <ul class="stack section">
+    {
+      FEATURES.map(({ title, text, Icon, color }) => (
+        <li class="card">
+          <h2 class="card-title">
+            <Icon size={22} color={color} aria-hidden="true" />
+            {title}
+          </h2>
+          <p>{text}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p class="section"><button class="button" type="button" disabled>Bientôt disponible</button></p>
+  <p class="lead">Application réservée aux personnes de 16 ans et plus.</p>
+</Base>
