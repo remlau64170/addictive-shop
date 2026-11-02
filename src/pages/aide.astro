@@ -1,0 +1,132 @@
+---
+import { ExternalLink, Phone, TriangleAlert } from "@lucide/astro";
+import Base from "../layouts/Base.astro";
+import { EMERGENCY, HELPLINES, telHref } from "../data/helplines";
+---
+
+<Base title="Besoin d'aide ?" description="Numéros d'urgence et services d'écoute : tabac, alcool, drogues, cannabis, jeux d'argent.">
+  <h1>Besoin d'aide ?</h1>
+  <p class="lead">Ces services vous écoutent, vous informent et vous orientent.</p>
+
+  <section class="emergency" aria-labelledby="emergency-title">
+    <h2 id="emergency-title"><TriangleAlert size={18} aria-hidden="true" />{EMERGENCY.title}</h2>
+    <ul>
+      {
+        EMERGENCY.lines.map((line) => (
+          <li>
+            <p>{line.text}</p>
+            <div class="calls">
+              {line.calls.map((call) => (
+                <a href={telHref(call.phoneHref)}>
+                  <Phone size={16} aria-hidden="true" />
+                  Appeler le {call.label}
+                </a>
+              ))}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <ul class="stack section">
+    {
+      HELPLINES.map((helpline) => (
+        <li class="card">
+          <h2>{helpline.name}</h2>
+          <a
+            class="number"
+            href={telHref(helpline.phoneHref)}
+            aria-label={`Appeler ${helpline.name}, ${helpline.phone}`}
+          >
+            <Phone size={20} aria-hidden="true" />
+            {helpline.phone}
+          </a>
+          <p>
+            {helpline.hours}
+            {helpline.details ? ` · ${helpline.details}` : ""}
+          </p>
+          {helpline.site && (
+            <a
+              class="site"
+              href={helpline.site.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${helpline.site.label} (s'ouvre dans un nouvel onglet)`}
+            >
+              {helpline.site.label}
+              <ExternalLink size={14} aria-hidden="true" />
+            </a>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</Base>
+
+<style>
+  .emergency {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid color-mix(in oklch, var(--danger) 40%, transparent);
+    border-radius: var(--radius);
+    background: color-mix(in oklch, var(--danger-soft) 40%, transparent);
+  }
+
+  .emergency h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--danger);
+    font-size: 1.0625rem;
+  }
+
+  .emergency li {
+    margin-top: 0.75rem;
+    font-weight: 500;
+  }
+
+  .calls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .calls a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.25rem 1rem;
+    border: 1px solid color-mix(in oklch, var(--danger) 50%, transparent);
+    border-radius: 0.75rem;
+    color: var(--foreground);
+    text-decoration: none;
+  }
+
+  .card h2 {
+    font-size: 1.0625rem;
+  }
+
+  .number {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    color: var(--foreground);
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+  }
+
+  .site {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    color: var(--primary-soft-foreground);
+    font-size: 0.875rem;
+  }
+</style>

@@ -22,4 +22,4 @@ Si vous le pouvez, changez de pièce, marchez quelques minutes ou appelez une pe
 
 ## Vous n'êtes pas seul·e
 
-Si une rechute arrive, elle fait partie du chemin : chaque jour reste une occasion de reprendre votre progression. Les numéros d'aide se trouvent en bas de chaque page.
+Si une rechute arrive, elle fait partie du chemin : chaque jour reste une occasion de reprendre votre progression. Tous les numéros sont sur la page [Besoin d'aide ?](/aide/).

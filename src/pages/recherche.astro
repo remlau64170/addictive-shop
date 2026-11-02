@@ -5,6 +5,12 @@ import { getVisibleArticles } from "../lib/articles";
 import { getProduits, productName } from "../lib/produits";
 
 const results = [
+  {
+    href: "/aide/",
+    type: "Aide",
+    title: "Besoin d'aide ?",
+    text: "Numéros d'urgence et services d'écoute : tabac, alcool, drogues, cannabis, jeux d'argent.",
+  },
   ...(await getProduits()).map((produit) => ({
     href: `/boutique/${produit.id}/`,
     type: "Boutique",
