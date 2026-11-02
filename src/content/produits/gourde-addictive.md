@@ -6,4 +6,4 @@ summary: "Une gourde pour vous accompagner au quotidien."
 order: 4
 ---
 
-Description provisoire : la matière et la contenance restent à définir.
+Description provisoire : la matière et la contenance restent à définir.

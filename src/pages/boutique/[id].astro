@@ -14,13 +14,13 @@ const { Content } = await render(produit);
 const shelf = SHOP_SHELVES.find((item) => item.id === produit.data.shelf);
 ---
 
-<Base title={`${produit.data.kind} « ${produit.data.title} »`} description={produit.data.summary}>
+<Base title={`${produit.data.kind} « ${produit.data.title} »`} description={produit.data.summary}>
   <a class="back" href="/boutique/"><ArrowLeft size={16} aria-hidden="true" />Toute la boutique</a>
   <p class="meta">
     <span class="badge">{shelf?.label}</span>
     <span class="badge badge-violet">Fiche provisoire</span>
   </p>
-  <h1>{produit.data.kind} « {produit.data.title} »</h1>
+  <h1>{produit.data.kind} « {produit.data.title} »</h1>
   <p class="lead">{produit.data.summary}</p>
   <div class="prose"><Content /></div>
   <p class="price">Prix à définir</p>

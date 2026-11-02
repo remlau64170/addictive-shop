@@ -1,5 +1,5 @@
 ---
-title: "Exemple : traverser une envie, un pas après l'autre"
+title: "Exemple : traverser une envie, un pas après l'autre"
 description: "Article d'exemple qui montre la mise en page, à remplacer par un vrai texte."
 category: sortir-addiction
 date: 2026-11-02
@@ -22,4 +22,4 @@ Si vous le pouvez, changez de pièce, marchez quelques minutes ou appelez une pe
 
 ## Vous n'êtes pas seul·e
 
-Si une rechute arrive, elle fait partie du chemin : chaque jour reste une occasion de reprendre votre progression. Les numéros d'aide se trouvent en bas de chaque page.
+Si une rechute arrive, elle fait partie du chemin : chaque jour reste une occasion de reprendre votre progression. Les numéros d'aide se trouvent en bas de chaque page.

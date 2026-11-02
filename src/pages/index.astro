@@ -30,8 +30,8 @@ const LINKS = [
 <Base title="Accueil">
   <section class="hero">
     <img src="/icon-only-192.png" width="96" height="96" alt="" />
-    <h1>Sois addict à <span>ta sobriété</span></h1>
-    <p class="lead">Chaque pas compte. Avancez à votre rythme : nous sommes là pour vous encourager.</p>
+    <h1>Sois addict à <span class="nowrap">ta sobriété</span></h1>
+    <p class="lead">Chaque pas compte. Avancez à votre rythme : nous sommes là pour vous encourager.</p>
   </section>
 
   <ul class="stack section">
@@ -62,7 +62,8 @@ const LINKS = [
     border-radius: 1.5rem;
   }
 
-  h1 span {
+  h1 .nowrap {
+    white-space: nowrap;
     background: linear-gradient(90deg, var(--success), var(--primary), var(--chart-3));
     -webkit-background-clip: text;
     background-clip: text;
