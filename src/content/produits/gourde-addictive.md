@@ -4,6 +4,7 @@ kind: Gourde
 shelf: objets
 summary: "Une gourde pour vous accompagner au quotidien."
 image: /visuels/gourde.svg
+needs: [sport-corps]
 order: 4
 ---
 

@@ -1,0 +1,59 @@
+---
+import { ChevronRight } from "@lucide/astro";
+
+interface Props {
+  /** Dernier élément sans `href` : c'est la page en cours. */
+  items: { label: string; href?: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="Fil d'Ariane">
+  <ol>
+    {
+      items.map((item, index) => (
+        <li>
+          {index > 0 && <ChevronRight size={14} aria-hidden="true" />}
+          {item.href ? <a href={item.href}>{item.label}</a> : <span aria-current="page">{item.label}</span>}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 0;
+    margin-right: 0.25rem;
+    color: var(--muted-foreground);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--muted-foreground);
+  }
+
+  a:hover {
+    color: var(--foreground);
+  }
+
+  [aria-current] {
+    color: var(--foreground);
+    font-weight: 600;
+  }
+</style>

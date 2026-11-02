@@ -1,51 +1,104 @@
 ---
-import { House, Info, Newspaper, Search, ShoppingBag, ShoppingCart, Smartphone } from "@lucide/astro";
+import { Menu, Search, ShoppingCart, X } from "@lucide/astro";
+import { SHOP_NEEDS, SHOP_SHELVES } from "../data/site";
 
-const TABS = [
-  { href: "/", label: "Accueil", Icon: House },
-  { href: "/boutique/", label: "Boutique", Icon: ShoppingBag },
-  { href: "/articles/", label: "Articles", Icon: Newspaper },
-  { href: "/appli/", label: "L'appli", Icon: Smartphone },
-  { href: "/a-propos/", label: "À propos", Icon: Info },
+const MENU = [
+  { href: "/boutique/", label: "Boutique" },
+  { href: "/articles/", label: "Articles" },
+  { href: "/appli/", label: "L'appli" },
+  { href: "/a-propos/", label: "À propos" },
 ];
 
 const path = Astro.url.pathname;
-const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href.slice(0, -1)));
+const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" : undefined);
 ---
 
 <header>
-  <nav aria-label="Navigation principale">
-    {
-      TABS.map(({ href, label, Icon }) => (
-        <a href={href} aria-current={isActive(href) ? "page" : undefined} class:list={{ home: href === "/" }}>
-          <Icon size={20} aria-hidden="true" />
-          {label}
-        </a>
-      ))
-    }
-  </nav>
-  <a class="brand" href="/">
-    <img src="/icon-only-192.png" width="32" height="32" alt="" />
-    Addictive
-  </a>
-  <div class="actions">
-    <a href="/recherche/" aria-label="Recherche"><Search size={22} aria-hidden="true" /></a>
-    <a href="/panier/" aria-label="Panier"><ShoppingCart size={22} aria-hidden="true" /></a>
+  <div class="wrap bar">
+    <details class="burger">
+      <summary aria-label="Menu"><Menu size={24} aria-hidden="true" /></summary>
+      <nav class="panel" aria-label="Menu">
+        <p class="panel-top">
+          Menu
+          <button class="close needs-js" type="button" data-close-menu aria-label="Fermer le menu">
+            <X size={24} aria-hidden="true" />
+          </button>
+        </p>
+        <ul>
+          <li><a href="/" aria-current={path === "/" ? "page" : undefined}>Accueil</a></li>
+          {MENU.map(({ href, label }) => <li><a href={href} aria-current={current(href)}>{label}</a></li>)}
+        </ul>
+        <p class="panel-title">Rayons de la boutique</p>
+        <ul>
+          {SHOP_SHELVES.map((shelf) => <li><a href={`/boutique/#type=${shelf.id}`}>{shelf.label}</a></li>)}
+        </ul>
+      </nav>
+    </details>
+
+    <a class="brand" href="/">
+      <img src="/icon-only-192.png" width="32" height="32" alt="" />
+      Addictive
+    </a>
+
+    <nav class="main" aria-label="Navigation principale">
+      <ul>
+        {
+          MENU.map(({ href, label }) => (
+            <li class:list={{ "has-menu": href === "/boutique/" }}>
+              <a href={href} aria-current={current(href)}>{label}</a>
+              {href === "/boutique/" && (
+                <div class="dropdown">
+                  <div>
+                    <p>Rayons</p>
+                    <ul>
+                      {SHOP_SHELVES.map((shelf) => (
+                        <li><a href={`/boutique/#type=${shelf.id}`}>{shelf.label}</a></li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p>Besoins</p>
+                    <ul>
+                      {SHOP_NEEDS.map((need) => (
+                        <li><a href={`/boutique/#besoin=${need.id}`}>{need.label}</a></li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="searchbar needs-js" role="search">
+      <input id="site-search" type="search" placeholder="Rechercher" aria-label="Rechercher sur le site" autocomplete="off" />
+      <a id="site-search-go" href="/recherche/" aria-label="Lancer la recherche"><Search size={18} aria-hidden="true" /></a>
+    </div>
+
+    <div class="actions">
+      <a class="icon search-link" href="/recherche/" aria-label="Recherche"><Search size={22} aria-hidden="true" /></a>
+      <a class="icon" href="/panier/" aria-label="Panier"><ShoppingCart size={22} aria-hidden="true" /></a>
+    </div>
   </div>
 </header>
 
 <style>
   header {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.25rem 0.5rem;
     border-bottom: 1px solid var(--border);
   }
 
+  .bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.25rem;
+    padding-block: 0.25rem;
+    padding-inline: 0.5rem;
+  }
+
   .brand {
-    grid-column: 2;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -60,90 +113,247 @@ const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWit
   }
 
   .actions {
-    grid-column: 3;
     display: flex;
     justify-content: flex-end;
+    min-width: 0;
   }
 
-  .actions a {
+  .icon,
+  summary,
+  .close {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 2.75rem;
     height: 2.75rem;
+    flex-shrink: 0;
     color: var(--foreground);
   }
 
-  .actions a:hover {
+  .icon:hover {
     color: var(--primary);
   }
 
-  /* Comme la barre d'onglets de l'appli : fixe en bas sur téléphone. */
-  nav {
-    position: fixed;
-    inset: auto 0 0;
-    z-index: 40;
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    padding-bottom: env(safe-area-inset-bottom);
-    border-top: 1px solid var(--border);
-    background: var(--card);
+  summary {
+    cursor: pointer;
+    list-style: none;
   }
 
-  nav a {
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Le voile derrière le panneau ferme le menu au toucher, même sans JavaScript. */
+  .burger[open] summary::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: oklch(0 0 0 / 0.6);
+  }
+
+  .panel {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 51;
+    width: min(85%, 20rem);
+    padding: 0.5rem 1rem 1.5rem;
+    overflow-y: auto;
+    background: var(--card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .panel-top {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 0.25rem;
-    min-height: 4rem;
-    padding: 0.25rem;
+    justify-content: space-between;
+    min-height: 2.75rem;
+    font-weight: 800;
+  }
+
+  .close {
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .panel-title {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
     color: var(--muted-foreground);
-    font-size: 0.6875rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    line-height: 1.2;
-    text-align: center;
+  }
+
+  .panel a {
+    display: flex;
+    align-items: center;
+    min-height: 3rem;
+    color: var(--foreground);
+    font-weight: 600;
     text-decoration: none;
   }
 
-  nav a:hover {
-    color: var(--foreground);
-  }
-
-  nav a[aria-current="page"] {
+  .panel a[aria-current="page"] {
     color: var(--primary);
   }
 
-  @media (min-width: 768px) {
-    header {
+  .main,
+  .searchbar {
+    display: none;
+  }
+
+  @media (min-width: 900px) {
+    .bar {
+      display: flex;
+      gap: 1.5rem;
+      padding-block: 0.5rem;
       padding-inline: 1.5rem;
     }
 
-    nav {
-      grid-column: 1;
-      grid-row: 1;
-      position: static;
+    .burger,
+    .search-link {
+      display: none;
+    }
+
+    .main {
+      display: block;
+    }
+
+    .main > ul {
       display: flex;
       gap: 0.25rem;
-      padding: 0;
-      border: 0;
-      background: none;
     }
 
-    /* Sur ordinateur, le logo central mène à l'accueil. */
-    nav a.home {
-      display: none;
+    .main > ul > li {
+      position: relative;
     }
 
-    nav a {
-      flex-direction: row;
+    .main > ul > li > a {
+      display: flex;
+      align-items: center;
       min-height: 2.75rem;
-      padding-inline: 0.5rem;
-      font-size: 0.875rem;
+      padding-inline: 0.625rem;
+      color: var(--foreground);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      text-decoration: none;
     }
 
-    nav a :global(svg) {
+    .main > ul > li > a:hover,
+    .main > ul > li > a[aria-current="page"] {
+      color: var(--primary);
+    }
+
+    .dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 50;
       display: none;
+      grid-template-columns: 9rem 14rem;
+      gap: 1.5rem;
+      padding: 1rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow-card);
+    }
+
+    .has-menu:hover .dropdown,
+    .has-menu:focus-within .dropdown {
+      display: grid;
+    }
+
+    .dropdown p {
+      margin-bottom: 0.25rem;
+      color: var(--muted-foreground);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .dropdown a {
+      display: flex;
+      align-items: center;
+      min-height: 2.25rem;
+      color: var(--foreground);
+      font-size: 0.9375rem;
+      text-decoration: none;
+    }
+
+    .dropdown a:hover {
+      color: var(--primary);
+    }
+
+    .searchbar {
+      display: flex;
+      flex: 1;
+      min-width: 0;
+      max-width: 22rem;
+      margin-left: auto;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--card);
+    }
+
+    .searchbar:focus-within {
+      border-color: var(--ring);
+    }
+
+    .searchbar input {
+      flex: 1;
+      min-width: 0;
+      padding: 0.5rem 0 0.5rem 1rem;
+      border: 0;
+      outline: 0;
+      background: none;
+      color: var(--foreground);
+      font: inherit;
+      font-size: 0.9375rem;
+    }
+
+    .searchbar input::placeholder {
+      color: var(--muted-foreground);
+    }
+
+    .searchbar a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.75rem;
+      min-height: 2.5rem;
+      color: var(--foreground);
     }
   }
 </style>
+
+<script>
+  const burger = document.querySelector<HTMLDetailsElement>(".burger");
+  const closeBurger = () => burger?.removeAttribute("open");
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeBurger();
+  });
+  document.querySelector("[data-close-menu]")?.addEventListener("click", closeBurger);
+  document.querySelectorAll(".panel a").forEach((link) => link.addEventListener("click", closeBurger));
+
+  // Sur la page Boutique, le lien ne change que le filtre : on referme le menu déroulant.
+  document.querySelectorAll<HTMLElement>(".dropdown a").forEach((link) => {
+    link.addEventListener("click", () => link.blur());
+  });
+
+  // La recherche reste après le # : elle n'est jamais envoyée au serveur ni écrite dans ses journaux.
+  const input = document.querySelector<HTMLInputElement>("#site-search");
+  const go = () => {
+    const query = input?.value.trim();
+    location.assign(query ? `/recherche/#q=${encodeURIComponent(query)}` : "/recherche/");
+  };
+  input?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") go();
+  });
+  document.querySelector("#site-search-go")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    go();
+  });
+</script>

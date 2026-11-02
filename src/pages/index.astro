@@ -1,5 +1,4 @@
 ---
-import { getCollection } from "astro:content";
 import {
   ArrowRight,
   Award,
@@ -17,10 +16,12 @@ import {
   Zap,
 } from "@lucide/astro";
 import Base from "../layouts/Base.astro";
+import ProductCard from "../components/ProductCard.astro";
 import { ARTICLE_CATEGORIES } from "../data/site";
 import { getVisibleArticles } from "../lib/articles";
+import { getProduits } from "../lib/produits";
 
-const produits = (await getCollection("produits")).sort((a, b) => a.data.order - b.data.order);
+const produits = await getProduits();
 const derniers = (await getVisibleArticles()).slice(0, 3);
 
 const AVANTAGES = [
@@ -44,8 +45,8 @@ const CATEGORY_ICONS = {
 };
 
 const TUILES = [
-  { href: "/boutique/#numerique", label: "Numérique", note: "Rayon", Icon: Sparkles, color: "var(--success)" },
-  { href: "/boutique/#objets", label: "Objets", note: "Rayon", Icon: Package, color: "var(--success)" },
+  { href: "/boutique/#type=numerique", label: "Numérique", note: "Rayon", Icon: Sparkles, color: "var(--success)" },
+  { href: "/boutique/#type=objets", label: "Objets", note: "Rayon", Icon: Package, color: "var(--success)" },
   ...ARTICLE_CATEGORIES.map((category) => ({
     href: `/articles/#${category.id}`,
     label: category.label,
@@ -60,7 +61,7 @@ const TUILES = [
   <section class="hero">
     <div class="wrap hero-grid">
       <div>
-        <h1>Sois addict à <span class="nowrap">ta sobriété</span></h1>
+        <h1>Sois addict à <span class="accent">ta sobriété</span></h1>
         <p class="subtitle">Des outils pour avancer, jour après jour.</p>
         <p class="hero-actions">
           <a class="button" href="/boutique/">Voir la boutique</a>
@@ -82,28 +83,10 @@ const TUILES = [
   <section class="band" aria-labelledby="phares-title">
     <div class="wrap">
       <h2 id="phares-title">Produits phares</h2>
+      <ul class="product-grid">
+        {produits.map((produit) => <li><ProductCard produit={produit} /></li>)}
+      </ul>
     </div>
-    <ul class="products" tabindex="0" aria-labelledby="phares-title">
-      {
-        produits.map((produit) => (
-          <li class="product">
-            <div class="visual">
-              <img
-                src={produit.data.image}
-                width="400"
-                height="400"
-                loading="lazy"
-                alt={`Visuel provisoire : ${produit.data.kind.toLowerCase()}`}
-              />
-              <span class="badge badge-violet">Visuel provisoire</span>
-            </div>
-            <h3>{produit.data.kind} « {produit.data.title} »</h3>
-            <p class="price">Prix à définir</p>
-            <a class="button" href={`/boutique/${produit.id}/`}>Voir le produit</a>
-          </li>
-        ))
-      }
-    </ul>
   </section>
 
   <section class="band app" aria-labelledby="app-title">
@@ -196,12 +179,6 @@ const TUILES = [
 </Base>
 
 <style>
-  .wrap {
-    max-width: 72rem;
-    margin-inline: auto;
-    padding-inline: 1rem;
-  }
-
   .band {
     padding-block: 1.5rem;
   }
@@ -218,10 +195,10 @@ const TUILES = [
 
   .hero h1 {
     font-size: 1.75rem;
+    text-wrap: balance;
   }
 
-  .nowrap {
-    white-space: nowrap;
+  .accent {
     background: linear-gradient(90deg, var(--success), var(--primary), var(--chart-3));
     -webkit-background-clip: text;
     background-clip: text;
@@ -234,14 +211,16 @@ const TUILES = [
     font-size: 0.9375rem;
   }
 
+  /* Les boutons passent l'un sous l'autre plutôt que de sortir de l'écran quand le texte est agrandi. */
   .hero-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
     margin-block: 0.75rem;
   }
 
   .hero-actions .button {
-    flex: 1;
+    flex: 1 1 8.5rem;
     min-width: 0;
     padding-inline: 0.5rem;
     font-size: 0.9375rem;
@@ -250,66 +229,6 @@ const TUILES = [
 
   .hero + .band {
     padding-top: 1rem;
-  }
-
-  .visual {
-    position: relative;
-  }
-
-  .visual img {
-    width: 100%;
-    height: auto;
-    border-radius: calc(var(--radius) + 4px);
-  }
-
-  .visual .badge {
-    position: absolute;
-    top: 0.5rem;
-    left: 0.5rem;
-    font-size: 0.6875rem;
-  }
-
-  .products {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 62%;
-    gap: 0.75rem;
-    padding: 0.25rem 1rem 0.75rem;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x proximity;
-    scroll-padding-inline: 1rem;
-  }
-
-  .products:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: -2px;
-  }
-
-  .product {
-    display: flex;
-    flex-direction: column;
-    padding: 0.75rem;
-    border-radius: calc(var(--radius) + 8px);
-    background: var(--card);
-    box-shadow: var(--shadow-card);
-    scroll-snap-align: start;
-  }
-
-  .product h3 {
-    margin-top: 0.75rem;
-    font-size: 0.9375rem;
-  }
-
-  .price {
-    margin-block: 0.25rem 0.75rem;
-    color: var(--muted-foreground);
-    font-size: 0.875rem;
-  }
-
-  .product .button {
-    margin-top: auto;
-    font-size: 0.9375rem;
   }
 
   .app {
@@ -358,6 +277,7 @@ const TUILES = [
   .pledges-grid li {
     display: flex;
     gap: 0.75rem;
+    min-width: 0;
   }
 
   .pledges-grid p {
@@ -373,6 +293,7 @@ const TUILES = [
 
   .tiles li {
     display: grid;
+    min-width: 0;
   }
 
   .tile {
@@ -380,6 +301,7 @@ const TUILES = [
     flex-direction: column;
     gap: 0.25rem;
     padding: 1rem;
+    border-radius: var(--radius);
   }
 
   .tile-note {
@@ -405,6 +327,7 @@ const TUILES = [
 
   .latest li {
     display: grid;
+    min-width: 0;
   }
 
   .more {
@@ -446,16 +369,8 @@ const TUILES = [
       margin-block: 1.25rem 0;
     }
 
-    .products {
-      grid-auto-flow: row;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      max-width: 72rem;
-      margin-inline: auto;
-      overflow: visible;
-    }
-
     .app-grid {
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       gap: 3rem;
     }
@@ -469,11 +384,17 @@ const TUILES = [
     }
 
     .tiles {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .latest {
       grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .tiles {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
     }
   }
 </style>

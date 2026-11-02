@@ -23,6 +23,9 @@ const produits = defineCollection({
     summary: z.string(),
     /** Visuel provisoire, dans public/visuels/. */
     image: z.string(),
+    needs: z.array(z.enum(["sortir-addiction", "mental-discipline", "sport-corps"])),
+    /** En euros ; vide tant que le prix n'est pas décidé. */
+    price: z.number().positive().nullable().default(null),
     order: z.number().int(),
   }),
 });

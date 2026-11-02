@@ -1,0 +1,65 @@
+---
+import { formatPrice, productName, type Produit } from "../lib/produits";
+
+interface Props {
+  produit: Produit;
+  heading?: "h2" | "h3";
+}
+
+const { produit, heading: Heading = "h3" } = Astro.props;
+const href = `/boutique/${produit.id}/`;
+---
+
+<article>
+  <a class="visual" href={href} tabindex="-1" aria-hidden="true">
+    <img src={produit.data.image} width="400" height="400" loading="lazy" alt="" />
+    <span class="badge badge-violet">Visuel provisoire</span>
+  </a>
+  <Heading class="name"><a href={href}>{productName(produit)}</a></Heading>
+  <p class="price">{formatPrice(produit.data.price)}</p>
+  <a class="button" href={href} tabindex="-1" aria-hidden="true">Voir le produit</a>
+</article>
+
+<style>
+  article {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 0.625rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+
+  .visual {
+    display: block;
+  }
+
+  .name {
+    margin-top: 0.625rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .name a {
+    color: var(--foreground);
+    text-decoration: none;
+  }
+
+  .name a:hover {
+    text-decoration: underline;
+  }
+
+  .price {
+    margin-block: 0.25rem 0.625rem;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .button {
+    margin-top: auto;
+    padding-inline: 0.5rem;
+    font-size: 0.875rem;
+  }
+</style>

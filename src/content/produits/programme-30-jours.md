@@ -4,6 +4,7 @@ kind: Programme
 shelf: numerique
 summary: "Un programme numérique pour avancer jour après jour."
 image: /visuels/programme.svg
+needs: [sortir-addiction, mental-discipline]
 order: 1
 ---
 

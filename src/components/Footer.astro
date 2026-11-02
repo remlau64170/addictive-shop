@@ -1,37 +1,49 @@
 ---
 import { ChevronDown, ExternalLink, Phone, TriangleAlert } from "@lucide/astro";
 import { EMERGENCY, HELPLINES, telHref } from "../data/helplines";
-import { LEGAL_PAGES } from "../data/site";
+import { LEGAL_PAGES, SHOP_NEEDS, SHOP_SHELVES } from "../data/site";
+
+const BOUTIQUE = [
+  { href: "/boutique/", label: "Toute la boutique" },
+  ...SHOP_SHELVES.map((shelf) => ({ href: `/boutique/#type=${shelf.id}`, label: shelf.label })),
+  ...SHOP_NEEDS.map((need) => ({ href: `/boutique/#besoin=${need.id}`, label: need.label })),
+];
+const ADDICTIVE = [
+  { href: "/articles/", label: "Articles" },
+  { href: "/appli/", label: "L'appli" },
+  { href: "/a-propos/", label: "À propos" },
+];
+const LEGAL = LEGAL_PAGES.map((page) => ({ href: `/${page.slug}/`, label: page.label }));
 ---
 
 <footer>
-  <div class="inner">
-    <h2>Besoin d'aide ?</h2>
-    <p class="intro">Ces services vous écoutent, vous informent et vous orientent.</p>
+  <div class="wrap columns">
+    <section class="help" aria-labelledby="help-title">
+      <h2 id="help-title">Aide et numéros d'urgence</h2>
+      <p class="intro">Ces services vous écoutent, vous informent et vous orientent.</p>
 
-    <!-- Les urgences restent toujours visibles : elles ne sont jamais dans une colonne repliable. -->
-    <section class="emergency" aria-labelledby="emergency-title">
-      <h3 id="emergency-title"><TriangleAlert size={16} aria-hidden="true" />{EMERGENCY.title}</h3>
-      <ul>
-        {
-          EMERGENCY.lines.map((line) => (
-            <li>
-              <p>{line.text}</p>
-              <div class="calls">
-                {line.calls.map((call) => (
-                  <a href={telHref(call.phoneHref)}>
-                    <Phone size={16} aria-hidden="true" />
-                    Appeler le {call.label}
-                  </a>
-                ))}
-              </div>
-            </li>
-          ))
-        }
-      </ul>
-    </section>
+      <!-- Les urgences restent toujours visibles : elles ne sont jamais dans un bloc repliable. -->
+      <div class="emergency">
+        <h3><TriangleAlert size={16} aria-hidden="true" />{EMERGENCY.title}</h3>
+        <ul>
+          {
+            EMERGENCY.lines.map((line) => (
+              <li>
+                <p>{line.text}</p>
+                <div class="calls">
+                  {line.calls.map((call) => (
+                    <a href={telHref(call.phoneHref)}>
+                      <Phone size={16} aria-hidden="true" />
+                      Appeler le {call.label}
+                    </a>
+                  ))}
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
 
-    <div class="columns">
       <details open>
         <summary>Numéros d'aide<ChevronDown size={18} aria-hidden="true" /></summary>
         <ul class="helplines">
@@ -44,7 +56,7 @@ import { LEGAL_PAGES } from "../data/site";
                   href={telHref(helpline.phoneHref)}
                   aria-label={`Appeler ${helpline.name}, ${helpline.phone}`}
                 >
-                  <Phone size={18} aria-hidden="true" />
+                  <Phone size={16} aria-hidden="true" />
                   {helpline.phone}
                 </a>
                 <p class="hours">
@@ -68,35 +80,40 @@ import { LEGAL_PAGES } from "../data/site";
           }
         </ul>
       </details>
+    </section>
 
-      <details>
-        <summary>Informations<ChevronDown size={18} aria-hidden="true" /></summary>
-        <ul class="links">
-          {
-            LEGAL_PAGES.map((page) => (
+    {
+      [
+        { className: "col-boutique", title: "Boutique", links: BOUTIQUE },
+        { className: "col-legal", title: "Informations légales", links: LEGAL },
+        { className: "col-addictive", title: "Addictive", links: ADDICTIVE },
+      ].map(({ className, title, links }) => (
+        <details class={className}>
+          <summary>{title}<ChevronDown size={18} aria-hidden="true" /></summary>
+          <ul class="links">
+            {links.map((link) => (
               <li>
-                <a href={`/${page.slug}/`}>{page.label}</a>
+                <a href={link.href}>{link.label}</a>
               </li>
-            ))
-          }
-        </ul>
-      </details>
-    </div>
-
-    <p class="note">© 2026 Addictive. Nos contenus ne remplacent pas l'avis d'un professionnel de santé.</p>
+            ))}
+          </ul>
+        </details>
+      ))
+    }
   </div>
+  <p class="wrap note">© 2026 Addictive. Nos contenus ne remplacent pas l'avis d'un professionnel de santé.</p>
 </footer>
 
 <style>
   footer {
+    margin-top: 2rem;
+    padding-block: 2rem;
     border-top: 1px solid var(--border);
     background: var(--card);
   }
 
-  .inner {
-    max-width: 72rem;
-    margin-inline: auto;
-    padding: 2rem 1rem;
+  h2 {
+    font-size: 1.0625rem;
   }
 
   .intro,
@@ -114,7 +131,7 @@ import { LEGAL_PAGES } from "../data/site";
     margin-top: 1rem;
     padding: 1rem;
     border: 1px solid color-mix(in oklch, var(--danger) 40%, transparent);
-    border-radius: calc(var(--radius) + 8px);
+    border-radius: var(--radius);
     background: color-mix(in oklch, var(--danger-soft) 40%, transparent);
   }
 
@@ -144,15 +161,11 @@ import { LEGAL_PAGES } from "../data/site";
     align-items: center;
     gap: 0.5rem;
     min-height: 2.75rem;
-    padding: 0.25rem 1rem;
+    padding: 0.25rem 0.75rem;
     border: 1px solid color-mix(in oklch, var(--danger) 50%, transparent);
-    border-radius: 1rem;
+    border-radius: 0.75rem;
     color: var(--foreground);
     text-decoration: none;
-  }
-
-  .columns {
-    margin-top: 1rem;
   }
 
   details {
@@ -163,6 +176,7 @@ import { LEGAL_PAGES } from "../data/site";
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.5rem;
     min-height: 3rem;
     font-weight: 700;
     cursor: pointer;
@@ -196,7 +210,7 @@ import { LEGAL_PAGES } from "../data/site";
     gap: 0.5rem;
     min-height: 2.75rem;
     color: var(--foreground);
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     text-decoration: none;
@@ -222,27 +236,55 @@ import { LEGAL_PAGES } from "../data/site";
     margin-top: 1rem;
   }
 
-  @media (min-width: 768px) {
-    .emergency ul {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0 1.5rem;
-    }
-
+  @media (min-width: 900px) {
     .columns {
       display: grid;
-      grid-template-columns: 3fr 1fr;
-      gap: 2rem;
+      grid-template-columns: 1fr 2.4fr 1fr 1fr;
+      gap: 2.5rem;
+    }
+
+    .col-boutique {
+      grid-area: 1 / 1;
+    }
+
+    .help {
+      grid-area: 1 / 2;
+    }
+
+    .col-legal {
+      grid-area: 1 / 3;
+    }
+
+    .col-addictive {
+      grid-area: 1 / 4;
     }
 
     details {
       border: 0;
     }
 
+    h2,
+    .col-boutique summary,
+    .col-legal summary,
+    .col-addictive summary {
+      min-height: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .help details summary {
+      min-height: 2.5rem;
+    }
+
+    .links a {
+      min-height: 2rem;
+    }
+
     .helplines {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1.25rem 1.5rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem 1.5rem;
     }
 
     .helplines li + li {

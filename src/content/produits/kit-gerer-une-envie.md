@@ -4,6 +4,7 @@ kind: Kit
 shelf: numerique
 summary: "Un kit numérique à garder sous la main dans les moments difficiles."
 image: /visuels/kit.svg
+needs: [sortir-addiction, mental-discipline]
 order: 2
 ---
 

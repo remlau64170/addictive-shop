@@ -43,7 +43,6 @@
   --ring: oklch(0.66 0.15 250);
   --chart-3: oklch(0.62 0.16 290);
   --shadow-card: 0 1px 1px oklch(0 0 0 / 0.35), 0 8px 24px oklch(0 0 0 / 0.35);
-  --nav-height: 4rem;
   color-scheme: dark;
 }
 
@@ -68,9 +67,13 @@ body {
   font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  overflow-wrap: break-word;
-  /* La barre d'onglets fixe ne recouvre jamais le pied de page. */
-  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
+  /* Texte agrandi sur téléphone : un mot long se coupe au lieu d'élargir la page. */
+  overflow-wrap: anywhere;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+[hidden] {
+  display: none !important;
 }
 
 h1,
@@ -133,6 +136,42 @@ svg {
 .page-wide {
   flex: 1;
   width: 100%;
+}
+
+/* Largeur du site : contenu centré, 1200 px au plus. */
+.wrap {
+  width: 100%;
+  max-width: 75rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+.visual {
+  position: relative;
+}
+
+.visual img {
+  width: 100%;
+  height: auto;
+  border-radius: calc(var(--radius) + 4px);
+}
+
+.visual .badge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  font-size: 0.6875rem;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.product-grid > li {
+  display: grid;
+  min-width: 0;
 }
 
 .announce {
@@ -263,15 +302,24 @@ a.card:hover {
 }
 
 @media (min-width: 768px) {
-  :root {
-    --nav-height: 0rem;
-  }
-
   h1 {
     font-size: 2.5rem;
   }
 
   .page {
     padding-top: 2.5rem;
+  }
+
+  .wrap {
+    padding-inline: 1.5rem;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .product-grid-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

@@ -28,6 +28,9 @@ export const SHOP_SHELVES = [
   { id: "objets", label: "Objets" },
 ] as const;
 
+/** Besoins de la boutique : les catégories d'articles, sans les témoignages. */
+export const SHOP_NEEDS = ARTICLE_CATEGORIES.filter((category) => category.id !== "temoignages");
+
 export const LEGAL_PAGES = [
   { slug: "mentions-legales", label: "Mentions légales" },
   { slug: "cgv", label: "CGV" },

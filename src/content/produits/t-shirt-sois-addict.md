@@ -4,6 +4,7 @@ kind: T-shirt
 shelf: objets
 summary: "Le slogan d'Addictive à porter fièrement."
 image: /visuels/tshirt.svg
+needs: [mental-discipline]
 order: 3
 ---
 
