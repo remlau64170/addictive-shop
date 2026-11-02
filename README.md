@@ -12,8 +12,7 @@ npm run dev
 - Articles : un fichier Markdown dans `src/content/articles/`. Avec `draft: true`, l'article n'est visible qu'avec
   `npm run dev` et reste absent du site construit.
 - Produits : un fichier Markdown dans `src/content/produits/`. Visuels dans `public/produits/`, refaits avec
-  `node scripts/visuels/generate.mjs`. Dès qu'un `price:` (en euros) est renseigné, le tri et
-  le filtre par prix de la boutique s'activent ; `needs:` donne les besoins du produit.
+  `node scripts/visuels/generate.mjs`. Le prix est dans `price:`, en euros.
 - Référencement : domaine de base dans `astro.config.mjs` (variable `SITE_URL`), contrôle du site construit avec
   `node scripts/verifier-seo.mjs`. À l'ouverture de la boutique, passer `availability` à `InStock` dans `src/pages/boutique/[id].astro`.
 - Démo de l'appli (`src/demo/`) : écrans en HTML/CSS repris de l'appli, données 100 % fictives (`data.ts`), aucun appel
