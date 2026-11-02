@@ -14,5 +14,11 @@ export function productName(produit: Produit) {
 /** Aucun prix n'est inventé : tant que `price` est vide, la page affiche « Prix à définir ». */
 export function formatPrice(price: number | null) {
   if (price === null) return "Prix à définir";
-  return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(price);
+  const digits = Number.isInteger(price) ? 0 : 2;
+  return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", minimumFractionDigits: digits, maximumFractionDigits: digits }).format(price);
+}
+
+/** Version réduite d'une image (480 px), pour les cartes et les vignettes. */
+export function thumbnail(src: string) {
+  return src.replace(".webp", "-480.webp");
 }

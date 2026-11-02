@@ -70,12 +70,14 @@ const TUILES = [
       </div>
       <div class="visual">
         <img
-          src="/visuels/produits.svg"
-          width="800"
-          height="300"
-          alt="Visuel provisoire des quatre produits : programme, kit, t-shirt et gourde"
+          src="/produits/hero.webp"
+          srcset="/produits/hero-800.webp 800w, /produits/hero.webp 1600w"
+          sizes="(min-width: 768px) 55vw, 100vw"
+          width="1600"
+          height="600"
+          alt="Le programme, le kit, le t-shirt et la gourde Addictive réunis"
         />
-        <span class="badge badge-violet">Visuel provisoire</span>
+        <span class="demo-note">Visuel de démonstration</span>
       </div>
     </div>
   </section>

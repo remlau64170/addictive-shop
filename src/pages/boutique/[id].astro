@@ -1,10 +1,11 @@
 ---
 import { render } from "astro:content";
+import { Check, Package, ShieldCheck } from "@lucide/astro";
 import Base from "../../layouts/Base.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import ProductCard from "../../components/ProductCard.astro";
 import { SHOP_SHELVES } from "../../data/site";
-import { formatPrice, getProduits, productName } from "../../lib/produits";
+import { formatPrice, getProduits, productName, thumbnail } from "../../lib/produits";
 
 export async function getStaticPaths() {
   const produits = await getProduits();
@@ -15,6 +16,8 @@ const { produit, produits } = Astro.props;
 const { Content } = await render(produit);
 const name = productName(produit);
 const shelf = SHOP_SHELVES.find((item) => item.id === produit.data.shelf);
+const numerique = produit.data.shelf === "numeriques";
+const images = produit.data.images;
 // Produits liés : ceux du même rayon d'abord.
 const liees = produits
   .filter((item) => item.id !== produit.id)
@@ -34,22 +37,81 @@ const liees = produits
     />
 
     <div class="top">
-      <div class="visual">
-        <img src={produit.data.image} width="400" height="400" alt={`Visuel provisoire : ${produit.data.kind.toLowerCase()}`} />
-        <span class="badge badge-violet">Visuel provisoire</span>
+      <div class="gallery">
+        <div class="visual">
+          <img id="gallery-main" src={images[0]!.src} width="1000" height="1000" alt={images[0]!.alt} />
+          <span class="demo-note">Visuel de démonstration</span>
+        </div>
+        <ul class="thumbs" aria-label="Images du produit">
+          {
+            images.map((image, index) => (
+              <li>
+                <a href={image.src} data-thumb={image.src} data-alt={image.alt} aria-label={`Image ${index + 1} : ${image.alt}`} aria-current={index === 0 ? "true" : undefined}>
+                  <img src={thumbnail(image.src)} width="480" height="480" loading="lazy" alt="" />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
       </div>
+
       <div>
         <h1>{name}</h1>
         <p class="price">{formatPrice(produit.data.price)}</p>
         <p class="lead">{produit.data.summary}</p>
+        {
+          produit.data.sizes && (
+            <div class="sizes">
+              <p class="label">Tailles</p>
+              <ul>{produit.data.sizes.map((size) => <li>{size}</li>)}</ul>
+            </div>
+          )
+        }
         <button class="button add" type="button" disabled>Ajouter au panier</button>
         <p class="soon">La boutique ouvre bientôt.</p>
+        {
+          !numerique && (
+            <p class="delivery">
+              <Package size={18} aria-hidden="true" />
+              Fabriqué à la demande, expédié sous 3 à 5 jours ouvrés (délai indicatif).
+            </p>
+          )
+        }
       </div>
     </div>
 
     <section class="block">
       <h2>Description</h2>
       <div class="prose"><Content /></div>
+    </section>
+
+    <section class="block">
+      <h2>Ce que contient le produit</h2>
+      <ul class="contains">
+        {produit.data.contains.map((item) => <li><Check size={18} aria-hidden="true" />{item}</li>)}
+      </ul>
+    </section>
+
+    <section class="block">
+      <h2>Caractéristiques</h2>
+      <dl class="specs">
+        {
+          produit.data.specs.map(({ label, value }) => (
+            <div>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      {
+        numerique && (
+          <p class="notice">
+            <ShieldCheck size={18} aria-hidden="true" />
+            <span>Ce produit ne remplace pas un professionnel de santé. Si vous en ressentez le besoin, <a href="/aide/">des services d'écoute sont là pour vous</a>.</span>
+          </p>
+        )
+      }
     </section>
 
     <section class="block">
@@ -76,10 +138,61 @@ const liees = produits
     font-size: 1.625rem;
   }
 
+  .thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .thumbs a {
+    display: block;
+    border: 2px solid transparent;
+    border-radius: 0.75rem;
+  }
+
+  .thumbs a[aria-current] {
+    border-color: var(--primary);
+  }
+
+  .thumbs img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.625rem;
+  }
+
   .price {
     margin-top: 0.75rem;
-    font-size: 1.125rem;
-    font-weight: 700;
+    font-size: 1.375rem;
+    font-weight: 800;
+  }
+
+  .sizes {
+    margin-top: 1rem;
+  }
+
+  .label {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .sizes ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.375rem;
+  }
+
+  .sizes li {
+    min-width: 2.75rem;
+    padding: 0.375rem 0.625rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    background: var(--card);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: center;
   }
 
   .add {
@@ -91,6 +204,22 @@ const liees = produits
     margin-top: 0.5rem;
     color: var(--muted-foreground);
     font-size: 0.875rem;
+  }
+
+  .delivery,
+  .notice {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    font-size: 0.9375rem;
+  }
+
+  .notice {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
   }
 
   .block {
@@ -106,6 +235,44 @@ const liees = produits
     max-width: 42rem;
   }
 
+  .contains {
+    max-width: 42rem;
+  }
+
+  .contains li {
+    display: flex;
+    gap: 0.5rem;
+    padding-block: 0.25rem;
+  }
+
+  .contains :global(svg) {
+    margin-top: 0.2rem;
+    color: var(--success);
+  }
+
+  .specs {
+    max-width: 42rem;
+    margin: 0;
+  }
+
+  .specs div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 1rem;
+    padding-block: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .specs dt {
+    color: var(--muted-foreground);
+  }
+
+  .specs dd {
+    margin: 0;
+    font-weight: 600;
+  }
+
   @media (min-width: 768px) {
     .top {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -113,7 +280,7 @@ const liees = produits
       align-items: start;
     }
 
-    .top .visual {
+    .gallery {
       max-width: 32rem;
     }
 
@@ -127,3 +294,20 @@ const liees = produits
     }
   }
 </style>
+
+<script>
+  // Sans JavaScript, chaque vignette ouvre simplement l'image en grand.
+  const main = document.querySelector<HTMLImageElement>("#gallery-main");
+  const thumbs = [...document.querySelectorAll<HTMLAnchorElement>("[data-thumb]")];
+  for (const thumb of thumbs) {
+    thumb.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (main) {
+        main.src = thumb.dataset.thumb ?? main.src;
+        main.alt = thumb.dataset.alt ?? "";
+      }
+      for (const other of thumbs) other.removeAttribute("aria-current");
+      thumb.setAttribute("aria-current", "true");
+    });
+  }
+</script>

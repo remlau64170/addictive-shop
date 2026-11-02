@@ -156,11 +156,18 @@ svg {
   border-radius: calc(var(--radius) + 4px);
 }
 
-.visual .badge {
+/* Mention discrète sur chaque visuel de produit. */
+.demo-note {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  font-size: 0.6875rem;
+  right: 0.375rem;
+  bottom: 0.375rem;
+  max-width: calc(100% - 0.75rem);
+  padding: 0.0625rem 0.375rem;
+  border-radius: 0.375rem;
+  background: oklch(0 0 0 / 0.55);
+  color: oklch(0.96 0.008 250 / 0.85);
+  font-size: 0.625rem;
+  line-height: 1.4;
 }
 
 .product-grid {

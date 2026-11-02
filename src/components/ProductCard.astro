@@ -1,5 +1,5 @@
 ---
-import { formatPrice, productName, type Produit } from "../lib/produits";
+import { formatPrice, productName, thumbnail, type Produit } from "../lib/produits";
 
 interface Props {
   produit: Produit;
@@ -12,8 +12,8 @@ const href = `/boutique/${produit.id}/`;
 
 <article>
   <a class="visual" href={href} tabindex="-1" aria-hidden="true">
-    <img src={produit.data.image} width="400" height="400" loading="lazy" alt="" />
-    <span class="badge badge-violet">Visuel provisoire</span>
+    <img src={thumbnail(produit.data.images[0]!.src)} width="480" height="480" loading="lazy" alt="" />
+    <span class="demo-note">Visuel de démonstration</span>
   </a>
   <Heading class="name"><a href={href}>{productName(produit)}</a></Heading>
   <p class="price">{formatPrice(produit.data.price)}</p>
@@ -53,8 +53,8 @@ const href = `/boutique/${produit.id}/`;
 
   .price {
     margin-block: 0.25rem 0.625rem;
-    color: var(--muted-foreground);
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
   }
 
   .button {
