@@ -21,6 +21,8 @@ const produits = defineCollection({
     kind: z.string(),
     shelf: z.enum(["numerique", "objets"]),
     summary: z.string(),
+    /** Visuel provisoire, dans public/visuels/. */
+    image: z.string(),
     order: z.number().int(),
   }),
 });

@@ -3,6 +3,7 @@ title: "Sois addict à ta sobriété"
 kind: T-shirt
 shelf: objets
 summary: "Le slogan d'Addictive à porter fièrement."
+image: /visuels/tshirt.svg
 order: 3
 ---
 

@@ -3,6 +3,7 @@ title: "Addictive"
 kind: Gourde
 shelf: objets
 summary: "Une gourde pour vous accompagner au quotidien."
+image: /visuels/gourde.svg
 order: 4
 ---
 
