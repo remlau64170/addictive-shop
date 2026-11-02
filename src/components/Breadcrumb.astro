@@ -1,5 +1,7 @@
 ---
 import { ChevronRight } from "@lucide/astro";
+import JsonLd from "./JsonLd.astro";
+import { absolute } from "../lib/seo";
 
 interface Props {
   /** Dernier élément sans `href` : c'est la page en cours. */
@@ -7,6 +9,15 @@ interface Props {
 }
 
 const { items } = Astro.props;
+const structured = {
+  "@type": "BreadcrumbList",
+  itemListElement: items.map((item, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: item.label,
+    item: absolute(item.href ?? Astro.url.pathname),
+  })),
+};
 ---
 
 <nav aria-label="Fil d'Ariane">
@@ -21,6 +32,7 @@ const { items } = Astro.props;
     }
   </ol>
 </nav>
+<JsonLd data={structured} />
 
 <style>
   ol {

@@ -2,12 +2,11 @@
 title: "30 jours pour reprendre le contrôle"
 kind: Programme
 shelf: numeriques
-summary: "Un programme numérique pour avancer jour après jour, sans pression."
+summary: "Un programme de 30 jours pour installer de bonnes habitudes et renforcer votre discipline, sans pression."
 images:
   - { src: /produits/programme-1.webp, alt: "Couverture du programme 30 jours, en livre posé" }
   - { src: /produits/programme-2.webp, alt: "Page de sommaire du programme" }
   - { src: /produits/programme-3.webp, alt: "Page Jour 1 du programme" }
-needs: [sortir-addiction, mental-discipline]
 price: 12
 order: 1
 contains:
@@ -21,6 +20,6 @@ specs:
   - { label: Livraison, value: Téléchargement immédiat }
 ---
 
-Ce programme vous accompagne pendant 30 jours, à raison d'une étape courte par jour. Chaque page vous propose une idée à comprendre et une action simple à essayer.
+Vous voulez reprendre votre quotidien en main : mieux vous organiser, tenir vos objectifs, retrouver de l'énergie ? Ce programme vous accompagne pendant 30 jours, à raison d'une étape courte par jour, pour installer une habitude à la fois.
 
 Si une journée vous échappe, reprenez simplement où vous en étiez : chaque jour reste une occasion d'avancer. Vous gardez le rythme qui vous convient.

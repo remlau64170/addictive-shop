@@ -11,8 +11,8 @@ const href = `/boutique/${produit.id}/`;
 ---
 
 <article>
-  <a class="visual" href={href} tabindex="-1" aria-hidden="true">
-    <img src={thumbnail(produit.data.images[0]!.src)} width="480" height="480" loading="lazy" alt="" />
+  <a class="visual" href={href} tabindex="-1">
+    <img src={thumbnail(produit.data.images[0]!.src)} width="480" height="480" loading="lazy" alt={produit.data.images[0]!.alt} />
     <span class="demo-note">Visuel de démonstration</span>
   </a>
   <Heading class="name"><a href={href}>{productName(produit)}</a></Heading>

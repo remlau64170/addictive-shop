@@ -1,16 +1,25 @@
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { DEFAULT_IMAGE, SITE_NAME, absolute } from "../lib/seo";
 import "../styles/global.css";
 
 interface Props {
   title: string;
-  description?: string;
+  description: string;
   /** Page en pleine largeur (accueil) : chaque section gère sa propre largeur. */
   wide?: boolean;
+  /** Page sans intérêt pour un moteur de recherche (panier, page à rédiger…). */
+  noindex?: boolean;
+  /** Image de partage ; par défaut, celle du site. */
+  image?: string;
+  ogType?: "website" | "article" | "product";
 }
 
-const { title, description = "Articles, boutique et appli pour vous accompagner vers la sobriété.", wide = false } = Astro.props;
+const { title, description, wide = false, noindex = false, image = DEFAULT_IMAGE, ogType = "website" } = Astro.props;
+const fullTitle = `${title} · ${SITE_NAME}`;
+const canonical = absolute(Astro.url.pathname);
+const imageUrl = absolute(image);
 ---
 
 <!doctype html>
@@ -19,8 +28,21 @@ const { title, description = "Articles, boutique et appli pour vous accompagner 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="oklch(0.17 0.028 264)" />
-    <title>{title} · Addictive</title>
+    <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="canonical" href={canonical} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
     <link rel="icon" href="/favicon-32.png" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link
@@ -30,7 +52,7 @@ const { title, description = "Articles, boutique et appli pour vous accompagner 
       type="font/woff2"
       crossorigin
     />
-    <noscript><style>.needs-js { display: none !important; } .shop-layout { display: block !important; }</style></noscript>
+    <noscript><style>.needs-js { display: none !important; }</style></noscript>
   </head>
   <body>
     <p class="announce">La boutique Addictive ouvre bientôt</p>

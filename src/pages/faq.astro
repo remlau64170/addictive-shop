@@ -1,0 +1,79 @@
+---
+import { ChevronDown } from "@lucide/astro";
+import Base from "../layouts/Base.astro";
+import Breadcrumb from "../components/Breadcrumb.astro";
+import JsonLd from "../components/JsonLd.astro";
+import { FAQ } from "../data/faq";
+
+const structured = {
+  "@type": "FAQPage",
+  mainEntity: FAQ.map(({ question, answer }) => ({
+    "@type": "Question",
+    name: question,
+    acceptedAnswer: { "@type": "Answer", text: answer },
+  })),
+};
+---
+
+<Base title="Questions fréquentes" description="Commandes, téléchargement, délais, paiement, appli, données personnelles : les réponses aux questions fréquentes sur Addictive.">
+  <JsonLd data={structured} />
+  <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Questions fréquentes" }]} />
+  <h1>Questions fréquentes</h1>
+  <p class="lead">Les réponses aux questions les plus courantes. Une mention « à confirmer » signale ce qui n'est pas encore décidé.</p>
+
+  <div class="faq">
+    {
+      FAQ.map(({ question, answer }) => (
+        <details>
+          <summary>
+            <h2>{question}</h2>
+            <ChevronDown size={18} aria-hidden="true" />
+          </summary>
+          <p>{answer}</p>
+        </details>
+      ))
+    }
+  </div>
+
+  <p class="section">Une autre question ? <a href="/contact/">Écrivez-nous</a>. Besoin d'une écoute ? <a href="/aide/">Consultez notre page d'aide</a>.</p>
+</Base>
+
+<style>
+  .faq {
+    margin-top: 1.5rem;
+  }
+
+  details {
+    border-bottom: 1px solid var(--border);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 3.25rem;
+    padding-block: 0.5rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  details[open] summary :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  details p {
+    padding-bottom: 1rem;
+    color: var(--muted-foreground);
+  }
+</style>

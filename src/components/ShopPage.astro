@@ -1,0 +1,144 @@
+---
+import Base from "../layouts/Base.astro";
+import Breadcrumb from "./Breadcrumb.astro";
+import ProductCard from "./ProductCard.astro";
+import { SHOP_SHELVES } from "../data/site";
+import { getProduits } from "../lib/produits";
+
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  intro: string;
+  /** Rayon affiché ; sans rayon, toute la boutique. */
+  shelf?: (typeof SHOP_SHELVES)[number]["id"];
+}
+
+const { title, description, heading, intro, shelf } = Astro.props;
+const produits = (await getProduits()).filter((produit) => !shelf || produit.data.shelf === shelf);
+const current = SHOP_SHELVES.find((item) => item.id === shelf);
+const TABS = [{ href: "/boutique/", label: "Tout", id: undefined as string | undefined }, ...SHOP_SHELVES];
+---
+
+<Base title={title} description={description} wide>
+  <div class="wrap shop">
+    <Breadcrumb
+      items={current
+        ? [{ label: "Accueil", href: "/" }, { label: "Boutique", href: "/boutique/" }, { label: current.label }]
+        : [{ label: "Accueil", href: "/" }, { label: "Boutique" }]}
+    />
+    <h1>{heading}</h1>
+    <p class="lead">{intro}</p>
+
+    <nav class="tabs" aria-label="Rayons de la boutique">
+      {TABS.map((tab) => <a href={tab.href} aria-current={tab.id === shelf ? "page" : undefined}>{tab.label}</a>)}
+    </nav>
+
+    <div class="toolbar">
+      <p>{produits.length} produit{produits.length > 1 ? "s" : ""}</p>
+      <label class="needs-js">
+        Trier par
+        <select id="shop-sort">
+          <option value="nouveautes">Nouveautés</option>
+          <option value="prix-asc">Prix croissant</option>
+          <option value="prix-desc">Prix décroissant</option>
+        </select>
+      </label>
+    </div>
+
+    <ul id="shop-grid" class="product-grid">
+      {
+        produits.map((produit) => (
+          <li data-order={produit.data.order} data-price={produit.data.price ?? ""}>
+            <ProductCard produit={produit} heading="h2" />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .shop {
+    padding-top: 0.5rem;
+  }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+  }
+
+  .tabs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.25rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--foreground);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .tabs a:hover {
+    border-color: var(--primary);
+  }
+
+  .tabs a[aria-current] {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-block: 1rem;
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+  }
+
+  .toolbar label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  select {
+    min-height: 2.75rem;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    background: var(--card);
+    color: var(--foreground);
+    font: inherit;
+  }
+</style>
+
+<script>
+  const grid = document.querySelector<HTMLElement>("#shop-grid");
+  const sort = document.querySelector<HTMLSelectElement>("#shop-sort");
+  if (grid && sort) {
+    const items = [...grid.children] as HTMLElement[];
+    sort.addEventListener("input", () => {
+      const order = (item: HTMLElement) => Number(item.dataset.order);
+      const price = (item: HTMLElement) => Number(item.dataset.price);
+      const compare = {
+        nouveautes: (a: HTMLElement, b: HTMLElement) => order(a) - order(b),
+        "prix-asc": (a: HTMLElement, b: HTMLElement) => price(a) - price(b) || order(a) - order(b),
+        "prix-desc": (a: HTMLElement, b: HTMLElement) => price(b) - price(a) || order(a) - order(b),
+      }[sort.value as "nouveautes" | "prix-asc" | "prix-desc"];
+      grid.append(...[...items].sort(compare));
+    });
+  }
+</script>

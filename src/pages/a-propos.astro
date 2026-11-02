@@ -1,21 +1,67 @@
 ---
+// À relire par Rémy : tous les textes de cette page sont des propositions.
+import { HeartHandshake, MessageCircleHeart, ShieldCheck } from "@lucide/astro";
 import Base from "../layouts/Base.astro";
+import Breadcrumb from "../components/Breadcrumb.astro";
+
+const VALEURS = [
+  { title: "Bienveillance", text: "Nous vous encourageons à chaque étape, à votre rythme. Une journée difficile n'efface jamais le chemin parcouru.", Icon: HeartHandshake },
+  { title: "Sources vérifiées", text: "Les ressources que nous proposons sont vérifiées avant publication, et les numéros d'aide sont contrôlés.", Icon: ShieldCheck },
+  { title: "Aucun jugement", text: "Quel que soit votre point de départ, vous avez votre place ici. Nous parlons de progression, jamais de faute.", Icon: MessageCircleHeart },
+];
 ---
 
-<Base title="À propos" description="Addictive vous accompagne pour reprendre la main sur vos addictions.">
-  <h1>À propos</h1>
+<Base title="À propos : notre mission" description="Addictive aide à construire de meilleures habitudes : développement personnel, discipline, remise au sport et sobriété, avec bienveillance et sans jugement.">
+  <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "À propos" }]} />
+  <h1>À propos d'Addictive</h1>
+  <p class="lead">Nous croyons que les grands changements se construisent avec de petites habitudes, répétées chaque jour.</p>
+
   <div class="prose">
+    <h2>Pourquoi Addictive existe</h2>
     <p>
-      Addictive est née d'une idée simple : la sobriété se construit jour après jour, et chaque progrès mérite d'être
-      célébré. Notre slogan le résume : « Sois addict à ta sobriété ».
+      Changer une habitude, retrouver de la discipline ou se remettre au sport demande de l'énergie, et on se retrouve vite seul
+      face à ses objectifs. Addictive est née de cette idée simple : la progression se construit jour après jour, et chaque
+      pas mérite d'être célébré.
     </p>
+
+    <h2>Notre mission</h2>
     <p>
-      Avec l'appli, ce site et sa boutique, nous voulons vous encourager, sans jugement, quel que soit votre point de
-      départ.
+      Vous aider à prendre le contrôle de votre quotidien : installer de bonnes habitudes, renforcer votre mental, bouger
+      davantage et, si c'est votre chemin, avancer vers la sobriété. Notre slogan le résume : « Sois addict à ta sobriété ».
     </p>
+
+    <h2>L'appli et la boutique</h2>
     <p>
-      Nos contenus ne remplacent pas l'avis d'un professionnel de santé. Si vous en ressentez le besoin, tous les numéros
-      sont sur la page <a href="/aide/">Besoin d'aide ?</a>.
+      <a href="/appli/">L'appli Addictive</a> vous permet de suivre vos séries et votre progression, et vous soutient quand une
+      envie arrive. <a href="/boutique/">La boutique</a> propose des programmes, des kits et des objets pour vous accompagner
+      au quotidien. <a href="/articles/">Les articles</a> partagent des repères simples sur le mental, le sport et le
+      changement d'habitudes.
     </p>
+
+    <h2>Nos valeurs</h2>
   </div>
+
+  <ul class="values">
+    {
+      VALEURS.map(({ title, text, Icon }) => (
+        <li class="card">
+          <h3 class="card-title"><Icon size={22} color="var(--success)" aria-hidden="true" />{title}</h3>
+          <p>{text}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p class="section">
+    Nos contenus ne remplacent pas l'avis d'un professionnel de santé. Si vous en ressentez le besoin, tous les numéros sont sur
+    la page <a href="/aide/">Besoin d'aide ?</a>
+  </p>
 </Base>
+
+<style>
+  .values {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+</style>

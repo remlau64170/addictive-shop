@@ -23,7 +23,6 @@ const produits = defineCollection({
     summary: z.string(),
     /** Visuels de démonstration, dans public/produits/ : la première image sert aussi aux cartes. */
     images: z.array(z.object({ src: z.string(), alt: z.string() })).min(3).max(4),
-    needs: z.array(z.enum(["sortir-addiction", "mental-discipline", "sport-corps"])),
     /** En euros ; vide tant que le prix n'est pas décidé. */
     price: z.number().positive().nullable().default(null),
     contains: z.array(z.string()).min(1),

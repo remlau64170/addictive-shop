@@ -5,7 +5,9 @@ import Base from "../../layouts/Base.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import ProductCard from "../../components/ProductCard.astro";
 import { SHOP_SHELVES } from "../../data/site";
+import JsonLd from "../../components/JsonLd.astro";
 import { formatPrice, getProduits, productName, thumbnail } from "../../lib/produits";
+import { PUBLISHER, absolute } from "../../lib/seo";
 
 export async function getStaticPaths() {
   const produits = await getProduits();
@@ -23,15 +25,34 @@ const liees = produits
   .filter((item) => item.id !== produit.id)
   .sort((a, b) => Number(b.data.shelf === produit.data.shelf) - Number(a.data.shelf === produit.data.shelf))
   .slice(0, 3);
+
+// Aucune note ni avis. La boutique n'est pas ouverte : le produit reste indiqué comme indisponible jusqu'à l'ouverture.
+const structured = {
+  "@type": "Product",
+  name,
+  description: produit.data.summary,
+  image: images.map((image) => absolute(image.src)),
+  brand: { "@type": "Brand", name: PUBLISHER.name },
+  category: shelf?.label,
+  url: absolute(Astro.url.pathname),
+  offers: {
+    "@type": "Offer",
+    url: absolute(Astro.url.pathname),
+    priceCurrency: "EUR",
+    price: produit.data.price?.toFixed(2),
+    availability: "https://schema.org/OutOfStock",
+  },
+};
 ---
 
-<Base title={name} description={produit.data.summary} wide>
+<Base title={name} description={produit.data.summary} wide image={images[0]!.src} ogType="product">
+  <JsonLd data={structured} />
   <div class="wrap fiche">
     <Breadcrumb
       items={[
         { label: "Accueil", href: "/" },
         { label: "Boutique", href: "/boutique/" },
-        { label: shelf?.label ?? "", href: `/boutique/#type=${produit.data.shelf}` },
+        { label: shelf?.label ?? "", href: shelf?.href ?? "/boutique/" },
         { label: name },
       ]}
     />
@@ -47,7 +68,7 @@ const liees = produits
             images.map((image, index) => (
               <li>
                 <a href={image.src} data-thumb={image.src} data-alt={image.alt} aria-label={`Image ${index + 1} : ${image.alt}`} aria-current={index === 0 ? "true" : undefined}>
-                  <img src={thumbnail(image.src)} width="480" height="480" loading="lazy" alt="" />
+                  <img src={thumbnail(image.src)} width="480" height="480" loading="lazy" alt={image.alt} />
                 </a>
               </li>
             ))
@@ -112,6 +133,14 @@ const liees = produits
           </p>
         )
       }
+    </section>
+
+    <section class="block">
+      <h2>Pour aller plus loin</h2>
+      <ul class="contains">
+        <li><a href="/appli/">Suivez vos habitudes avec l'appli Addictive</a></li>
+        <li><a href="/articles/">Lisez nos articles sur la discipline et la remise au sport</a></li>
+      </ul>
     </section>
 
     <section class="block">
@@ -290,7 +319,7 @@ const liees = produits
 
     .add {
       width: auto;
-      min-width: 16rem;
+      min-width: min(16rem, 100%);
     }
   }
 </style>

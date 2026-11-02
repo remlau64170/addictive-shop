@@ -315,8 +315,22 @@ async function toWebp(png, target, width, height) {
   }
 }
 
+/** Image de partage (réseaux sociaux) : JPEG, le format le mieux accepté. */
+const OG = `<div style="position:relative; width:1200px; height:630px; overflow:hidden; padding:70px 80px;
+  background: radial-gradient(620px 460px at 90% 10%, rgb(138 108 240 / .4), transparent 70%), radial-gradient(620px 420px at 0 100%, rgb(47 214 195 / .28), transparent 70%), linear-gradient(160deg, #111a42, #070b1a)">
+  ${lockup(64)}
+  <p style="margin-top:62px; font-size:78px; line-height:1.08; font-weight:800; letter-spacing:-.02em">Vos habitudes,<br><span class="grad">votre progression</span></p>
+  <p style="margin-top:30px; font-size:32px; color:#c6d1e6">Discipline, mental, sport : avancez chaque jour.</p>
+  <p style="position:absolute; left:80px; bottom:56px; font-size:24px; font-weight:700; color:#9fb3d9">Sois addict à ta sobriété</p>
+</div>`;
+
 await makeLogo();
 const only = process.argv[2];
+if (!only || only === "og") {
+  const png = capture("og", OG, 1200, 630);
+  await sharp(readFileSync(png)).resize(1200, 630, { fit: "cover", position: "top" }).jpeg({ quality: 84, mozjpeg: true }).toFile(join(ROOT, "public/og.jpg"));
+  console.log("og", Math.round(statSync(join(ROOT, "public/og.jpg")).size / 1024), "Ko");
+}
 for (const [name, inner] of Object.entries(VIEWS)) {
   if (only && only !== name) continue;
   const png = capture(name, `<div class="stage">${inner}</div>`, 1000, 1000);

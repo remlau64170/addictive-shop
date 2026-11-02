@@ -123,7 +123,7 @@ export function formatCountdown(seconds: number) {
 /* ---------- Éléments communs ---------- */
 
 function backBar(title: string, action = `data-back`, right = "") {
-  return `<div class="topbar"><button class="round" type="button" ${action} aria-label="Retour">${icon("arrowLeft")}</button><h1 class="title">${title}</h1>${right}</div>`;
+  return `<div class="topbar"><button class="round" type="button" ${action} aria-label="Retour">${icon("arrowLeft")}</button><p class="title">${title}</p>${right}</div>`;
 }
 
 const backLink = (label: string) =>
@@ -163,7 +163,7 @@ function home(state: State) {
 
   return `<div class="pad">
     <div class="brandbar">
-      <span class="brand-mini"><img src="/icon-only-192.png" width="36" height="36" alt=""><b>Addictive</b></span>
+      <span class="brand-mini"><img src="/icon-only-192.png" width="36" height="36" alt="Logo Addictive"><b>Addictive</b></span>
       <span class="shortcuts">
         <button class="short" type="button" data-go="envies" aria-label="Mes envies">${icon("calendarDays", 16, "primary")}</button>
         <button class="short wide" type="button" data-go="badges" aria-label="Mes badges"><span>🌿</span><span>Badges</span></button>
@@ -171,7 +171,7 @@ function home(state: State) {
       </span>
     </div>
     <p class="tiny muted">Sois addict à ta sobriété</p>
-    <h1 class="h1">Mes addictions</h1>
+    <p class="h1">Mes addictions</p>
     <button class="craving-cta" type="button" data-go="choose">
       <span class="cta-main">${icon("heartPulse", 20)} J'ai une envie maintenant</span>
       <span class="cta-sub">Prenons 3 minutes pour la faire redescendre.</span>
@@ -222,7 +222,7 @@ function monthGrid(state: State, addiction: Addiction, marks: Marks) {
   return `<section class="card mt16">
     <div class="between">
       <button class="round sm" type="button" data-month="-1" data-id="${addiction.id}" ${atStart ? "disabled" : ""} aria-label="Mois précédent">${icon("chevronLeft", 16)}</button>
-      <h2 class="h2 cap">${MONTHS_FR[first.getMonth()]} ${first.getFullYear()}</h2>
+      <p class="h2 cap">${MONTHS_FR[first.getMonth()]} ${first.getFullYear()}</p>
       <button class="round sm" type="button" data-month="1" data-id="${addiction.id}" ${delta >= 0 ? "disabled" : ""} aria-label="Mois suivant">${icon("chevronRight", 16)}</button>
     </div>
     ${toastButton("Sélection multiple de jours passés", "btn outline sm mt12")}
@@ -256,7 +256,7 @@ function dayDialog(state: State, addiction: Addiction) {
   }
   return `<div class="dialog-veil" data-close-day></div>
   <div class="dialog" role="dialog" aria-label="${longDate(state.dayOpen)}">
-    <div class="between"><h2 class="h3">${longDate(state.dayOpen)}</h2>
+    <div class="between"><p class="h3">${longDate(state.dayOpen)}</p>
     <button class="round sm" type="button" data-close-day aria-label="Fermer">${icon("x", 16)}</button></div>
     <p class="text-sm muted mt4">Renseignez ou corrigez cette journée.</p>
     <div class="mt12">${body}</div>
@@ -308,16 +308,16 @@ function fiche(state: State, id: Addiction["id"]) {
         <p class="text-sm muted">jours consécutifs</p></section>
     </div>
     <section class="card mt16">
-      <div class="between"><h2 class="h2">Progression</h2><button class="linkish" type="button" data-go="badges">Tous les badges</button></div>
+      <div class="between"><p class="h2">Progression</p><button class="linkish" type="button" data-go="badges">Tous les badges</button></div>
       <p class="text-sm muted mt8">🔥 ${stats.current} jour${stats.current > 1 ? "s" : ""} sans rechute · 🧠 ${SESSIONS.length} envies maîtrisées · 🏆 ${plural(earned.length, "badge")}</p>
       <div class="chips mt12">${earned.map((badge) => `<span class="chip soft">${badge.emoji} ${badge.name}</span>`).join("")}</div>
       ${next ? `<p class="small muted mt12">${stats.current} / ${next.threshold} jours — encore ${plural(next.threshold - stats.current, "jour")} pour débloquer « ${next.name} »</p>` : ""}
       ${toastButton("Partager ma progression", "btn secondary sm mt16", "share")}
     </section>
-    <section class="card mt16"><h2 class="h2">Aujourd'hui — ${longDate(0)}</h2>${todayBlock}</section>
+    <section class="card mt16"><p class="h2">Aujourd'hui — ${longDate(0)}</p>${todayBlock}</section>
     ${quantifiable ? reductionCard(addiction, marks) : ""}
     ${monthGrid(state, addiction, marks)}
-    <section class="card mt16"><h2 class="h2">Infos</h2>
+    <section class="card mt16"><p class="h2">Infos</p>
       <dl class="dl mt12">
         ${row("Journées tenues", `${stats.successes}`)}
         ${row("Rechutes notées", `${stats.relapses}`)}
@@ -350,7 +350,7 @@ function reductionCard(addiction: Addiction, marks: Marks) {
       <p class="small muted mt8">${reached ? "🎉 Étape atteinte, bravo !" : `${pct} % du chemin parcouru depuis votre référence (${reference} ${addiction.unit})`}</p>
     </li>`;
   }).join("");
-  return `<section class="card mt16"><h2 class="h2">Étapes de réduction</h2>
+  return `<section class="card mt16"><p class="h2">Étapes de réduction</p>
     <p class="text-sm muted mt4">Moyenne actuelle : ${frenchNumber(average)} ${addiction.unit} (sur ${AVERAGE_WINDOW_DAYS} jours)</p>
     <ul class="stack mt12">${items}</ul></section>`;
 }
@@ -359,7 +359,7 @@ function reductionCard(addiction: Addiction, marks: Marks) {
 
 function choose() {
   return `<div class="pad">${backLink("Mes addictions")}
-    <h1 class="h1 mt20">Une envie forte ?</h1>
+    <p class="h1 mt20">Une envie forte ?</p>
     <p class="muted mt8">On va simplement passer les 3 prochaines minutes ensemble.</p>
     <p class="text-sm b mt24">Quelle addiction vous donne envie en ce moment ?</p>
     <div class="stack mt12">${ADDICTIONS.map(
@@ -379,7 +379,7 @@ const options = (field: string, list: string[], selected: string | null) =>
 
 function context(state: State) {
   return `<div class="pad">${backLink("Mes addictions")}
-    <h1 class="h1 mt20">Deux questions rapides</h1>
+    <p class="h1 mt20">Deux questions rapides</p>
     <p class="text-sm muted mt8">Facultatif. Vous pouvez commencer tout de suite.</p>
     <button class="btn primary tall mt16" type="button" data-start>Commencer les 3 minutes</button>
     <div class="card mt16"><p class="text-sm b">Où êtes-vous ?</p>${options("place", PLACE_OPTIONS, state.craving.place)}</div>
@@ -482,7 +482,7 @@ function done(state: State) {
       : `<div class="card big mt20"><p>${INTENSITY_OPTIONS[picked]?.message}</p>
          <p class="small muted mt12">Cette session n'est pas comptée comme une rechute : votre série et votre record sont intacts.</p></div>`;
   return `<div class="pad">
-    <h1 class="h1 mt16">3 minutes sont passées.</h1>
+    <p class="h1 mt16">3 minutes sont passées.</p>
     <p class="muted mt8">L'envie est-elle toujours là ?</p>
     ${body}
     <button class="btn primary tall mt20" type="button" data-start>Recommencer 3 minutes</button>
@@ -575,7 +575,7 @@ function envies(state: State) {
   const slotLabel = `${String(slot[0]).charAt(0).toUpperCase()}${String(slot[0]).slice(1)}`;
 
   return `<div class="pad">${backLink("Mes addictions")}
-    <h1 class="h1 mt20">Mes envies</h1>
+    <p class="h1 mt20">Mes envies</p>
     <p class="text-sm muted mt8">Ces moments ne sont jamais comptés comme des rechutes : ils servent seulement à repérer quand les envies apparaissent.</p>
     <section class="card mt24">
       <div class="between">
@@ -620,7 +620,7 @@ function badgeSection(title: string, subtitle: string, badges: { threshold: numb
         ${unlocked ? "" : `<div class="bar thin mt4"><span style="width:${pct}%"></span></div><p class="tiny muted mt4">${Math.min(value, badge.threshold)}${unit} / ${badge.threshold}${unit}</p>`}</div></li>`;
     })
     .join("");
-  return `<section class="card mt16"><h2 class="h2">${title}</h2><p class="small muted">${subtitle}</p><ul class="stack-sm mt16">${items}</ul></section>`;
+  return `<section class="card mt16"><p class="h2">${title}</p><p class="small muted">${subtitle}</p><ul class="stack-sm mt16">${items}</ul></section>`;
 }
 
 const streakLabel = (threshold: number) => `${threshold} ${threshold <= 1 ? "jour" : "jours"} sans rechute`;
@@ -657,7 +657,7 @@ function badges(state: State) {
         <p class="text-sm muted mt8">1 min 28 · 🪙 ${GAME_STATS.coins} pièces</p>
         <p class="small muted mt4">${GAME_STATS.games} parties jouées</p>
       </section>
-      <section class="card mt16"><h2 class="h2">Podium</h2><p class="small muted">Vos 3 meilleures parties en points, toutes addictions confondues.</p>
+      <section class="card mt16"><p class="h2">Podium</p><p class="small muted">Vos 3 meilleures parties en points, toutes addictions confondues.</p>
         <ul class="stack-sm mt12">${GAME_PODIUM.map((item) => `<li class="note podium"><span class="big-emoji">${item.medal}</span><span><b>${item.points} pts</b><span class="small muted block">${item.detail}</span></span></li>`).join("")}</ul>
       </section>`;
   return `<div class="pad">${backBar("Badges et mini-jeu")}<div class="segments mt20">${tabButtons}</div>${content}</div>`;
@@ -671,7 +671,7 @@ function resource(state: State, item: (typeof CONSEILS)[number], kind: IconName)
   return `<article class="card">
     <div class="between top"><span class="res-icon">${icon(kind)}</span>
     <button class="round${favorite ? " primary-txt" : ""}" type="button" data-favorite="${item.title}" aria-pressed="${favorite}" aria-label="${favorite ? "Retirer des favoris" : "Ajouter aux favoris"}">${icon("bookmark", 20, favorite ? "fill" : "")}</button></div>
-    <h3 class="h3 mt8">${item.title}</h3>
+    <p class="h3 mt8">${item.title}</p>
     <p class="text-sm muted mt4">${item.text}</p>
     <p class="small muted mt8">Source : ${item.source}${item.tags ? ` · ${item.tags}` : ""}</p>
     <div class="res-actions mt16">
@@ -683,7 +683,7 @@ function resource(state: State, item: (typeof CONSEILS)[number], kind: IconName)
 
 function helpSection() {
   return `<div class="stack mt16">
-    <section class="emergency-box"><h2 class="emergency-title">${EMERGENCY.title}</h2>
+    <section class="emergency-box"><p class="emergency-title">${EMERGENCY.title}</p>
       ${EMERGENCY.lines
         .map(
           (line) => `<p class="text-sm b mt12">${line.text}</p><div class="calls mt8">${line.calls
@@ -710,7 +710,7 @@ function forms(state: State) {
       : `<button class="fake-search mt12" type="button" data-toast>${icon("search", 16)} ${placeholder}</button>
         <div class="stack mt16">${(tab === "conseils" ? CONSEILS : STRUCTURES).map((item) => resource(state, item, tab === "conseils" ? "lightbulb" : "mapPin")).join("")}</div>`;
   return `<div class="pad forms">
-    <header class="forms-head"><span class="forms-title">${icon("compass", 24, "primary")}<h1 class="title">AddictForms</h1></span>
+    <header class="forms-head"><span class="forms-title">${icon("compass", 24, "primary")}<p class="title">AddictForms</p></span>
       <span class="forms-tools">
         <button class="round lg" type="button" data-toast aria-label="Mes favoris">${icon("bookmark")}</button>
         <button class="round lg sos" type="button" data-pill="forms" data-value="aide" aria-label="Besoin d'aide immédiate">${icon("phone")}</button>
@@ -747,7 +747,7 @@ function compte(state: State) {
         : `<section class="card center">${icon("messageCircle", 32, "primary")}<p class="b mt12">Vos conversations apparaîtront ici</p><p class="text-sm muted mt4">${SOON}.</p></section>`;
   return `<div class="pad">
     <header class="profile"><button class="avatar" type="button" data-toast aria-label="Modifier mon profil (nom affiché et photo)">C</button>
-      <div class="grow"><h1 class="title">Camille</h1><button class="underline text-sm muted" type="button" data-toast>Modifier mon profil</button></div>
+      <div class="grow"><p class="title">Camille</p><button class="underline text-sm muted" type="button" data-toast>Modifier mon profil</button></div>
       <button class="round lg gear" type="button" data-toast aria-label="Paramètres">${icon("settings")}</button></header>
     <dl class="figures mt20">
       <div><dd>${best}</dd><dt>Série en cours</dt></div>
@@ -782,7 +782,7 @@ function news(state: State) {
     </article>`;
   }).join("");
   return `<div class="pad">
-    <div class="between"><h1 class="h1 flat">Actualités</h1>
+    <div class="between"><p class="h1 flat">Actualités</p>
       <span class="forms-tools"><button class="round" type="button" data-toast aria-label="Actualiser">${icon("refresh")}</button>
       <button class="round" type="button" data-toast aria-label="Activité">${icon("bell")}</button></span></div>
     <div class="stack mt20">${cards}</div>

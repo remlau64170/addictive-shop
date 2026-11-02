@@ -2,12 +2,11 @@
 title: "Addictive"
 kind: Gourde
 shelf: physiques
-summary: "Une gourde en métal pour vous accompagner au quotidien."
+summary: "Une gourde en métal pour vous accompagner à la salle, au travail et en balade."
 images:
   - { src: /produits/gourde-1.webp, alt: "Gourde bleu nuit avec le logo Addictive" }
   - { src: /produits/gourde-2.webp, alt: "Détail du logo sur la gourde" }
   - { src: /produits/gourde-3.webp, alt: "Détail du bouchon de la gourde" }
-needs: [sport-corps]
 price: 19
 order: 4
 contains:
@@ -20,6 +19,6 @@ specs:
   - { label: Délai indicatif, value: "Fabriqué à la demande, expédié sous 3 à 5 jours ouvrés" }
 ---
 
-Boire un grand verre d'eau est l'un des gestes les plus simples quand une envie arrive. Cette gourde vous suit partout : au travail, au sport ou en balade.
+Bien s'hydrater fait partie des habitudes les plus simples à installer. Cette gourde vous suit partout : à la salle, au travail ou en balade.
 
 Son logo vous rappelle votre objectif à chaque gorgée.

@@ -1,0 +1,93 @@
+---
+import { Mail } from "@lucide/astro";
+import Base from "../layouts/Base.astro";
+import Breadcrumb from "../components/Breadcrumb.astro";
+import { CONTACT_EMAIL } from "../lib/seo";
+---
+
+<Base title="Contact" description="Une question sur la boutique, les articles ou l'appli Addictive ? Écrivez-nous depuis votre messagerie, nous vous répondrons avec plaisir.">
+  <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Contact" }]} />
+  <h1>Contact</h1>
+  <p class="lead">Une question, une idée ou un retour ? Écrivez-nous, nous lirons votre message avec attention.</p>
+
+  <p class="address"><Mail size={18} aria-hidden="true" /><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
+
+  <form id="contact-form" action={`mailto:${CONTACT_EMAIL}`} method="post" enctype="text/plain">
+    <label>Nom<input name="nom" type="text" autocomplete="name" required /></label>
+    <label>E-mail<input name="email" type="email" autocomplete="email" required /></label>
+    <label>Sujet<input name="sujet" type="text" required /></label>
+    <label>Message<textarea name="message" rows="6" required></textarea></label>
+    <button class="button" type="submit">Ouvrir ma messagerie</button>
+  </form>
+
+  <p class="note">Ce bouton ouvre votre messagerie avec un e-mail prérempli, que vous envoyez vous-même. Rien n'est envoyé ni conservé par le site.</p>
+  <p class="note">Pour une réponse rapide, consultez aussi nos <a href="/faq/">questions fréquentes</a>. Besoin d'une écoute ? <a href="/aide/">Notre page d'aide</a> réunit les numéros utiles.</p>
+</Base>
+
+<style>
+  .address {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  form {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  label {
+    display: grid;
+    gap: 0.375rem;
+    min-width: 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    background: var(--card);
+    color: var(--foreground);
+    font: inherit;
+    font-weight: 400;
+  }
+
+  input:focus,
+  textarea:focus {
+    border-color: var(--ring);
+    outline: 0;
+  }
+
+  .button {
+    justify-self: start;
+    cursor: pointer;
+  }
+
+  .note {
+    margin-top: 1rem;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+</style>
+
+<script>
+  // Tout se passe dans le navigateur : le message est composé puis confié à la messagerie du visiteur.
+  const form = document.querySelector<HTMLFormElement>("#contact-form");
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const value = (name: string) => String(data.get(name) ?? "").trim();
+    const body = `${value("message")}\r\n\r\n${value("nom")}\r\n${value("email")}`;
+    const address = form.action.replace(/^mailto:/, "");
+    location.href = `mailto:${address}?subject=${encodeURIComponent(value("sujet"))}&body=${encodeURIComponent(body)}`;
+  });
+</script>

@@ -13,11 +13,13 @@ import {
   Sprout,
 } from "@lucide/astro";
 import Base from "../layouts/Base.astro";
+import JsonLd from "../components/JsonLd.astro";
 import ProductCard from "../components/ProductCard.astro";
 import PhoneShowcase from "../components/PhoneShowcase.astro";
 import { ARTICLE_CATEGORIES, SHOP_SHELVES } from "../data/site";
 import { getVisibleArticles } from "../lib/articles";
 import { getProduits } from "../lib/produits";
+import { CONTACT_EMAIL, PUBLISHER, absolute } from "../lib/seo";
 
 const produits = await getProduits();
 const derniers = (await getVisibleArticles()).slice(0, 3);
@@ -41,7 +43,7 @@ const CATEGORY_ICONS = {
 
 const TUILES = [
   ...SHOP_SHELVES.map((shelf) => ({
-    href: `/boutique/#type=${shelf.id}`,
+    href: shelf.href,
     label: shelf.label,
     note: "Rayon",
     Icon: SHELF_ICONS[shelf.id],
@@ -57,12 +59,14 @@ const TUILES = [
 ];
 ---
 
-<Base title="Accueil" wide>
+<Base title="Développement personnel, discipline et habitudes" description="Développement personnel, discipline, motivation et remise au sport : articles, programmes et objets pour installer de bonnes habitudes, jusqu'à la sobriété." wide>
+  <JsonLd data={{ ...PUBLISHER, email: CONTACT_EMAIL, slogan: "Sois addict à ta sobriété" }} />
+  <JsonLd data={{ "@type": "WebSite", name: PUBLISHER.name, url: absolute("/"), inLanguage: "fr" }} />
   <section class="hero">
     <div class="wrap hero-grid">
       <div>
-        <h1>Sois addict à <span class="accent">ta sobriété</span></h1>
-        <p class="subtitle">Des outils pour avancer, jour après jour.</p>
+        <h1>Vos habitudes, <span class="accent">votre progression</span></h1>
+        <p class="subtitle">Discipline, mental, sport : avancez chaque jour.</p>
         <p class="hero-actions">
           <a class="button" href="/boutique/">Voir la boutique</a>
           <a class="button button-secondary" href="/appli/">Découvrir l'appli</a>

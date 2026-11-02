@@ -1,9 +1,11 @@
 ---
-import { ArrowLeft } from "@lucide/astro";
 import { render } from "astro:content";
 import Base from "../../layouts/Base.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+import JsonLd from "../../components/JsonLd.astro";
 import { ARTICLE_CATEGORIES } from "../../data/site";
 import { getVisibleArticles } from "../../lib/articles";
+import { DEFAULT_IMAGE, PUBLISHER, absolute } from "../../lib/seo";
 
 export async function getStaticPaths() {
   const articles = await getVisibleArticles();
@@ -13,10 +15,22 @@ export async function getStaticPaths() {
 const { article } = Astro.props;
 const { Content } = await render(article);
 const category = ARTICLE_CATEGORIES.find((item) => item.id === article.data.category);
+const structured = {
+  "@type": "Article",
+  headline: article.data.title,
+  description: article.data.description,
+  datePublished: article.data.date.toISOString().slice(0, 10),
+  inLanguage: "fr",
+  image: absolute(DEFAULT_IMAGE),
+  mainEntityOfPage: absolute(Astro.url.pathname),
+  author: PUBLISHER,
+  publisher: PUBLISHER,
+};
 ---
 
-<Base title={article.data.title} description={article.data.description}>
-  <a class="back" href="/articles/"><ArrowLeft size={16} aria-hidden="true" />Tous les articles</a>
+<Base title={article.data.title} description={article.data.description} ogType="article" noindex={article.data.draft}>
+  <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Articles", href: "/articles/" }, { label: article.data.title }]} />
+  <JsonLd data={structured} />
   <article>
     <p class="meta">
       <span class="badge">{category?.label}</span>
@@ -25,6 +39,15 @@ const category = ARTICLE_CATEGORIES.find((item) => item.id === article.data.cate
     <h1>{article.data.title}</h1>
     <div class="prose"><Content /></div>
   </article>
+
+  <aside class="more" aria-labelledby="more-title">
+    <h2 id="more-title">Pour aller plus loin</h2>
+    <ul>
+      <li><a href="/boutique/programme-30-jours/">Le programme « 30 jours pour reprendre le contrôle »</a></li>
+      <li><a href="/appli/">Suivez vos habitudes avec l'appli Addictive</a></li>
+      <li><a href="/articles/">Tous les articles</a></li>
+    </ul>
+  </aside>
 </Base>
 
 <style>
@@ -33,5 +56,19 @@ const category = ARTICLE_CATEGORIES.find((item) => item.id === article.data.cate
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-block: 0.5rem 0.75rem;
+  }
+
+  .more {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .more ul {
+    margin-top: 0.5rem;
+  }
+
+  .more li {
+    padding-block: 0.25rem;
   }
 </style>

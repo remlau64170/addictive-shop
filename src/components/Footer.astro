@@ -1,14 +1,13 @@
 ---
 import { ChevronDown } from "@lucide/astro";
-import { LEGAL_PAGES, SHOP_NEEDS, SHOP_SHELVES } from "../data/site";
+import { LEGAL_PAGES, SHOP_SHELVES, SLOGAN } from "../data/site";
 
 const COLUMNS = [
   {
     title: "Boutique",
     links: [
       { href: "/boutique/", label: "Toute la boutique" },
-      ...SHOP_SHELVES.map((shelf) => ({ href: `/boutique/#type=${shelf.id}`, label: shelf.label })),
-      ...SHOP_NEEDS.map((need) => ({ href: `/boutique/#besoin=${need.id}`, label: need.label })),
+      ...SHOP_SHELVES,
     ],
   },
   {
@@ -21,6 +20,8 @@ const COLUMNS = [
       { href: "/articles/", label: "Articles" },
       { href: "/appli/", label: "L'appli" },
       { href: "/a-propos/", label: "À propos" },
+      { href: "/faq/", label: "Questions fréquentes" },
+      { href: "/contact/", label: "Contact" },
     ],
   },
 ];
@@ -45,6 +46,7 @@ const COLUMNS = [
   </div>
   <div class="wrap bottom">
     <a class="help" href="/aide/">Besoin d'aide ?</a>
+    <p class="signature">{SLOGAN}</p>
     <p>© 2026 Addictive. Nos contenus ne remplacent pas l'avis d'un professionnel de santé.</p>
   </div>
 </footer>
@@ -100,6 +102,11 @@ const COLUMNS = [
     margin-top: 0.75rem;
     color: var(--muted-foreground);
     font-size: 0.875rem;
+  }
+
+  .signature {
+    color: var(--foreground);
+    font-weight: 700;
   }
 
   .help {

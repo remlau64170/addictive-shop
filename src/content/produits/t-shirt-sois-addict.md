@@ -2,12 +2,11 @@
 title: "Sois addict à ta sobriété"
 kind: T-shirt
 shelf: physiques
-summary: "Un t-shirt noir pour porter fièrement le slogan d'Addictive."
+summary: "Un t-shirt noir à porter à l'entraînement comme au quotidien, avec le slogan d'Addictive."
 images:
   - { src: /produits/tshirt-1.webp, alt: "T-shirt noir vu de face, avec le slogan Sois addict à ta sobriété" }
   - { src: /produits/tshirt-2.webp, alt: "T-shirt noir vu de dos, avec le petit logo Addictive" }
   - { src: /produits/tshirt-3.webp, alt: "Gros plan sur le motif du t-shirt" }
-needs: [mental-discipline]
 price: 29
 order: 3
 sizes: [S, M, L, XL, XXL]
@@ -21,6 +20,6 @@ specs:
   - { label: Délai indicatif, value: "Fabriqué à la demande, expédié sous 3 à 5 jours ouvrés" }
 ---
 
-Un t-shirt noir, simple et facile à porter, pour vous rappeler chaque jour le chemin parcouru. Le slogan se lit de loin, le petit logo reste discret dans le dos.
+Un t-shirt noir, simple et facile à porter, à l'entraînement comme au quotidien. Le slogan se lit de loin et vous rappelle chaque jour le chemin parcouru, le petit logo reste discret dans le dos.
 
 Chaque t-shirt est fabriqué à la demande, à votre taille.

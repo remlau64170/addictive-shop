@@ -9,7 +9,7 @@ export function getStaticPaths() {
 const { label } = Astro.props;
 ---
 
-<Base title={label}>
+<Base title={label} description={`${label} du site Addictive : page en cours de rédaction.`} noindex>
   <h1>{label}</h1>
   <p class="section"><span class="badge badge-violet">À rédiger</span></p>
 </Base>

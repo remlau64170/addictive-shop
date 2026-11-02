@@ -6,6 +6,12 @@ import { getProduits, productName } from "../lib/produits";
 
 const results = [
   {
+    href: "/faq/",
+    type: "Questions",
+    title: "Questions fréquentes",
+    text: "Commandes, téléchargement, délais, paiement, appli et données personnelles.",
+  },
+  {
     href: "/aide/",
     type: "Aide",
     title: "Besoin d'aide ?",
@@ -26,7 +32,7 @@ const results = [
 ];
 ---
 
-<Base title="Recherche" description="Recherchez un produit ou un article Addictive.">
+<Base title="Recherche" description="Recherchez un produit, un article ou une réponse sur le site Addictive." noindex>
   <h1>Recherche</h1>
   <div class="field needs-js" role="search">
     <Search size={20} aria-hidden="true" />
