@@ -79,7 +79,7 @@ const TUILES = [
           sizes="(min-width: 768px) 55vw, 100vw"
           width="1600"
           height="600"
-          alt="Le programme, le kit, le t-shirt et la gourde Addictive réunis"
+          alt="Le programme Série 30, les cartes SOS Envie, le t-shirt et la gourde Addictive réunis"
         />
         <span class="demo-note">Visuel de démonstration</span>
       </div>
@@ -149,6 +149,9 @@ const TUILES = [
             {derniers.map((article) => (
               <li>
                 <a class="card" href={`/articles/${article.id}/`}>
+                  {article.data.cover && (
+                    <img class="cover" src={article.data.cover.src.replace(".webp", "-800.webp")} width="800" height="450" loading="lazy" alt={article.data.cover.alt} />
+                  )}
                   {article.data.draft && <span class="badge badge-violet">Brouillon</span>}
                   <h3>{article.data.title}</h3>
                   <p>{article.data.description}</p>

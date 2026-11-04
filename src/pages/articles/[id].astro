@@ -5,6 +5,7 @@ import Breadcrumb from "../../components/Breadcrumb.astro";
 import JsonLd from "../../components/JsonLd.astro";
 import { ARTICLE_CATEGORIES } from "../../data/site";
 import { getVisibleArticles } from "../../lib/articles";
+import { getProduits, productName } from "../../lib/produits";
 import { DEFAULT_IMAGE, PUBLISHER, absolute } from "../../lib/seo";
 
 export async function getStaticPaths() {
@@ -15,20 +16,22 @@ export async function getStaticPaths() {
 const { article } = Astro.props;
 const { Content } = await render(article);
 const category = ARTICLE_CATEGORIES.find((item) => item.id === article.data.category);
+const cover = article.data.cover;
+const related = (await getProduits()).find((produit) => produit.id === article.data.related);
 const structured = {
   "@type": "Article",
   headline: article.data.title,
   description: article.data.description,
   datePublished: article.data.date.toISOString().slice(0, 10),
   inLanguage: "fr",
-  image: absolute(DEFAULT_IMAGE),
+  image: absolute(cover?.src ?? DEFAULT_IMAGE),
   mainEntityOfPage: absolute(Astro.url.pathname),
   author: PUBLISHER,
   publisher: PUBLISHER,
 };
 ---
 
-<Base title={article.data.title} description={article.data.description} ogType="article" noindex={article.data.draft}>
+<Base title={article.data.seoTitle ?? article.data.title} description={article.data.description} ogType="article" noindex={article.data.draft} image={cover?.src}>
   <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Articles", href: "/articles/" }, { label: article.data.title }]} />
   <JsonLd data={structured} />
   <article>
@@ -37,13 +40,14 @@ const structured = {
       {article.data.draft && <span class="badge badge-violet">Brouillon</span>}
     </p>
     <h1>{article.data.title}</h1>
+    {cover && <img class="cover" src={cover.src} width="1600" height="900" alt={cover.alt} />}
     <div class="prose"><Content /></div>
   </article>
 
   <aside class="more" aria-labelledby="more-title">
     <h2 id="more-title">Pour aller plus loin</h2>
     <ul>
-      <li><a href="/boutique/programme-30-jours/">Le programme « 30 jours pour reprendre le contrôle »</a></li>
+      {related && <li><a href={`/boutique/${related.id}/`}>{productName(related)}</a></li>}
       <li><a href="/appli/">Suivez vos habitudes avec l'appli Addictive</a></li>
       <li><a href="/articles/">Tous les articles</a></li>
     </ul>
@@ -56,6 +60,13 @@ const structured = {
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-block: 0.5rem 0.75rem;
+  }
+
+  .cover {
+    width: 100%;
+    height: auto;
+    margin-top: 1.25rem;
+    border-radius: var(--radius);
   }
 
   .more {

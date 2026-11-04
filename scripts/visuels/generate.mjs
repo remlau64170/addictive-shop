@@ -74,23 +74,9 @@ const lockup = (size = 34) =>
 const programmeCover = `<div style="${coverBase}">
   ${lockup()}
   <p style="margin-top:52px; font-size:17px; font-weight:600; letter-spacing:.2em; color:#9fb3d9">PROGRAMME</p>
-  <p class="grad" style="font-size:196px; line-height:.95; font-weight:800; letter-spacing:-.04em">30</p>
-  <p style="font-size:40px; line-height:1.02; font-weight:800; margin-top:4px">jours</p>
-  <p style="font-size:35px; line-height:1.16; font-weight:700; margin-top:18px">pour reprendre<br>le contrôle</p>
+  <p style="font-size:58px; line-height:1; font-weight:800; margin-top:8px">Série <span class="grad" style="font-size:150px; letter-spacing:-.04em">30</span></p>
+  <p style="font-size:33px; line-height:1.16; font-weight:700; margin-top:16px">30 jours pour<br>reprendre la main</p>
   <p style="margin-top:auto; font-size:17px; color:#b6c3dc">Une étape par jour, à votre rythme.</p>
-</div>`;
-
-const kitCover = `<div style="${coverBase}">
-  ${lockup()}
-  <p style="margin-top:40px; font-size:17px; font-weight:600; letter-spacing:.2em; color:#9fb3d9">KIT</p>
-  <p style="font-size:40px; line-height:1.1; font-weight:800; margin-top:10px">Gérer une envie<br>en <span class="grad">10 minutes</span></p>
-  <svg viewBox="0 0 240 240" width="238" height="238" style="margin:28px auto 0">
-    <defs><linearGradient id="r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2fd6c3"/><stop offset=".55" stop-color="#4d9cf5"/><stop offset="1" stop-color="#8a6cf0"/></linearGradient></defs>
-    <circle cx="120" cy="120" r="100" fill="none" stroke="rgb(255 255 255 / .1)" stroke-width="16"/>
-    <path d="M120 20 A100 100 0 1 1 33 170" fill="none" stroke="url(#r)" stroke-width="16" stroke-linecap="round"/>
-    <text x="120" y="136" text-anchor="middle" font-family="Jakarta" font-weight="800" font-size="62" fill="#eef2f8">10:00</text>
-  </svg>
-  <p style="margin-top:auto; font-size:17px; color:#b6c3dc">Des fiches à garder sous la main.</p>
 </div>`;
 
 /* ---------- Pages intérieures ---------- */
@@ -112,10 +98,10 @@ const sommaire = sheet(`${lockup(28)}
   ${[
     ["Bienvenue", "Comment utiliser ce programme", "3"],
     ["Semaine 1", "Comprendre vos envies", "6"],
-    ["Semaine 2", "Installer de nouvelles habitudes", "20"],
-    ["Semaine 3", "Tenir dans les moments difficiles", "34"],
-    ["Semaine 4", "Consolider votre progression", "48"],
-    ["Et après", "Garder le cap, jour après jour", "62"],
+    ["Semaine 2", "Installer de nouvelles habitudes", "14"],
+    ["Semaine 3", "Tenir dans les moments difficiles", "22"],
+    ["Semaine 4", "Consolider votre progression", "30"],
+    ["Votre plan", "« Si… alors… » à remplir", "40"],
   ]
     .map(
       ([title, text, page]) => `<div style="display:flex; align-items:center; gap:18px; padding:14px 18px; border-radius:14px; background:rgb(255 255 255 / .05)">
@@ -130,39 +116,11 @@ const jour1 = sheet(`${eyebrow("SEMAINE 1")}
   <p style="margin-top:18px; font-size:19px; line-height:1.5; color:#c6d1e6">Aujourd'hui, rien à prouver. Prenez simplement cinq minutes pour noter où vous en êtes. Être ici est déjà un premier pas.</p>
   <div style="margin-top:22px; padding:20px; border-radius:16px; background:rgb(77 156 245 / .14); border:1px solid rgb(77 156 245 / .35)">
     <p style="font-size:19px; font-weight:700">L'exercice du jour</p>
-    <p style="margin-top:6px; font-size:18px; line-height:1.45; color:#c6d1e6">Écrivez trois raisons qui vous donnent envie de reprendre le contrôle.</p></div>
+    <p style="margin-top:6px; font-size:18px; line-height:1.45; color:#c6d1e6">Écrivez trois raisons qui vous donnent envie de reprendre la main.</p></div>
   <div style="margin-top:22px; display:grid; gap:12px; font-size:18px">
     ${["Je note mes trois raisons", "Je choisis un moment de la journée", "Je me félicite d'avoir commencé"]
       .map((text) => `<p style="display:flex; align-items:center; gap:12px"><span style="width:22px; height:22px; border-radius:7px; border:2px solid #2fd6c3"></span>${text}</p>`)
       .join("")}</div>${pageNo("7")}`, { rotate: 2 });
-
-const respiration = sheet(`${eyebrow("FICHE 1")}
-  <p style="margin-top:12px; font-size:46px; line-height:1.06; font-weight:800">Respiration<br><span class="grad">4-6</span></p>
-  <p style="margin-top:14px; font-size:19px; line-height:1.5; color:#c6d1e6">Installez-vous, relâchez les épaules et laissez l'envie passer, une respiration après l'autre.</p>
-  <svg viewBox="0 0 480 250" width="486" height="250" style="margin-top:14px">
-    <defs><linearGradient id="w" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2fd6c3"/><stop offset=".55" stop-color="#4d9cf5"/><stop offset="1" stop-color="#8a6cf0"/></linearGradient></defs>
-    <path d="M10 190 C70 190 80 40 150 40 C230 40 240 190 320 190 C370 190 380 90 470 60" fill="none" stroke="url(#w)" stroke-width="10" stroke-linecap="round"/>
-    <text x="10" y="238" font-family="Jakarta" font-weight="700" font-size="24" fill="#eef2f8">Inspirez <tspan font-weight="400" font-size="20" fill="#b6c3dc">4 secondes</tspan></text>
-    <text x="470" y="238" text-anchor="end" font-family="Jakarta" font-weight="700" font-size="24" fill="#eef2f8">Expirez <tspan font-weight="400" font-size="20" fill="#b6c3dc">6 secondes</tspan></text>
-  </svg>
-  <div style="margin-top:16px; padding:18px 20px; border-radius:16px; background:rgb(47 214 195 / .12); border:1px solid rgb(47 214 195 / .35); font-size:19px; font-weight:600">Répétez dix fois, sans forcer.</div>${pageNo("3")}`);
-
-const sport = sheet(`${eyebrow("FICHE 2")}
-  <p style="margin-top:12px; font-size:44px; line-height:1.06; font-weight:800">Défi sport<br><span class="grad">express</span></p>
-  <p style="margin-top:14px; font-size:19px; line-height:1.5; color:#c6d1e6">Bouger change les idées. Allez à votre rythme et adaptez chaque mouvement.</p>
-  <div style="margin-top:20px; display:grid; gap:12px">
-  ${[
-    ["2 min", "Marche sur place"],
-    ["10", "Flexions de jambes"],
-    ["30 s", "Étirements des bras"],
-    ["10", "Rotations des épaules"],
-    ["1 min", "Respiration calme"],
-  ]
-    .map(
-      ([value, text]) => `<div style="display:flex; align-items:center; gap:16px; padding:12px 16px; border-radius:14px; background:rgb(255 255 255 / .05)">
-      <p class="grad" style="width:92px; font-size:26px; font-weight:800">${value}</p><p style="font-size:20px; font-weight:600">${text}</p></div>`,
-    )
-    .join("")}</div>${pageNo("5")}`, { rotate: 2 });
 
 /* ---------- T-shirt ---------- */
 
@@ -256,20 +214,109 @@ function bottle({ viewBox = "0 0 1000 1000", shadow = true }) {
   </svg>`;
 }
 
+/* ---------- SOS Envie : jeu de cartes ---------- */
+
+const PROTOCOLE = [
+  ["0–1 min", "Stop", "Posez ce que vous faites. Dites-vous : « c'est une vague, elle va passer »."],
+  ["1–3 min", "Respirez", "Inspirez 4 secondes, expirez 6 secondes. Recommencez dix fois."],
+  ["3–5 min", "Bougez", "20 squats, une marche rapide ou quelques étirements."],
+  ["5–8 min", "Changez de décor", "Buvez un grand verre d'eau et changez de pièce."],
+  ["8–10 min", "Faites le point", "L'envie a baissé ? Notez ce qui vous a aidé."],
+];
+
+function sosCard([time, title, text], index, { width = 360 } = {}) {
+  const s = width / 360;
+  return `<div style="position:relative; width:${width}px; height:${500 * s}px; padding:${30 * s}px ${28 * s}px; border-radius:${22 * s}px; overflow:hidden; display:flex; flex-direction:column;
+    background: radial-gradient(${260 * s}px ${220 * s}px at 100% 0, rgb(138 108 240 / .45), transparent 70%), radial-gradient(${260 * s}px ${220 * s}px at 0 100%, rgb(47 214 195 / .3), transparent 70%), linear-gradient(160deg, #131c46, #0b1130);
+    box-shadow: 0 ${24 * s}px ${50 * s}px rgb(0 0 0 / .55), inset 0 0 0 ${2 * s}px rgb(255 255 255 / .08)">
+    <div style="display:flex; justify-content:space-between; align-items:center; font-size:${15 * s}px; font-weight:700; letter-spacing:.14em; color:#2fd6c3">
+      <span>ÉTAPE ${index + 1}/5</span><span style="padding:${5 * s}px ${12 * s}px; border-radius:999px; background:rgb(77 156 245 / .2); color:#cfe0ff; letter-spacing:0">${time}</span></div>
+    <p class="grad" style="margin-top:${26 * s}px; font-size:${120 * s}px; line-height:.9; font-weight:800">${index + 1}</p>
+    <p style="margin-top:${18 * s}px; font-size:${38 * s}px; line-height:1.05; font-weight:800">${title}</p>
+    <p style="margin-top:${14 * s}px; font-size:${19 * s}px; line-height:1.45; color:#c6d1e6">${text}</p>
+    <div style="margin-top:auto; display:flex; align-items:center; gap:${8 * s}px; font-size:${15 * s}px; font-weight:700; color:#9fb3d9">
+      <img src="logo.png" width="${22 * s}" height="${22 * s}" alt=""> SOS Envie</div>
+  </div>`;
+}
+
+const sosFan = `<div class="floor"></div>
+  <div class="cast" style="left:220px; top:760px; width:560px; height:110px"></div>
+  ${PROTOCOLE.map((step, index) => [step, index]).reverse().map(([step, index]) => {
+    const angle = (index - 2) * 11;
+    return `<div style="position:absolute; left:320px; top:210px; transform-origin:50% 120%; transform:rotate(${angle}deg) translateY(${Math.abs(index - 2) * 14}px)">${sosCard(step, index)}</div>`;
+  }).join("")}`;
+
+const sosCloseUp = `<div class="floor"></div>
+  <div class="cast" style="left:260px; top:800px; width:500px; height:100px"></div>
+  <div style="position:absolute; left:255px; top:115px; transform:rotate(-4deg)">${sosCard(PROTOCOLE[1], 1, { width: 490 })}</div>`;
+
+const sosPhone = `<div class="floor"></div>
+  <div class="cast" style="left:330px; top:850px; width:360px; height:90px"></div>
+  <div style="position:absolute; left:340px; top:70px; width:330px; height:690px; padding:12px; border-radius:52px; transform:rotate(-6deg);
+    background:linear-gradient(135deg, #4a5168, #1d2233 45%, #3a4156); box-shadow:inset 0 0 0 2px rgb(255 255 255 / .2), 10px 30px 60px rgb(0 0 0 / .6)">
+    <div style="position:relative; width:100%; height:100%; border-radius:42px; overflow:hidden; padding:70px 26px 30px;
+      background: radial-gradient(260px 240px at 100% 0, rgb(138 108 240 / .55), transparent 70%), radial-gradient(260px 260px at 0 100%, rgb(47 214 195 / .35), transparent 70%), linear-gradient(170deg, #121b45, #070b1a)">
+      <span style="position:absolute; top:14px; left:50%; width:96px; height:26px; margin-left:-48px; border-radius:999px; background:#000"></span>
+      <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; color:#9fb3d9"><img src="logo.png" width="22" height="22" alt=""> SOS Envie</div>
+      <p style="margin-top:14px; font-size:30px; line-height:1.1; font-weight:800">La vague<br><span class="grad">va passer.</span></p>
+      <div style="margin-top:22px; display:grid; gap:10px">
+        ${PROTOCOLE.map(([time, title], index) => `<div style="display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:14px; background:rgb(255 255 255 / .07)">
+          <span class="grad" style="width:22px; font-size:24px; font-weight:800">${index + 1}</span>
+          <span style="flex:1"><span style="display:block; font-size:16px; font-weight:700">${title}</span><span style="font-size:13px; color:#b6c3dc">${time}</span></span></div>`).join("")}
+      </div>
+    </div>
+  </div>`;
+
+/* ---------- Couvertures d'articles (1600 × 900) ---------- */
+
+const articleFrame = (eyebrow, title, visual) => `<div style="position:relative; width:1600px; height:900px; overflow:hidden; padding:96px 110px;
+  background: radial-gradient(760px 600px at 92% 12%, rgb(138 108 240 / .38), transparent 70%), radial-gradient(760px 560px at 0 100%, rgb(47 214 195 / .24), transparent 70%), linear-gradient(160deg, #111a42, #070b1a)">
+  ${lockup(48)}
+  <p style="margin-top:210px; font-size:26px; font-weight:700; letter-spacing:.18em; color:#2fd6c3">${eyebrow}</p>
+  <p style="margin-top:20px; width:600px; font-size:72px; line-height:1.06; font-weight:800; letter-spacing:-.02em">${title}</p>
+  ${visual}
+</div>`;
+
+const habitCalendar = `<div style="position:absolute; right:110px; top:170px; width:640px; padding:44px; zoom:1.08; border-radius:36px; background:rgb(255 255 255 / .05); box-shadow:inset 0 0 0 2px rgb(255 255 255 / .07), 0 40px 80px rgb(0 0 0 / .45)">
+  <div style="display:flex; justify-content:space-between; font-size:24px; font-weight:700"><span>Votre série</span><span class="grad">25 jours</span></div>
+  <div style="margin-top:28px; display:grid; grid-template-columns:repeat(7, 1fr); gap:14px">
+    ${Array.from({ length: 35 }, (_, i) => {
+      const done = i < 26 && i !== 9;
+      const missed = i === 9;
+      return `<span style="aspect-ratio:1; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800; color:#070b1a;
+        background:${done ? "linear-gradient(135deg, #2fd6c3, #4d9cf5)" : missed ? "rgb(255 255 255 / .16)" : "rgb(255 255 255 / .06)"}">${done ? "✓" : ""}</span>`;
+    }).join("")}
+  </div>
+  <p style="margin-top:26px; font-size:22px; color:#b6c3dc">Un jour manqué n'efface rien : on reprend le lendemain.</p>
+</div>`;
+
+const sportWeeks = `<div style="position:absolute; right:110px; top:170px; width:640px; padding:44px; zoom:1.08; border-radius:36px; background:rgb(255 255 255 / .05); box-shadow:inset 0 0 0 2px rgb(255 255 255 / .07), 0 40px 80px rgb(0 0 0 / .45)">
+  <div style="display:flex; justify-content:space-between; font-size:24px; font-weight:700"><span>Reprise en 4 semaines</span><span class="grad">150 min</span></div>
+  <div style="margin-top:34px; height:330px; display:flex; align-items:flex-end; gap:30px">
+    ${[[45, "15 min"], [60, "20 min"], [100, "25 min"], [150, "30 min"]].map(([height, label], i) => `<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:12px">
+      <span style="font-size:22px; font-weight:700; color:#cfe0ff">${label}</span>
+      <span style="width:100%; height:${height * 1.8}px; border-radius:18px 18px 8px 8px; background:linear-gradient(180deg, #8a6cf0, #4d9cf5 50%, #2fd6c3)"></span>
+      <span style="font-size:20px; color:#b6c3dc">Semaine ${i + 1}</span></div>`).join("")}
+  </div>
+  <p style="margin-top:26px; font-size:22px; color:#b6c3dc">Un peu plus chaque semaine, à votre rythme.</p>
+</div>`;
+
+const ARTICLE_COVERS = {
+  "motivation-habitude": articleFrame("MENTAL ET DISCIPLINE", "Motivation ou habitude : ce qui marche vraiment", habitCalendar),
+  "reprendre-le-sport": articleFrame("SPORT ET CORPS", "Reprendre le sport après une pause", sportWeeks),
+};
+
 /* ---------- Scènes ---------- */
 
 const programmeBook = book({ cover: programmeCover });
-const kitBook = `<div style="position:absolute; left:206px; top:192px; width:430px; height:600px; border-radius:8px; background:#17214d; transform:rotate(-9deg); box-shadow:0 20px 40px rgb(0 0 0 / .5)"></div>
-  <div style="position:absolute; left:226px; top:176px; width:430px; height:600px; border-radius:8px; background:#1e2a5e; transform:rotate(-4deg); box-shadow:0 20px 40px rgb(0 0 0 / .5)"></div>
-  ${book({ cover: kitCover, depth: 20, rotate: -26, left: 290, top: 150, width: 480, height: 680 })}`;
 
 const VIEWS = {
-  "programme-1": programmeBook,
-  "programme-2": sommaire,
-  "programme-3": jour1,
-  "kit-1": kitBook,
-  "kit-2": respiration,
-  "kit-3": sport,
+  "serie-30-1": programmeBook,
+  "serie-30-2": sommaire,
+  "serie-30-3": jour1,
+  "sos-envie-1": sosFan,
+  "sos-envie-2": sosCloseUp,
+  "sos-envie-3": sosPhone,
   "tshirt-1": teeStage(tee({})),
   "tshirt-2": teeStage(tee({ back: true })),
   "tshirt-3": teeStage(tee({ viewBox: "310 265 380 380", weave: true })),
@@ -282,7 +329,7 @@ const VIEWS = {
 const HERO = `<div class="stage" style="width:1600px; height:600px"><div class="floor" style="height:130px"></div>
   ${[
     [-310, programmeBook, .58, -215],
-    [50, kitBook, .58, -215],
+    [50, sosFan, .58, -200],
     [460, tee({}), .58, -205],
     [850, bottle({ shadow: false }), .56, -205],
   ]
@@ -337,6 +384,15 @@ for (const [name, inner] of Object.entries(VIEWS)) {
   await toWebp(png, join(OUT, `${name}.webp`), 1000, 1000);
   await toWebp(png, join(OUT, `${name}-480.webp`), 480, 480);
   console.log(name, Math.round(statSync(join(OUT, `${name}.webp`)).size / 1024), "Ko");
+}
+const ARTICLES = join(ROOT, "public/articles");
+mkdirSync(ARTICLES, { recursive: true });
+for (const [name, html] of Object.entries(ARTICLE_COVERS)) {
+  if (only && only !== name) continue;
+  const png = capture(`article-${name}`, html, 1600, 900);
+  await toWebp(png, join(ARTICLES, `${name}.webp`), 1600, 900);
+  await toWebp(png, join(ARTICLES, `${name}-800.webp`), 800, 450);
+  console.log(name, Math.round(statSync(join(ARTICLES, `${name}.webp`)).size / 1024), "Ko");
 }
 if (!only || only === "hero") {
   const png = capture("hero", HERO, 1600, 600);

@@ -11,6 +11,12 @@ const articles = defineCollection({
     date: z.coerce.date(),
     /** Brouillon : visible avec `npm run dev`, absent du site construit. */
     draft: z.boolean().default(false),
+    /** Titre court pour les moteurs de recherche ; sinon, le titre de l'article. */
+    seoTitle: z.string().optional(),
+    /** Image de couverture, dans public/articles/ (une version -800 existe pour les listes). */
+    cover: z.object({ src: z.string(), alt: z.string() }).optional(),
+    /** Produit proposé dans « Pour aller plus loin » (nom du fichier, sans .md). */
+    related: z.string().optional(),
   }),
 });
 
@@ -18,6 +24,8 @@ const produits = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/produits" }),
   schema: z.object({
     title: z.string(),
+    /** Nom complet affiché ; sinon « Type « titre » ». */
+    name: z.string().optional(),
     kind: z.string(),
     shelf: z.enum(["numeriques", "physiques"]),
     summary: z.string(),

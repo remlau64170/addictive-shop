@@ -9,7 +9,7 @@ export const FAQ = [
   },
   {
     question: "Comment recevrai-je un produit numérique ?",
-    answer: "Les programmes et les kits sont prévus au format PDF, avec un téléchargement immédiat après l'achat. Le mode de téléchargement exact est à confirmer avant l'ouverture.",
+    answer: "Les produits numériques sont prévus au format PDF, avec un téléchargement immédiat après l'achat. Le mode de téléchargement exact est à confirmer avant l'ouverture.",
   },
   {
     question: "Quels sont les délais pour les produits physiques ?",

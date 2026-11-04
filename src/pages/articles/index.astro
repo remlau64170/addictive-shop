@@ -26,7 +26,10 @@ const articles = await getVisibleArticles();
               {inCategory.map((article) => (
                 <li>
                   <a class="card" href={`/articles/${article.id}/`}>
-                    {article.data.draft && <span class="badge badge-violet">Brouillon</span>}
+                    {article.data.cover && (
+                    <img class="cover" src={article.data.cover.src.replace(".webp", "-800.webp")} width="800" height="450" loading="lazy" alt={article.data.cover.alt} />
+                  )}
+                  {article.data.draft && <span class="badge badge-violet">Brouillon</span>}
                     <h3>{article.data.title}</h3>
                     <p>{article.data.description}</p>
                   </a>

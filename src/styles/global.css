@@ -294,6 +294,44 @@ a.card:hover {
   margin-top: 1.75rem;
 }
 
+.card .cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 0.75rem;
+  border-radius: calc(var(--radius) - 4px);
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.prose th,
+.prose td {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th {
+  color: var(--muted-foreground);
+  font-weight: 600;
+}
+
+/* 1re colonne assez large pour son en-tête ; ailleurs, les mots longs se coupent avec un tiret. */
+.prose th:first-child,
+.prose td:first-child {
+  width: 6em;
+}
+
+.prose th,
+.prose td {
+  hyphens: auto;
+}
+
 .prose ul {
   padding-left: 1.25rem;
   list-style: disc;

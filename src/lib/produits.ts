@@ -8,7 +8,7 @@ export async function getProduits() {
 }
 
 export function productName(produit: Produit) {
-  return `${produit.data.kind} « ${produit.data.title} »`;
+  return produit.data.name ?? `${produit.data.kind} « ${produit.data.title} »`;
 }
 
 /** Aucun prix n'est inventé : tant que `price` est vide, la page affiche « Prix à définir ». */
