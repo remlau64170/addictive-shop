@@ -8,6 +8,8 @@ import { SHOP_SHELVES } from "../../data/site";
 import JsonLd from "../../components/JsonLd.astro";
 import { formatPrice, getProduits, productName, thumbnail } from "../../lib/produits";
 import { PUBLISHER, absolute } from "../../lib/seo";
+import { avisDuProduit, demiEtoiles, moisAnnee, noteMoyenne } from "../../lib/avis";
+import Etoiles from "../../components/Etoiles.astro";
 
 export async function getStaticPaths() {
   const produits = await getProduits();
@@ -26,7 +28,12 @@ const liees = produits
   .sort((a, b) => Number(b.data.shelf === produit.data.shelf) - Number(a.data.shelf === produit.data.shelf))
   .slice(0, 3);
 
-// Aucune note ni avis. La boutique n'est pas ouverte : le produit reste indiqué comme indisponible jusqu'à l'ouverture.
+const avis = avisDuProduit(produit.id);
+const moyenne = avis.length > 0 ? noteMoyenne(avis) : 0;
+const frNote = (note: number) => String(note).replace(".", ",");
+
+// Note et avis seulement s'il existe de vrais avis pour ce produit. La boutique n'est pas ouverte : le produit reste indiqué
+// comme indisponible jusqu'à l'ouverture.
 const structured = {
   "@type": "Product",
   name,
@@ -42,6 +49,18 @@ const structured = {
     price: produit.data.price?.toFixed(2),
     availability: "https://schema.org/OutOfStock",
   },
+  ...(avis.length > 0
+    ? {
+        aggregateRating: { "@type": "AggregateRating", ratingValue: moyenne, reviewCount: avis.length, bestRating: 5, worstRating: 1 },
+        review: avis.map((item) => ({
+          "@type": "Review",
+          author: { "@type": "Person", name: item.prenom },
+          datePublished: item.date,
+          reviewBody: item.texte,
+          reviewRating: { "@type": "Rating", ratingValue: item.note, bestRating: 5, worstRating: 1 },
+        })),
+      }
+    : {}),
 };
 ---
 
@@ -104,6 +123,37 @@ const structured = {
     <section class="block">
       <h2>Description</h2>
       <div class="prose"><Content /></div>
+    </section>
+
+    <section class="block avis" aria-labelledby="avis-title">
+      <h2 id="avis-title">Avis</h2>
+      {
+        avis.length === 0 ? (
+          <p class="avis-vide">Pas encore d'avis. Les premiers arriveront après les premières commandes.</p>
+        ) : (
+          <>
+            <p class="avis-resume">
+              <Etoiles note={demiEtoiles(moyenne)} label={`Note moyenne : ${frNote(moyenne)} sur 5`} />
+              <strong>{frNote(moyenne)} / 5</strong>
+              <span>· {avis.length} avis</span>
+            </p>
+            <ul class="avis-liste">
+              {avis.map((item) => (
+                <li>
+                  <p class="avis-auteur">
+                    <strong>{item.prenom}</strong>
+                    <span>{moisAnnee(item.date)}</span>
+                    {item.verifie && <span class="badge">Achat vérifié</span>}
+                  </p>
+                  <p><Etoiles note={Math.round(item.note)} label={`Note : ${item.note} sur 5`} /></p>
+                  <p>{item.texte}</p>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+      <p class="avis-note">Les avis sont publiés avec l'accord de leurs auteurs, sans modification du texte.</p>
     </section>
 
     <section class="block">
@@ -262,6 +312,47 @@ const structured = {
   .prose {
     margin-top: 0;
     max-width: 42rem;
+  }
+
+  .avis-vide {
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--muted-foreground);
+  }
+
+  .avis-resume,
+  .avis-auteur {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+  }
+
+  .avis-resume {
+    font-size: 1.0625rem;
+  }
+
+  .avis-liste {
+    max-width: 42rem;
+    margin-top: 1rem;
+  }
+
+  .avis-liste li {
+    padding-block: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .avis-auteur span {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .avis-note {
+    margin-top: 0.75rem;
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
   }
 
   .contains {

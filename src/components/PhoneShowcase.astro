@@ -1,15 +1,8 @@
 ---
-import { Award, CalendarDays, ChartLine, Compass, Zap } from "@lucide/astro";
+import AppBenefits from "./AppBenefits.astro";
 import { initialState, renderApp, type Route } from "../demo/screens";
 import "../demo/demo.css";
 
-const AVANTAGES = [
-  { title: "Votre série", text: "Voyez votre progression d'un coup d'œil.", Icon: ChartLine, color: "var(--success)" },
-  { title: "Votre calendrier", text: "Retrouvez votre parcours, jour après jour.", Icon: CalendarDays, color: "var(--primary)" },
-  { title: "Une aide immédiate", text: "Une activité, un quiz ou un mini-jeu quand une envie arrive.", Icon: Zap, color: "var(--chart-3)" },
-  { title: "Vos badges", text: "Célébrez chaque étape franchie.", Icon: Award, color: "var(--success)" },
-  { title: "AddictForms", text: "Des vidéos, des conseils et des numéros d'aide vérifiés.", Icon: Compass, color: "var(--primary)" },
-];
 
 const state = initialState();
 const app = (route: Route) => renderApp(route, state);
@@ -53,17 +46,7 @@ const DECOR: { position: string; start: number; routes: Route[] }[] = [
 </div>
 <p class="mention">Démo interactive, données fictives</p>
 
-<ul class="benefits">
-  {
-    AVANTAGES.map(({ title, text, Icon, color }) => (
-      <li>
-        <Icon size={24} color={color} aria-hidden="true" />
-        <strong>{title}</strong>
-        <p>{text}</p>
-      </li>
-    ))
-  }
-</ul>
+<AppBenefits />
 
 <style>
   /* Tailles fixes par palier : `--s` réduit l'écran de 360 px de large à la largeur `--w` du téléphone. */
@@ -173,31 +156,6 @@ const DECOR: { position: string; start: number; routes: Route[] }[] = [
     text-align: center;
   }
 
-  .benefits {
-    display: grid;
-    gap: 0.75rem;
-    margin-top: 1.25rem;
-    text-align: left;
-  }
-
-  .benefits li {
-    min-width: 0;
-    padding: 1rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--card);
-  }
-
-  .benefits strong {
-    display: block;
-    margin-top: 0.5rem;
-  }
-
-  .benefits p {
-    margin-top: 0.125rem;
-    color: var(--muted-foreground);
-    font-size: 0.875rem;
-  }
 
   @media (max-width: 339px) {
     .scene {
@@ -206,11 +164,6 @@ const DECOR: { position: string; start: number; routes: Route[] }[] = [
     }
   }
 
-  @media (min-width: 600px) {
-    .benefits {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
 
   @media (min-width: 768px) {
     .scene {
@@ -256,11 +209,6 @@ const DECOR: { position: string; start: number; routes: Route[] }[] = [
     }
   }
 
-  @media (min-width: 1000px) {
-    .benefits {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-    }
-  }
 
   @media (min-width: 1100px) {
     .scene {

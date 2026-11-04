@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import PhoneShowcase from "../components/PhoneShowcase.astro";
+import AppVideo from "../components/AppVideo.astro";
 import Breadcrumb from "../components/Breadcrumb.astro";
 ---
 
@@ -9,6 +10,10 @@ import Breadcrumb from "../components/Breadcrumb.astro";
     <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "L'appli" }]} />
     <h1>L'appli Addictive</h1>
     <p class="lead">Un soutien au quotidien pour reprendre la main, à votre rythme.</p>
+    <div class="video">
+      <AppVideo />
+    </div>
+    <h2 class="demo-title">Essayez la démo interactive</h2>
     <PhoneShowcase />
     <p class="section"><button class="button" type="button" disabled>Bientôt disponible</button></p>
     <p class="lead">Application réservée aux personnes de 16 ans et plus.</p>
@@ -20,6 +25,14 @@ import Breadcrumb from "../components/Breadcrumb.astro";
   .appli {
     padding-block: 1.5rem 2.5rem;
     text-align: center;
+  }
+
+  .video {
+    margin-top: 1.5rem;
+  }
+
+  .demo-title {
+    margin-top: 2.5rem;
   }
 
   .appli :global(ol) {

@@ -4,3 +4,6 @@ dist/
 .env*
 *.log
 .DS_Store
+
+# Vidéos et fichiers de travail hors du site (par exemple la vidéo TikTok) : jamais dans git
+medias/

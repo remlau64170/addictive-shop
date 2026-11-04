@@ -15,7 +15,8 @@ import {
 import Base from "../layouts/Base.astro";
 import JsonLd from "../components/JsonLd.astro";
 import ProductCard from "../components/ProductCard.astro";
-import PhoneShowcase from "../components/PhoneShowcase.astro";
+import AppBenefits from "../components/AppBenefits.astro";
+import AppVideo from "../components/AppVideo.astro";
 import { ARTICLE_CATEGORIES, SHOP_SHELVES } from "../data/site";
 import { getVisibleArticles } from "../lib/articles";
 import { getProduits } from "../lib/produits";
@@ -98,7 +99,9 @@ const TUILES = [
   <section class="band app-band" aria-labelledby="app-title">
     <div class="wrap">
       <h2 id="app-title">Suivez votre progression avec Addictive</h2>
-      <PhoneShowcase />
+      <AppVideo />
+      <AppBenefits />
+      <p class="app-action"><a href="/appli/">Essayer la démo interactive</a></p>
       <p class="app-action"><button class="button" type="button" disabled>Bientôt disponible</button></p>
     </div>
   </section>
@@ -231,6 +234,10 @@ const TUILES = [
 
 
 
+
+  .app-band h2 {
+    margin-bottom: 1.25rem;
+  }
 
   .app-band h2,
   .app-action {

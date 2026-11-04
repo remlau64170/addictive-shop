@@ -6,6 +6,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 
 const ROOT = resolve(import.meta.dirname, "..");
+const AVIS = JSON.parse(readFileSync(join(resolve(import.meta.dirname, ".."), "src/data/avis.json"), "utf8"));
 const DIST = join(ROOT, "dist");
 const problems = [];
 const warn = (page, message) => problems.push(`${page} : ${message}`);
@@ -42,7 +43,10 @@ export function checkStructured(page, html) {
     types.push(data["@type"]);
     if (data["@context"] !== "https://schema.org") warn(page, "JSON-LD sans @context");
     for (const key of REQUIRED[data["@type"]] ?? ["?"]) if (!data[key]) warn(page, `${data["@type"]} sans ${key}`);
-    if (/aggregateRating|"review"/.test(raw)) warn(page, "note ou avis dans le JSON-LD");
+    const slug = page.match(/^\/boutique\/([^/]+)\/$/)?.[1];
+    const reels = AVIS.filter((avis) => avis.produit === slug).length;
+    if (/aggregateRating|"review"/.test(raw) && reels === 0) warn(page, "note ou avis dans le JSON-LD sans avis réel");
+    if (data["@type"] === "Product" && reels > 0 && data.aggregateRating?.reviewCount !== reels) warn(page, "nombre d'avis incohérent");
     if (data["@type"] === "Product") {
       const { price, priceCurrency, availability } = data.offers;
       if (!/^\d+\.\d{2}$/.test(price ?? "") || priceCurrency !== "EUR" || !availability) warn(page, `offre incomplète (${price})`);
