@@ -7,7 +7,7 @@ date: 2026-11-11
 draft: false
 ---
 
-**En bref : un écart n'est pas un échec et n'efface pas vos progrès.** Ce qui transforme un écart en rechute complète, c'est souvent la réaction qui suit : « j'ai tout gâché, autant continuer ». Les psychologues appellent cela l'effet de violation de l'abstinence. Le reconnaître permet de reprendre dès le lendemain.
+**En bref : un écart n'est pas la fin du chemin et n'efface pas vos progrès.** Ce qui transforme un écart en rechute complète, c'est souvent la réaction qui suit : « j'ai tout gâché, autant continuer ». Les psychologues appellent cela l'effet de violation de l'abstinence. Le reconnaître permet de reprendre dès le lendemain.
 
 ## Écart ou rechute : quelle différence ?
 
@@ -48,7 +48,7 @@ Si les écarts deviennent fréquents, si vous vous sentez perdu ou si la culpabi
 
 ## Questions fréquentes
 
-### Est-ce qu'une rechute veut dire que j'ai échoué ?
+### Est-ce qu'une rechute veut dire que tout est perdu ?
 Non. Beaucoup de personnes qui arrêtent durablement ont connu des écarts en chemin. Ce qui compte est la façon de reprendre ensuite.
 
 ### Dois-je remettre mon compteur à zéro ?
