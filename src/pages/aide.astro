@@ -71,7 +71,7 @@ import { EMERGENCY, HELPLINES, telHref } from "../data/helplines";
     margin-top: 1.5rem;
     padding: 1.25rem;
     border: 1px solid color-mix(in oklch, var(--danger) 40%, transparent);
-    border-radius: var(--radius);
+    border-radius: var(--radius-card);
     background: color-mix(in oklch, var(--danger-soft) 40%, transparent);
   }
 
@@ -102,9 +102,15 @@ import { EMERGENCY, HELPLINES, telHref } from "../data/helplines";
     min-height: 2.75rem;
     padding: 0.25rem 1rem;
     border: 1px solid color-mix(in oklch, var(--danger) 50%, transparent);
-    border-radius: 0.75rem;
+    border-radius: var(--radius-pill);
     color: var(--foreground);
+    font-weight: 600;
     text-decoration: none;
+    transition: background-color var(--ease);
+  }
+
+  .calls a:hover {
+    background: color-mix(in oklch, var(--danger) 22%, transparent);
   }
 
   .card h2 {

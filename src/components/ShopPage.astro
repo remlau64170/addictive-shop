@@ -21,7 +21,7 @@ const TABS = [{ href: "/boutique/", label: "Tout", id: undefined as string | und
 ---
 
 <Base title={title} description={description} wide>
-  <div class="wrap shop">
+  <div class="wrap wrap-page">
     <Breadcrumb
       items={current
         ? [{ label: "Accueil", href: "/" }, { label: "Boutique", href: "/boutique/" }, { label: current.label }]
@@ -59,15 +59,11 @@ const TABS = [{ href: "/boutique/", label: "Tout", id: undefined as string | und
 </Base>
 
 <style>
-  .shop {
-    padding-top: 0.5rem;
-  }
-
   .tabs {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 1.25rem;
+    margin-top: 1.5rem;
   }
 
   .tabs a {
@@ -76,15 +72,19 @@ const TABS = [{ href: "/boutique/", label: "Tout", id: undefined as string | und
     min-height: 2.75rem;
     padding: 0.25rem 1rem;
     border: 1px solid var(--border);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     color: var(--foreground);
     font-size: 0.9375rem;
     font-weight: 600;
     text-decoration: none;
+    transition:
+      border-color var(--ease),
+      background-color var(--ease);
   }
 
   .tabs a:hover {
     border-color: var(--primary);
+    background: var(--primary-soft);
   }
 
   .tabs a[aria-current] {
@@ -99,7 +99,7 @@ const TABS = [{ href: "/boutique/", label: "Tout", id: undefined as string | und
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem 1rem;
-    margin-block: 1rem;
+    margin-block: 1.25rem 1rem;
     color: var(--muted-foreground);
     font-size: 0.9375rem;
   }
@@ -118,10 +118,15 @@ const TABS = [{ href: "/boutique/", label: "Tout", id: undefined as string | und
     max-width: 100%;
     padding: 0.25rem 0.5rem;
     border: 1px solid var(--border);
-    border-radius: 0.75rem;
+    border-radius: var(--radius-control);
     background: var(--card);
     color: var(--foreground);
     font: inherit;
+    cursor: pointer;
+  }
+
+  select:hover {
+    border-color: var(--border-strong);
   }
 </style>
 

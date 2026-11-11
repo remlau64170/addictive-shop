@@ -46,7 +46,7 @@ const structured = {
 
   <aside class="more" aria-labelledby="more-title">
     <h2 id="more-title">Pour aller plus loin</h2>
-    <ul>
+    <ul class="link-list">
       {related && <li><a href={`/boutique/${related.id}/`}>{productName(related)}</a></li>}
       <li><a href="/appli/">Suivez vos habitudes avec l'appli Addictive</a></li>
       <li><a href="/articles/">Tous les articles</a></li>
@@ -62,24 +62,25 @@ const structured = {
     margin-block: 0.5rem 0.75rem;
   }
 
+  /* Titre d'article : un peu plus petit que les autres titres de page, pour tenir dans la colonne de lecture. */
+  h1 {
+    font-size: clamp(1.75rem, 1.45rem + 1.3vw, 2.375rem);
+  }
+
   .cover {
     width: 100%;
     height: auto;
-    margin-top: 1.25rem;
-    border-radius: var(--radius);
+    margin-top: 1.5rem;
+    border-radius: var(--radius-card);
   }
 
   .more {
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
+    margin-top: var(--space-block);
+    padding-top: 1.75rem;
     border-top: 1px solid var(--border);
   }
 
   .more ul {
-    margin-top: 0.5rem;
-  }
-
-  .more li {
-    padding-block: 0.25rem;
+    margin-top: 1rem;
   }
 </style>

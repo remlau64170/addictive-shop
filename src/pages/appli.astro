@@ -6,7 +6,7 @@ import Breadcrumb from "../components/Breadcrumb.astro";
 ---
 
 <Base title="L'appli pour suivre vos habitudes et votre sobriété" description="Avec l'appli Addictive, suivez vos habitudes, vos séries et votre progression, et trouvez de l'aide quand une envie arrive. Bientôt disponible." wide>
-  <div class="wrap appli">
+  <div class="wrap wrap-page appli">
     <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "L'appli" }]} />
     <h1>L'appli Addictive</h1>
     <p class="lead">Un soutien au quotidien pour reprendre la main, à votre rythme.</p>
@@ -15,7 +15,7 @@ import Breadcrumb from "../components/Breadcrumb.astro";
     </div>
     <h2 class="demo-title">Essayez la démo interactive</h2>
     <PhoneShowcase />
-    <p class="section"><button class="button" type="button" disabled>Bientôt disponible</button></p>
+    <p class="section"><span class="status">Bientôt disponible</span></p>
     <p class="lead">Application réservée aux personnes de 16 ans et plus.</p>
     <p class="lead">En attendant, découvrez <a href="/boutique/">la boutique</a> et <a href="/articles/">nos articles</a>.</p>
   </div>
@@ -23,8 +23,11 @@ import Breadcrumb from "../components/Breadcrumb.astro";
 
 <style>
   .appli {
-    padding-block: 1.5rem 2.5rem;
     text-align: center;
+  }
+
+  .appli .lead {
+    margin-inline: auto;
   }
 
   .video {
@@ -32,7 +35,7 @@ import Breadcrumb from "../components/Breadcrumb.astro";
   }
 
   .demo-title {
-    margin-top: 2.5rem;
+    margin-top: var(--space-block);
   }
 
   .appli :global(ol) {

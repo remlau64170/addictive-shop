@@ -59,15 +59,20 @@ const results = [
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 1rem;
-    padding-inline: 1rem;
+    margin-top: 1.25rem;
+    padding-inline: 1.125rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-pill);
     background: var(--card);
   }
 
   .field:focus-within {
     border-color: var(--ring);
+    box-shadow: 0 0 0 1px var(--ring);
+  }
+
+  .field :global(svg) {
+    color: var(--muted-foreground);
   }
 
   input {

@@ -66,7 +66,7 @@ const structured = {
 
 <Base title={name} description={produit.data.summary} wide image={images[0]!.src} ogType="product">
   <JsonLd data={structured} />
-  <div class="wrap fiche">
+  <div class="wrap wrap-page">
     <Breadcrumb
       items={[
         { label: "Accueil", href: "/" },
@@ -95,7 +95,7 @@ const structured = {
         </ul>
       </div>
 
-      <div>
+      <div class="buy">
         <h1>{name}</h1>
         <p class="price">{formatPrice(produit.data.price)}</p>
         <p class="lead">{produit.data.summary}</p>
@@ -120,6 +120,8 @@ const structured = {
       </div>
     </div>
 
+    <div class="details">
+    <div class="details-main">
     <section class="block">
       <h2>Description</h2>
       <div class="prose"><Content /></div>
@@ -155,7 +157,9 @@ const structured = {
       }
       <p class="avis-note">Les avis sont publiés avec l'accord de leurs auteurs, sans modification du texte.</p>
     </section>
+    </div>
 
+    <div class="details-side">
     <section class="block">
       <h2>Ce que contient le produit</h2>
       <ul class="contains">
@@ -184,10 +188,12 @@ const structured = {
         )
       }
     </section>
+    </div>
+    </div>
 
     <section class="block">
       <h2>Pour aller plus loin</h2>
-      <ul class="contains">
+      <ul class="link-list more-links">
         <li><a href="/appli/">Suivez vos habitudes avec l'appli Addictive</a></li>
         <li><a href="/articles/">Lisez nos articles sur la discipline et la remise au sport</a></li>
       </ul>
@@ -203,10 +209,6 @@ const structured = {
 </Base>
 
 <style>
-  .fiche {
-    padding-top: 0.5rem;
-  }
-
   .top {
     display: grid;
     gap: 1.25rem;
@@ -214,7 +216,7 @@ const structured = {
   }
 
   .top h1 {
-    font-size: 1.625rem;
+    font-size: clamp(1.625rem, 1.3rem + 1.4vw, 2.375rem);
   }
 
   .thumbs {
@@ -227,7 +229,12 @@ const structured = {
   .thumbs a {
     display: block;
     border: 2px solid transparent;
-    border-radius: 0.75rem;
+    border-radius: var(--radius-control);
+    transition: border-color var(--ease);
+  }
+
+  .thumbs a:hover {
+    border-color: var(--border-strong);
   }
 
   .thumbs a[aria-current] {
@@ -238,17 +245,17 @@ const structured = {
     display: block;
     width: 100%;
     height: auto;
-    border-radius: 0.625rem;
+    border-radius: calc(var(--radius-control) - 2px);
   }
 
   .price {
-    margin-top: 0.75rem;
-    font-size: 1.375rem;
+    margin-top: 0.625rem;
+    font-size: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
     font-weight: 800;
   }
 
   .sizes {
-    margin-top: 1rem;
+    margin-top: 1.25rem;
   }
 
   .label {
@@ -267,7 +274,7 @@ const structured = {
     min-width: 2.75rem;
     padding: 0.375rem 0.625rem;
     border: 1px solid var(--border);
-    border-radius: 0.75rem;
+    border-radius: var(--radius-control);
     background: var(--card);
     font-size: 0.875rem;
     font-weight: 600;
@@ -276,7 +283,8 @@ const structured = {
 
   .add {
     width: 100%;
-    margin-top: 1.25rem;
+    min-height: 3.25rem;
+    margin-top: 1.5rem;
   }
 
   .soon {
@@ -289,24 +297,38 @@ const structured = {
   .notice {
     display: flex;
     gap: 0.5rem;
-    margin-top: 0.75rem;
+    margin-top: 1rem;
     font-size: 0.9375rem;
   }
 
+  .delivery :global(svg),
+  .notice :global(svg) {
+    margin-top: 0.2rem;
+    color: var(--success);
+  }
+
   .notice {
-    margin-top: 1rem;
-    padding: 0.75rem 1rem;
+    padding: 0.875rem 1rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-card);
     background: var(--card);
   }
 
+  .details,
   .block {
-    margin-top: 2.5rem;
+    margin-top: var(--space-block);
   }
 
   .block h2 {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .details .block:first-child {
+    margin-top: 0;
+  }
+
+  .details-side {
+    margin-top: var(--space-block);
   }
 
   .prose {
@@ -315,9 +337,9 @@ const structured = {
   }
 
   .avis-vide {
-    padding: 1rem;
+    padding: 1rem 1.25rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-card);
     background: var(--card);
     color: var(--muted-foreground);
   }
@@ -335,7 +357,6 @@ const structured = {
   }
 
   .avis-liste {
-    max-width: 42rem;
     margin-top: 1rem;
   }
 
@@ -355,14 +376,10 @@ const structured = {
     font-size: 0.8125rem;
   }
 
-  .contains {
-    max-width: 42rem;
-  }
-
   .contains li {
     display: flex;
     gap: 0.5rem;
-    padding-block: 0.25rem;
+    padding-block: 0.3125rem;
   }
 
   .contains :global(svg) {
@@ -371,7 +388,6 @@ const structured = {
   }
 
   .specs {
-    max-width: 42rem;
     margin: 0;
   }
 
@@ -380,8 +396,12 @@ const structured = {
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 0 1rem;
-    padding-block: 0.5rem;
+    padding-block: 0.625rem;
     border-bottom: 1px solid var(--border);
+  }
+
+  .specs div:last-child {
+    border-bottom: 0;
   }
 
   .specs dt {
@@ -396,21 +416,48 @@ const structured = {
   @media (min-width: 768px) {
     .top {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 2.5rem;
+      gap: clamp(1.5rem, 4vw, 3.5rem);
       align-items: start;
     }
 
-    .gallery {
-      max-width: 32rem;
-    }
-
-    .top h1 {
-      font-size: 2rem;
+    .buy {
+      padding-top: 0.5rem;
     }
 
     .add {
       width: auto;
-      min-width: min(16rem, 100%);
+      min-width: min(18rem, 100%);
+    }
+
+    .more-links {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+  }
+
+  /* Grand écran : la description à gauche, le contenu et les caractéristiques dans un encadré à droite. */
+  @media (min-width: 1000px) {
+    .details {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: clamp(2rem, 4vw, 3.5rem);
+      align-items: start;
+    }
+
+    .details-side {
+      margin-top: 0;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      background: var(--card);
+    }
+
+    .details-side h2 {
+      font-size: 1.25rem;
+    }
+
+    .details-side .notice {
+      background: var(--secondary);
     }
   }
 </style>

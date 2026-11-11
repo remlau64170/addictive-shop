@@ -52,8 +52,8 @@ const structured = {
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    min-height: 3.25rem;
-    padding-block: 0.5rem;
+    min-height: 3.5rem;
+    padding-block: 0.75rem;
     cursor: pointer;
     list-style: none;
   }
@@ -63,9 +63,19 @@ const structured = {
   }
 
   summary h2 {
-    font-size: 1rem;
+    font-size: 1.0625rem;
     font-weight: 600;
     line-height: 1.35;
+    transition: color var(--ease);
+  }
+
+  summary:hover h2 {
+    color: var(--primary-soft-foreground);
+  }
+
+  summary :global(svg) {
+    color: var(--muted-foreground);
+    transition: transform var(--ease);
   }
 
   details[open] summary :global(svg) {

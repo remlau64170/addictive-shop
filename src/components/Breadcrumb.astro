@@ -35,17 +35,19 @@ const structured = {
 <JsonLd data={structured} />
 
 <style>
+  /* Une seule ligne : un titre long se termine par « … » au lieu de passer seul à la ligne. */
   ol {
     display: flex;
-    flex-wrap: wrap;
     margin: 0;
     padding: 0;
     list-style: none;
     font-size: 0.875rem;
+    line-height: 2.75rem;
   }
 
   li {
     display: flex;
+    flex: 0 1 auto;
     align-items: center;
     gap: 0.25rem;
     min-width: 0;
@@ -53,19 +55,50 @@ const structured = {
     color: var(--muted-foreground);
   }
 
+  li:last-child {
+    flex-shrink: 100;
+    min-width: 3rem;
+    margin-right: 0;
+  }
+
+  a,
+  [aria-current] {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
     color: var(--muted-foreground);
+    text-decoration: none;
   }
 
   a:hover {
     color: var(--foreground);
+    text-decoration: underline;
+  }
+
+  a:focus-visible {
+    outline-offset: -2px;
   }
 
   [aria-current] {
     color: var(--foreground);
     font-weight: 600;
+  }
+
+  /* Petit écran, page en profondeur : le titre de la page est juste dessous, le fil garde seulement le chemin. */
+  @media (max-width: 599px) {
+    li:last-child:not(:nth-child(-n + 2)) {
+      display: none;
+    }
+  }
+
+  /* Très petit écran, chemin de quatre niveaux : le logo ramène déjà à l'accueil, le fil commence au rayon. */
+  @media (max-width: 419px) {
+    li:first-child:nth-last-child(n + 4),
+    li:first-child:nth-last-child(n + 4) + li :global(svg) {
+      display: none;
+    }
   }
 </style>

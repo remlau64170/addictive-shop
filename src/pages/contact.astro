@@ -37,7 +37,11 @@ import { CONTACT_EMAIL } from "../lib/seo";
   form {
     display: grid;
     gap: 1rem;
-    margin-top: 1.25rem;
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background: color-mix(in oklch, var(--card) 55%, transparent);
   }
 
   label {
@@ -54,17 +58,22 @@ import { CONTACT_EMAIL } from "../lib/seo";
     min-height: 2.75rem;
     padding: 0.5rem 0.75rem;
     border: 1px solid var(--border);
-    border-radius: 0.75rem;
+    border-radius: var(--radius-control);
     background: var(--card);
     color: var(--foreground);
     font: inherit;
     font-weight: 400;
+    transition: border-color var(--ease);
+  }
+
+  input:hover,
+  textarea:hover {
+    border-color: var(--border-strong);
   }
 
   input:focus,
   textarea:focus {
     border-color: var(--ring);
-    outline: 0;
   }
 
   .button {

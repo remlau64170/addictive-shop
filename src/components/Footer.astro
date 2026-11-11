@@ -53,8 +53,7 @@ const COLUMNS = [
 
 <style>
   footer {
-    margin-top: 2rem;
-    padding-block: 1.5rem 2rem;
+    padding-block: 1rem 1.5rem;
     border-top: 1px solid var(--border);
     background: var(--card);
   }
@@ -78,19 +77,34 @@ const COLUMNS = [
     display: none;
   }
 
+  summary :global(svg) {
+    color: var(--muted-foreground);
+    transition: transform var(--ease);
+  }
+
   details[open] summary :global(svg) {
     transform: rotate(180deg);
   }
 
   ul {
-    padding-bottom: 1rem;
+    padding-bottom: 0.75rem;
   }
 
-  li a {
+  /* Liens sobres : clairs au survol, soulignés seulement à ce moment-là. */
+  li a,
+  .help {
     display: inline-flex;
     align-items: center;
     min-height: 2.75rem;
-    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+
+  li a:hover,
+  .help:hover {
+    color: var(--foreground);
+    text-decoration: underline;
   }
 
   .bottom {
@@ -110,13 +124,15 @@ const COLUMNS = [
   }
 
   .help {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-    color: var(--muted-foreground);
+    color: var(--foreground);
+    font-weight: 600;
   }
 
   @media (min-width: 900px) {
+    footer {
+      padding-block: 3rem 2rem;
+    }
+
     .columns {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -129,11 +145,17 @@ const COLUMNS = [
 
     summary {
       min-height: 0;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.625rem;
     }
 
     li a {
       min-height: 2rem;
+    }
+
+    .bottom {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
     }
 
     /* Sur ordinateur, les colonnes sont toujours ouvertes. Navigateur trop ancien : elles restent simplement repliables. */
