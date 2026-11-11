@@ -4,8 +4,9 @@ export const CONTACT_EMAIL = "contact@addictive-app.com";
 export const DEFAULT_IMAGE = "/og.jpg";
 
 export function absolute(path: string) {
-  const withSlash = path.endsWith("/") || /\.[a-z0-9]+$/i.test(path) ? path : `${path}/`;
-  return new URL(withSlash, import.meta.env.SITE).href;
+  const [pathname, hash] = path.split("#");
+  const withSlash = pathname.endsWith("/") || /\.[a-z0-9]+$/i.test(pathname) ? pathname : `${pathname}/`;
+  return new URL(withSlash + (hash ? `#${hash}` : ""), import.meta.env.SITE).href;
 }
 
 export const PUBLISHER = {

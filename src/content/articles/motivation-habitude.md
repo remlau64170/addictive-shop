@@ -1,7 +1,7 @@
 ---
 title: "Pourquoi la motivation ne suffit pas : comment une habitude se construit vraiment"
 seoTitle: "Motivation ou habitude : ce qui marche vraiment"
-description: "La motivation va et vient. Une habitude, elle, tient quand l'envie n'est pas là. Ce que dit la recherche sur le temps qu'il faut, et 4 leviers simples pour vous lancer."
+description: "La motivation va et vient, une habitude tient. Ce que dit la recherche sur le temps qu'il faut, et 4 leviers simples pour vous lancer."
 category: mental-discipline
 date: 2026-11-02
 draft: false

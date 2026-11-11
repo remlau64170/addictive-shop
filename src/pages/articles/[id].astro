@@ -4,45 +4,83 @@ import Base from "../../layouts/Base.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import JsonLd from "../../components/JsonLd.astro";
 import { ARTICLE_CATEGORIES } from "../../data/site";
-import { getVisibleArticles } from "../../lib/articles";
+import { faqFromBody, formatDate, getVisibleArticles, lastModified, relatedArticles } from "../../lib/articles";
 import { getProduits, productName } from "../../lib/produits";
 import { DEFAULT_IMAGE, PUBLISHER, absolute } from "../../lib/seo";
 
 export async function getStaticPaths() {
   const articles = await getVisibleArticles();
-  return articles.map((article) => ({ params: { id: article.id }, props: { article } }));
+  return articles.map((article) => ({ params: { id: article.id }, props: { article, all: articles } }));
 }
 
-const { article } = Astro.props;
+const { article, all } = Astro.props;
 const { Content } = await render(article);
 const category = ARTICLE_CATEGORIES.find((item) => item.id === article.data.category);
 const cover = article.data.cover;
 const related = (await getProduits()).find((produit) => produit.id === article.data.related);
+const url = absolute(Astro.url.pathname);
+const published = article.data.date;
+const modified = lastModified(article);
+const isUpdated = modified.getTime() !== published.getTime();
+const iso = (date: Date) => date.toISOString().slice(0, 10);
+const readMore = relatedArticles(article, all);
+const faq = faqFromBody(article.body);
+const categoryHref = `/articles/#${article.data.category}`;
 const structured = {
   "@type": "Article",
   headline: article.data.title,
   description: article.data.description,
-  datePublished: article.data.date.toISOString().slice(0, 10),
-  inLanguage: "fr",
+  datePublished: iso(published),
+  dateModified: iso(modified),
+  inLanguage: "fr-FR",
+  url,
   image: absolute(cover?.src ?? DEFAULT_IMAGE),
-  mainEntityOfPage: absolute(Astro.url.pathname),
+  mainEntityOfPage: url,
+  articleSection: category?.label,
   author: PUBLISHER,
   publisher: PUBLISHER,
 };
+const faqStructured = faq.length
+  ? {
+      "@type": "FAQPage",
+      inLanguage: "fr-FR",
+      mainEntity: faq.map(({ question, answer }) => ({ "@type": "Question", name: question, acceptedAnswer: { "@type": "Answer", text: answer } })),
+    }
+  : undefined;
 ---
 
 <Base title={article.data.seoTitle ?? article.data.title} description={article.data.description} ogType="article" noindex={article.data.draft} image={cover?.src}>
-  <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Articles", href: "/articles/" }, { label: article.data.title }]} />
+  <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Articles", href: "/articles/" }, ...(category ? [{ label: category.label, href: categoryHref }] : []), { label: article.data.title }]} />
   <JsonLd data={structured} />
+  {faqStructured && <JsonLd data={faqStructured} />}
   <article>
     <p class="meta">
       <span class="badge">{category?.label}</span>
       {article.data.draft && <span class="badge badge-violet">Brouillon</span>}
+      <span class="dates">
+        Publié le <time datetime={iso(published)}>{formatDate(published)}</time>
+        {isUpdated && <> · Mis à jour le <time datetime={iso(modified)}>{formatDate(modified)}</time></>}
+      </span>
     </p>
     <h1>{article.data.title}</h1>
     {cover && <img class="cover" src={cover.src} width="1600" height="900" alt={cover.alt} />}
     <div class="prose"><Content /></div>
   </article>
+
+  {
+    readMore.length > 0 && (
+      <aside class="more" aria-labelledby="read-title">
+        <h2 id="read-title">À lire aussi</h2>
+        <ul class="link-list">
+          {readMore.map((other) => (
+            <li>
+              <a href={`/articles/${other.id}/`}>{other.data.title}</a>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    )
+  }
 
   <aside class="more" aria-labelledby="more-title">
     <h2 id="more-title">Pour aller plus loin</h2>
@@ -58,8 +96,14 @@ const structured = {
   .meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
     margin-block: 0.5rem 0.75rem;
+  }
+
+  .dates {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
   }
 
   /* Titre d'article : un peu plus petit que les autres titres de page, pour tenir dans la colonne de lecture. */

@@ -7,8 +7,10 @@ const articles = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    category: z.enum(["sortir-addiction", "mental-discipline", "sport-corps", "temoignages"]),
+    category: z.enum(["envies-et-addictions", "sortir-addiction", "mental-discipline", "sport-corps", "temoignages"]),
     date: z.coerce.date(),
+    /** Date de dernière mise à jour, si elle diffère de la date de publication. */
+    updated: z.coerce.date().optional(),
     /** Brouillon : visible avec `npm run dev`, absent du site construit. */
     draft: z.boolean().default(false),
     /** Titre court pour les moteurs de recherche ; sinon, le titre de l'article. */

@@ -2,6 +2,11 @@ export const SLOGAN = "Sois addict à ta sobriété";
 
 export const ARTICLE_CATEGORIES = [
   {
+    id: "envies-et-addictions",
+    label: "Envies et addictions",
+    intro: "Comprendre les envies, les laisser passer et rebondir après un écart.",
+  },
+  {
     id: "mental-discipline",
     label: "Mental et discipline",
     intro: "Des habitudes simples pour renforcer votre motivation et tenir vos objectifs.",

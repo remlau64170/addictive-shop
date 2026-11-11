@@ -19,13 +19,14 @@ function walk(dir) {
 }
 
 const unescape = (text) => text.replace(/&#x27;|&#39;/g, "'").replace(/&amp;/g, "&").replace(/&quot;/g, '"');
+const flat = (text) => unescape(text).replace(/[\u2018\u2019]/g, "'").replace(/[\u00a0\u202f]/g, " ");
 const meta = (html, attr, name) => unescape(html.match(new RegExp(`<meta ${attr}="${name}" content="([^"]*)"`))?.[1] ?? "");
 
 const REQUIRED = {
   Organization: ["name", "url", "logo"],
   WebSite: ["name", "url"],
   Product: ["name", "description", "image", "offers"],
-  Article: ["headline", "datePublished", "author", "image"],
+  Article: ["headline", "description", "datePublished", "dateModified", "author", "publisher", "image", "inLanguage", "url"],
   FAQPage: ["mainEntity"],
   BreadcrumbList: ["itemListElement"],
 };
@@ -56,10 +57,20 @@ export function checkStructured(page, html) {
         if (item.position !== index + 1 || !item.name || !item.item?.startsWith("https://")) warn(page, "fil d'Ariane incorrect");
       });
     }
+    if (data["@type"] === "Article") {
+      const iso = /^\d{4}-\d{2}-\d{2}$/;
+      if (!iso.test(data.datePublished ?? "") || !iso.test(data.dateModified ?? "") || data.dateModified < data.datePublished) warn(page, "dates de l'article incorrectes");
+      if (data.inLanguage !== "fr-FR") warn(page, "inLanguage de l'article différent de fr-FR");
+      if (data.author?.["@type"] !== "Organization" || data.publisher?.["@type"] !== "Organization" || data.publisher?.name !== data.author?.name) warn(page, "auteur ou éditeur de l'article incorrect");
+      if (data.url !== data.mainEntityOfPage || data.url !== html.match(/<link rel="canonical" href="([^"]+)"/)?.[1]) warn(page, "url de l'article différente de l'adresse canonique");
+      if (!data.image?.startsWith("https://")) warn(page, "image de l'article non absolue");
+      if (!flat(html).includes(flat(data.headline))) warn(page, "titre de l'article absent de la page");
+    }
     if (data["@type"] === "FAQPage") {
-      for (const { name, acceptedAnswer } of data.mainEntity) {
-        if (!html.includes(name) && !unescape(html).includes(name)) warn(page, `question absente de la page : ${name}`);
-        if (!unescape(html).includes(acceptedAnswer.text)) warn(page, `réponse absente de la page : ${name}`);
+      if (!data.mainEntity?.length) warn(page, "FAQPage sans question");
+      for (const { name, acceptedAnswer } of data.mainEntity ?? []) {
+        if (!flat(html).includes(flat(name))) warn(page, `question absente de la page : ${name}`);
+        if (!flat(html).includes(flat(acceptedAnswer?.text ?? "\u0000"))) warn(page, `réponse absente de la page : ${name}`);
       }
     }
   }
@@ -81,7 +92,7 @@ for (const file of pages) {
   if (!html.includes('<html lang="fr"')) warn(page, "lang absent");
   if (!title) warn(page, "pas de titre");
   if (title.length > 70) warn(page, `titre long (${title.length})`);
-  if (description.length < 50 || description.length > 170) warn(page, `description de ${description.length} caractères`);
+  if (description.length < 50 || description.length > 160) warn(page, `description de ${description.length} caractères`);
   titles.set(title, [...(titles.get(title) ?? []), page]);
   descriptions.set(description, [...(descriptions.get(description) ?? []), page]);
 
@@ -108,6 +119,19 @@ for (const file of pages) {
     if (!existsSync(join(target, "index.html")) && !existsSync(target)) warn(page, `lien cassé : ${href}`);
   }
   const types = checkStructured(page, html);
+  if (/^\/articles\/[^/]+\/$/.test(page)) {
+    if (!types.includes("Article")) warn(page, "Article absent");
+    const questions = [...html.matchAll(/<h3[^>]*>[\s\S]*?<\/h3>/g)].length;
+    if (/<h2[^>]*>\s*Questions fréquentes\s*<\/h2>/.test(html) && !types.includes("FAQPage")) warn(page, "section « Questions fréquentes » sans FAQPage");
+    if (types.includes("FAQPage") && questions === 0) warn(page, "FAQPage sans question visible");
+    if (!/<time datetime="\d{4}-\d{2}-\d{2}"/.test(html)) warn(page, "date de publication absente");
+    const readAlso = html.indexOf('id="read-title"');
+    if (readAlso < 0 || [...html.slice(readAlso, html.indexOf("</aside>", readAlso)).matchAll(/href="\/articles\/[^"]+\/"/g)].length < 3) warn(page, "« À lire aussi » : moins de 3 articles");
+    const afterTitle = html.slice(html.indexOf("</h1>"));
+    const firstText = afterTitle.match(/<p[^>]*>([\s\S]*?)<\/p>/)?.[1] ?? "";
+    const isNew = /<strong>En bref/.test(html);
+    if (isNew && !firstText.trim().startsWith("<strong>En bref")) warn(page, "le paragraphe « En bref » n'est pas le premier texte sous le titre");
+  }
   const expected = page === "/" ? ["Organization", "WebSite"] : page === "/faq/" ? ["FAQPage"] : /^\/boutique\/(?!produits-)[^/]+\/$/.test(page) ? ["Product"] : [];
   for (const type of expected) if (!types.includes(type)) warn(page, `${type} absent`);
   if (page !== "/" && !noindex && !types.includes("BreadcrumbList")) warn(page, "BreadcrumbList absent");
@@ -128,6 +152,24 @@ for (const { page, noindex } of report) {
 
 const robots = readFileSync(join(DIST, "robots.txt"), "utf8");
 if (!robots.includes("Sitemap: https://")) warn("robots.txt", "sitemap non indiqué");
+for (const bot of ["Googlebot", "Bingbot", "Google-Extended", "GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "Claude-User", "PerplexityBot", "Applebot"]) {
+  if (!robots.includes(`User-agent: ${bot}\nAllow: /\n`)) warn("robots.txt", `${bot} non autorisé explicitement`);
+}
+if (/^Disallow:\s*\S/m.test(robots)) warn("robots.txt", "une page est interdite aux robots : ils ne verraient plus son noindex");
+
+const sitemapXml = readFileSync(join(DIST, "sitemap.xml"), "utf8");
+for (const [, loc, rest] of sitemapXml.matchAll(/<loc>([^<]+)<\/loc>(.*?)<\/url>/g)) {
+  const path = new URL(loc).pathname;
+  if (path.startsWith("/articles/") && path !== "/articles/" && !/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/.test(rest)) warn(loc, "article sans lastmod dans le sitemap");
+}
+
+const llms = readFileSync(join(DIST, "llms.txt"), "utf8");
+if (!llms.startsWith("# ") || !/^> /m.test(llms)) warn("llms.txt", "titre ou présentation absents");
+const llmsLinks = [...llms.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((match) => new URL(match[1]).pathname);
+for (const path of llmsLinks) if (!report.some((entry) => entry.page === path)) warn("llms.txt", `lien cassé : ${path}`);
+for (const { page, noindex } of report) {
+  if (/^\/articles\/[^/]+\/$/.test(page) && !noindex && !llmsLinks.includes(page)) warn("llms.txt", `article absent : ${page}`);
+}
 
 console.table(report.map(({ page, types, noindex }) => ({ page, donnees: types.join(", "), noindex })));
 console.log(`${pages.length} pages, ${sitemap.length} dans le sitemap, ${problems.length} problème(s)`);

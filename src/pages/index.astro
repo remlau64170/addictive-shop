@@ -4,6 +4,7 @@ import {
   Brain,
   Download,
   Dumbbell,
+  Flame,
   Hammer,
   Lock,
   MessageCircle,
@@ -36,6 +37,7 @@ const ENGAGEMENTS = [
 const SHELF_ICONS = { numeriques: Sparkles, physiques: Package };
 
 const CATEGORY_ICONS = {
+  "envies-et-addictions": Flame,
   "sortir-addiction": Sprout,
   "mental-discipline": Brain,
   "sport-corps": Dumbbell,
@@ -285,6 +287,11 @@ const TUILES = [
     gap: 0.75rem;
   }
 
+  /* Une dernière tuile seule sur sa ligne prend toute la largeur, plutôt que de rester dans un coin. */
+  .tiles li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
   .tiles li {
     display: grid;
     min-width: 0;
@@ -368,6 +375,14 @@ const TUILES = [
       gap: 1.25rem;
     }
 
+    .tiles li:last-child:nth-child(odd) {
+      grid-column: auto;
+    }
+
+    .tiles li:last-child:nth-child(3n + 1) {
+      grid-column: 1 / -1;
+    }
+
     .tile {
       padding: 1.25rem;
     }
@@ -386,6 +401,14 @@ const TUILES = [
   @media (min-width: 1100px) {
     .tiles {
       grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .tiles li:last-child:nth-child(3n + 1) {
+      grid-column: auto;
+    }
+
+    .tiles li:last-child:nth-child(6n + 1) {
+      grid-column: 1 / -1;
     }
   }
 </style>
