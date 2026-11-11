@@ -1,0 +1,56 @@
+---
+import { PLAY_STORE_URL, WEB_APP_URL } from "../data/site";
+---
+
+<!-- Badge officiel « Disponible sur Google Play » (version française), hébergé dans le projet et affiché sans aucune modification.
+     Le fichier contient déjà la zone de protection exigée : ne pas le rogner, ne pas le recolorer, ne pas descendre sous 3 rem de haut. -->
+<div class="store-links">
+  <a class="play" href={PLAY_STORE_URL} target="_blank" rel="noopener">
+    <img src="/badges/google-play-fr.png" width="646" height="250" alt="Télécharger sur Google Play" />
+    <span class="sr-only">(s'ouvre dans un nouvel onglet)</span>
+  </a>
+  <a class="web" href={WEB_APP_URL} target="_blank" rel="noopener">
+    Utiliser la version web<span class="sr-only"> (s'ouvre dans un nouvel onglet)</span>
+  </a>
+</div>
+
+<style>
+  .store-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem 1.25rem;
+  }
+
+  .play {
+    display: inline-block;
+    border-radius: 0.75rem;
+    line-height: 0;
+  }
+
+  /* 4,25 rem de haut pour tout le fichier : le badge lui-même en fait environ 3,2 rem, au-dessus du minimum de Google. */
+  .play img {
+    display: block;
+    width: auto;
+    height: 4.25rem;
+  }
+
+  .web {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.25rem;
+    color: var(--foreground);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklch, var(--foreground) 40%, transparent);
+    text-underline-offset: 0.3em;
+    transition: text-decoration-color var(--ease), color var(--ease);
+  }
+
+  .web:hover {
+    color: var(--primary-hover);
+    text-decoration-color: currentColor;
+  }
+</style>

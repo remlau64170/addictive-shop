@@ -8,6 +8,8 @@ import { join, relative, resolve } from "node:path";
 const ROOT = resolve(import.meta.dirname, "..");
 const AVIS = JSON.parse(readFileSync(join(resolve(import.meta.dirname, ".."), "src/data/avis.json"), "utf8"));
 const DIST = join(ROOT, "dist");
+const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.addictive_app.twa";
+const WEB_APP_URL = "https://addictive-app.com";
 const problems = [];
 const warn = (page, message) => problems.push(`${page} : ${message}`);
 
@@ -28,6 +30,7 @@ const REQUIRED = {
   Product: ["name", "description", "image", "offers"],
   Article: ["headline", "description", "datePublished", "dateModified", "author", "publisher", "image", "inLanguage", "url"],
   FAQPage: ["mainEntity"],
+  MobileApplication: ["name", "operatingSystem", "applicationCategory", "offers", "url"],
   BreadcrumbList: ["itemListElement"],
 };
 
@@ -65,6 +68,11 @@ export function checkStructured(page, html) {
       if (data.url !== data.mainEntityOfPage || data.url !== html.match(/<link rel="canonical" href="([^"]+)"/)?.[1]) warn(page, "url de l'article différente de l'adresse canonique");
       if (!data.image?.startsWith("https://")) warn(page, "image de l'article non absolue");
       if (!flat(html).includes(flat(data.headline))) warn(page, "titre de l'article absent de la page");
+    }
+    if (data["@type"] === "MobileApplication") {
+      if (data.offers?.price !== "0" || data.offers?.priceCurrency !== "EUR") warn(page, "MobileApplication : l'offre doit être à 0 EUR");
+      if (data.url !== PLAY_STORE_URL) warn(page, "MobileApplication : url différente de la fiche Google Play");
+      if (data.operatingSystem !== "Android" || data.applicationCategory !== "HealthApplication") warn(page, "MobileApplication : système ou catégorie incorrects");
     }
     if (data["@type"] === "FAQPage") {
       if (!data.mainEntity?.length) warn(page, "FAQPage sans question");
@@ -119,6 +127,13 @@ for (const file of pages) {
     if (!existsSync(join(target, "index.html")) && !existsSync(target)) warn(page, `lien cassé : ${href}`);
   }
   const types = checkStructured(page, html);
+  if (/bientôt disponible|sera bientôt|prochainement/i.test(unescape(html).replace(/<[^>]+>/g, " "))) warn(page, "mention « bientôt disponible » ou « prochainement » restante");
+  for (const [tag] of html.matchAll(/<a\b[^>]*target="_blank"[^>]*>/g)) if (!/rel="[^"]*noopener/.test(tag)) warn(page, `lien externe sans rel="noopener" : ${tag.slice(0, 80)}`);
+  if (page === "/" || page === "/appli/") {
+    if (!unescape(html).includes(`href="${PLAY_STORE_URL}"`)) warn(page, "lien Google Play absent");
+    if (!html.includes(`href="${WEB_APP_URL}"`)) warn(page, "lien version web absent");
+    if (!html.includes('src="/badges/google-play-fr.png"')) warn(page, "badge Google Play absent");
+  }
   if (/^\/articles\/[^/]+\/$/.test(page)) {
     if (!types.includes("Article")) warn(page, "Article absent");
     const questions = [...html.matchAll(/<h3[^>]*>[\s\S]*?<\/h3>/g)].length;
@@ -132,7 +147,7 @@ for (const file of pages) {
     const isNew = /<strong>En bref/.test(html);
     if (isNew && !firstText.trim().startsWith("<strong>En bref")) warn(page, "le paragraphe « En bref » n'est pas le premier texte sous le titre");
   }
-  const expected = page === "/" ? ["Organization", "WebSite"] : page === "/faq/" ? ["FAQPage"] : /^\/boutique\/(?!produits-)[^/]+\/$/.test(page) ? ["Product"] : [];
+  const expected = page === "/" ? ["Organization", "WebSite"] : page === "/faq/" ? ["FAQPage"] : page === "/appli/" ? ["MobileApplication"] : /^\/boutique\/(?!produits-)[^/]+\/$/.test(page) ? ["Product"] : [];
   for (const type of expected) if (!types.includes(type)) warn(page, `${type} absent`);
   if (page !== "/" && !noindex && !types.includes("BreadcrumbList")) warn(page, "BreadcrumbList absent");
   report.push({ page, types, noindex });
@@ -165,7 +180,10 @@ for (const [, loc, rest] of sitemapXml.matchAll(/<loc>([^<]+)<\/loc>(.*?)<\/url>
 
 const llms = readFileSync(join(DIST, "llms.txt"), "utf8");
 if (!llms.startsWith("# ") || !/^> /m.test(llms)) warn("llms.txt", "titre ou présentation absents");
-const llmsLinks = [...llms.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((match) => new URL(match[1]).pathname);
+const siteHost = new URL(sitemapXml.match(/<loc>([^<]+)/)[1]).host;
+const llmsLinks = [...llms.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((match) => new URL(match[1])).filter((url) => url.host === siteHost).map((url) => url.pathname);
+if (/bientôt disponible/i.test(llms)) warn("llms.txt", "mention « bientôt disponible » restante");
+if (!llms.includes(PLAY_STORE_URL)) warn("llms.txt", "lien Google Play absent");
 for (const path of llmsLinks) if (!report.some((entry) => entry.page === path)) warn("llms.txt", `lien cassé : ${path}`);
 for (const { page, noindex } of report) {
   if (/^\/articles\/[^/]+\/$/.test(page) && !noindex && !llmsLinks.includes(page)) warn("llms.txt", `article absent : ${page}`);

@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { ARTICLE_CATEGORIES, SLOGAN } from "../data/site";
+import { ARTICLE_CATEGORIES, PLAY_STORE_URL, SLOGAN, WEB_APP_URL } from "../data/site";
 import { getVisibleArticles } from "../lib/articles";
 import { getProduits, productName } from "../lib/produits";
 import { absolute } from "../lib/seo";
@@ -17,7 +17,9 @@ export const GET: APIRoute = async () => {
     `## Pages principales
 
 ${[
-  line("L'appli Addictive", "/appli/", "suivre ses habitudes, ses séries et sa progression (bientôt disponible)"),
+  line("L'appli Addictive", "/appli/", "suivre ses habitudes, ses séries et sa progression ; disponible sur Google Play et en version web"),
+  `- [Télécharger sur Google Play](${PLAY_STORE_URL}) : l'appli Addictive pour Android`,
+  `- [Version web d'Addictive](${WEB_APP_URL}) : l'appli dans le navigateur, pour iPhone et ordinateur`,
   line("Boutique", "/boutique/", "programmes, cartes à imprimer et objets"),
   line("À propos", "/a-propos/", "la mission et les valeurs d'Addictive"),
   line("Questions fréquentes", "/faq/", "commandes, téléchargement, délais, paiement, données personnelles"),

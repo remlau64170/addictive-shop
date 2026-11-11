@@ -15,6 +15,7 @@ import {
 } from "@lucide/astro";
 import Base from "../layouts/Base.astro";
 import JsonLd from "../components/JsonLd.astro";
+import StoreLinks from "../components/StoreLinks.astro";
 import ProductCard from "../components/ProductCard.astro";
 import AppBenefits from "../components/AppBenefits.astro";
 import AppVideo from "../components/AppVideo.astro";
@@ -103,10 +104,10 @@ const TUILES = [
       <h2 id="app-title">Suivez votre progression avec Addictive</h2>
       <AppVideo />
       <AppBenefits />
-      <p class="app-actions">
-        <a class="button button-secondary" href="/appli/">Essayer la démo interactive</a>
-        <span class="status">Bientôt disponible</span>
-      </p>
+      <div class="app-actions">
+        <StoreLinks />
+        <a class="button button-soft" href="/appli/">Essayer la démo interactive</a>
+      </div>
     </div>
   </section>
 
@@ -246,11 +247,10 @@ const TUILES = [
 
   .app-actions {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
     gap: 0.75rem;
-    margin-top: 1.75rem;
+    margin-top: 1.5rem;
   }
 
   .pledges {

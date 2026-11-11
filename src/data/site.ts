@@ -39,3 +39,7 @@ export const LEGAL_PAGES = [
   { slug: "confidentialite", label: "Confidentialité" },
   { slug: "cookies", label: "Cookies" },
 ] as const;
+
+/** L'appli Addictive : publiée sur Google Play depuis le 4 novembre 2026, et en version web pour iPhone et ordinateur. */
+export const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.addictive_app.twa";
+export const WEB_APP_URL = "https://addictive-app.com";

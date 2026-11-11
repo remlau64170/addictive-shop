@@ -25,7 +25,7 @@ export const FAQ = [
   },
   {
     question: "Qu'est-ce que l'appli Addictive ?",
-    answer: "C'est une application pour suivre vos habitudes, vos séries et votre progression, avec une aide quand une envie arrive. Elle est réservée aux personnes de 16 ans et plus, et sera bientôt disponible.",
+    answer: "C'est une application pour suivre vos habitudes, vos séries et votre progression, avec une aide quand une envie arrive. Elle est réservée aux personnes de 16 ans et plus, et disponible sur Google Play (Android) ainsi qu'en version web pour iPhone et ordinateur.",
   },
   {
     question: "Que faites-vous de mes données personnelles ?",

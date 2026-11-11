@@ -3,21 +3,50 @@ import Base from "../layouts/Base.astro";
 import PhoneShowcase from "../components/PhoneShowcase.astro";
 import AppVideo from "../components/AppVideo.astro";
 import Breadcrumb from "../components/Breadcrumb.astro";
+import JsonLd from "../components/JsonLd.astro";
+import StoreLinks from "../components/StoreLinks.astro";
+import { PLAY_STORE_URL, SLOGAN } from "../data/site";
+import { DEFAULT_IMAGE, PUBLISHER, SITE_NAME, absolute } from "../lib/seo";
+
+const DESCRIPTION = "Avec l'appli Addictive, suivez vos habitudes, vos séries et votre progression, et trouvez de l'aide quand une envie arrive. Sur Google Play et en version web.";
+
+// Aucune note ni aucun avis : l'appli n'en affiche pas encore sur ce site.
+const structured = {
+  "@type": "MobileApplication",
+  name: SITE_NAME,
+  description: DESCRIPTION,
+  operatingSystem: "Android",
+  applicationCategory: "HealthApplication",
+  inLanguage: "fr-FR",
+  url: PLAY_STORE_URL,
+  downloadUrl: PLAY_STORE_URL,
+  image: absolute(DEFAULT_IMAGE),
+  offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+  publisher: PUBLISHER,
+  slogan: SLOGAN,
+};
 ---
 
-<Base title="L'appli pour suivre vos habitudes et votre sobriété" description="Avec l'appli Addictive, suivez vos habitudes, vos séries et votre progression, et trouvez de l'aide quand une envie arrive. Bientôt disponible." wide>
+<Base title="L'appli pour suivre vos habitudes et votre sobriété" description={DESCRIPTION} wide>
   <div class="wrap wrap-page appli">
     <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "L'appli" }]} />
     <h1>L'appli Addictive</h1>
+    <JsonLd data={structured} />
     <p class="lead">Un soutien au quotidien pour reprendre la main, à votre rythme.</p>
     <div class="video">
       <AppVideo />
     </div>
+    <div class="stores">
+      <StoreLinks />
+      <p class="note">Sur Android avec Google Play. Sur iPhone et sur ordinateur avec la version web.</p>
+    </div>
     <h2 class="demo-title">Essayez la démo interactive</h2>
     <PhoneShowcase />
-    <p class="section"><span class="status">Bientôt disponible</span></p>
+    <div class="stores stores-after">
+      <StoreLinks />
+    </div>
     <p class="lead">Application réservée aux personnes de 16 ans et plus.</p>
-    <p class="lead">En attendant, découvrez <a href="/boutique/">la boutique</a> et <a href="/articles/">nos articles</a>.</p>
+    <p class="lead">Découvrez aussi <a href="/boutique/">la boutique</a> et <a href="/articles/">nos articles</a>.</p>
   </div>
 </Base>
 
@@ -32,6 +61,20 @@ import Breadcrumb from "../components/Breadcrumb.astro";
 
   .video {
     margin-top: 1.5rem;
+  }
+
+  .stores {
+    margin-top: 1.5rem;
+  }
+
+  .stores-after {
+    margin-block: var(--space-block) 1.5rem;
+  }
+
+  .note {
+    margin: 0.5rem 0 0;
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
   }
 
   .demo-title {

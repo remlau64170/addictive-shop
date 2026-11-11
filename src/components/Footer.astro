@@ -1,6 +1,6 @@
 ---
 import { ChevronDown } from "@lucide/astro";
-import { LEGAL_PAGES, SHOP_SHELVES, SLOGAN } from "../data/site";
+import { LEGAL_PAGES, PLAY_STORE_URL, SHOP_SHELVES, SLOGAN } from "../data/site";
 
 const COLUMNS = [
   {
@@ -19,6 +19,7 @@ const COLUMNS = [
     links: [
       { href: "/articles/", label: "Articles" },
       { href: "/appli/", label: "L'appli" },
+      { href: PLAY_STORE_URL, label: "Télécharger l'appli", external: true },
       { href: "/a-propos/", label: "À propos" },
       { href: "/faq/", label: "Questions fréquentes" },
       { href: "/contact/", label: "Contact" },
@@ -36,7 +37,16 @@ const COLUMNS = [
           <ul>
             {links.map((link) => (
               <li>
-                <a href={link.href}>{link.label}</a>
+                {
+                  "external" in link ? (
+                    <a href={link.href} target="_blank" rel="noopener">
+                      {link.label}
+                      <span class="sr-only"> (s'ouvre dans un nouvel onglet)</span>
+                    </a>
+                  ) : (
+                    <a href={link.href}>{link.label}</a>
+                  )
+                }
               </li>
             ))}
           </ul>
