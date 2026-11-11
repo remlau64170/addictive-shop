@@ -15,14 +15,13 @@ const articles = await getVisibleArticles();
   {
     ARTICLE_CATEGORIES.map((category) => {
       const inCategory = articles.filter((article) => article.data.category === category.id);
+      // Une catégorie sans article n'est pas affichée : elle reviendra d'elle-même avec son premier article.
+      if (inCategory.length === 0) return null;
       return (
         <section class="section" id={category.id}>
           <h2>{category.label}</h2>
           <p class="lead intro">{category.intro}</p>
-          {inCategory.length === 0 ? (
-            <p class="card">Les premiers articles arrivent bientôt.</p>
-          ) : (
-            <ul class="stack">
+          <ul class="stack">
               {inCategory.map((article) => (
                 <li>
                   <a class="card" href={`/articles/${article.id}/`}>
@@ -35,8 +34,7 @@ const articles = await getVisibleArticles();
                   </a>
                 </li>
               ))}
-            </ul>
-          )}
+          </ul>
         </section>
       );
     })

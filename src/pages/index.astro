@@ -25,7 +25,8 @@ import { getProduits } from "../lib/produits";
 import { CONTACT_EMAIL, PUBLISHER, absolute } from "../lib/seo";
 
 const produits = await getProduits();
-const derniers = (await getVisibleArticles()).slice(0, 3);
+const articles = await getVisibleArticles();
+const derniers = articles.slice(0, 3);
 
 
 const ENGAGEMENTS = [
@@ -53,7 +54,7 @@ const TUILES = [
     Icon: SHELF_ICONS[shelf.id],
     color: "var(--success)",
   })),
-  ...ARTICLE_CATEGORIES.map((category) => ({
+  ...ARTICLE_CATEGORIES.filter((category) => articles.some((article) => article.data.category === category.id)).map((category) => ({
     href: `/articles/#${category.id}`,
     label: category.label,
     note: "Articles",
@@ -146,16 +147,14 @@ const TUILES = [
     </div>
   </section>
 
+  {
+    derniers.length > 0 && (
   <section class="band" aria-labelledby="articles-title">
     <div class="wrap">
       <div class="section-head">
         <h2 id="articles-title">Derniers articles</h2>
         <a href="/articles/">Tous les articles<ArrowRight size={16} aria-hidden="true" /></a>
       </div>
-      {
-        derniers.length === 0 ? (
-          <p class="card">Les premiers articles arrivent bientôt.</p>
-        ) : (
           <ul class="latest">
             {derniers.map((article) => (
               <li>
@@ -170,10 +169,10 @@ const TUILES = [
               </li>
             ))}
           </ul>
-        )
-      }
     </div>
   </section>
+    )
+  }
 </Base>
 
 <style>
@@ -288,6 +287,7 @@ const TUILES = [
   }
 
   /* Une dernière tuile seule sur sa ligne prend toute la largeur, plutôt que de rester dans un coin. */
+  /* Une dernière tuile seule sur sa ligne prend toute la largeur (deux colonnes, petits écrans). */
   .tiles li:last-child:nth-child(odd) {
     grid-column: 1 / -1;
   }
@@ -371,16 +371,12 @@ const TUILES = [
     }
 
     .tiles {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
       gap: 1.25rem;
     }
 
     .tiles li:last-child:nth-child(odd) {
       grid-column: auto;
-    }
-
-    .tiles li:last-child:nth-child(3n + 1) {
-      grid-column: 1 / -1;
     }
 
     .tile {
@@ -398,17 +394,4 @@ const TUILES = [
     }
   }
 
-  @media (min-width: 1100px) {
-    .tiles {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
-
-    .tiles li:last-child:nth-child(3n + 1) {
-      grid-column: auto;
-    }
-
-    .tiles li:last-child:nth-child(6n + 1) {
-      grid-column: 1 / -1;
-    }
-  }
 </style>
