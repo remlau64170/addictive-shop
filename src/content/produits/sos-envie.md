@@ -16,7 +16,7 @@ contains:
   - "Des fonds d'écran pour garder le protocole sur votre téléphone"
 specs:
   - { label: Format, value: "PDF à imprimer (12 cartes) et fonds d'écran pour téléphone" }
-  - { label: Livraison, value: Téléchargement immédiat }
+  - { label: Livraison, value: Accès dès le paiement }
 ---
 
 Envie de grignoter, de scroller, de tout laisser tomber ou de reprendre une vieille habitude : ces moments finissent par redescendre. SOS Envie vous aide à laisser passer la vague, en suivant un protocole simple en 5 étapes minutées.

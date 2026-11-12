@@ -96,7 +96,11 @@ if (idSession && vars.STRIPE_SECRET_KEY) {
   const s = await lire(`/checkout/sessions/${idSession}`);
   verifier("preuve dans Stripe : formulation exacte de la case", s.metadata?.consentement_retractation === CONSENTEMENT_RETRACTATION);
   verifier("preuve dans Stripe : date de l'accord", !Number.isNaN(Date.parse(s.metadata?.consentement_date ?? "")));
-  verifier("facture : même formulation que la case", (s.invoice_creation?.invoice_data?.footer ?? "").includes(`« ${CONSENTEMENT_RETRACTATION} »`));
+  verifier("facture créée par Checkout (invoice_creation)", s.invoice_creation?.enabled === true);
+  const pied = s.invoice_creation?.invoice_data?.footer ?? "";
+  verifier("pied de facture : phrase exacte de la case", pied.includes(`« ${CONSENTEMENT_RETRACTATION} »`));
+  verifier("pied de facture : date et heure de l'accord", /le \d{1,2} \S+ \d{4} à \d{2}:\d{2} \(heure de Paris\)/.test(pied), pied.match(/le .*?\(heure de Paris\)/)?.[0]);
+  verifier("pied de facture : mention de TVA", pied.includes("TVA non applicable, art. 293 B du CGI"));
   await fetch(`https://api.stripe.com/v1/checkout/sessions/${idSession}/expire`, { method: "POST", headers: { Authorization: `Bearer ${vars.STRIPE_SECRET_KEY}` } });
 }
 

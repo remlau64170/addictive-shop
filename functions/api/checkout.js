@@ -27,10 +27,13 @@ export async function onRequestPost({ request, env }) {
     if (!price?.active || price.currency !== "eur" || !price.unit_amount) return back(origin, slug, "indisponible");
 
     // Preuve de l'accord, avec la formulation exacte de la case, enregistrée sur la session, le paiement et la facture.
+    const maintenant = new Date();
     const accord = {
       consentement_retractation: CONSENTEMENT_RETRACTATION,
-      consentement_date: new Date().toISOString(),
+      consentement_date: maintenant.toISOString(),
     };
+    // Date et heure lisibles sur la facture, à l'heure de Paris : « 12 novembre 2026 à 22:10 ».
+    const quand = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" }).format(maintenant);
     const session = await stripe(env, "/checkout/sessions", {
       method: "POST",
       body: {
@@ -38,14 +41,15 @@ export async function onRequestPost({ request, env }) {
         locale: "fr",
         submit_type: "pay",
         line_items: [{ price: price.id, quantity: 1 }],
-        // Reçu et facture avec la mention légale de la franchise en base de TVA.
+        // Facture envoyée par e-mail par Stripe : c'est la confirmation écrite (support durable) de l'achat et de l'accord.
+        // Coût Stripe : 0,4 % de la vente, plafonné à 2 $ (environ 0,05 € sur 12 €). Voir docs/paiement.md.
         invoice_creation: {
           enabled: true,
           invoice_data: {
             description: product.name,
             footer: `${MENTION_TVA}
 
-Votre accord lors de l'achat : « ${CONSENTEMENT_RETRACTATION} »`,
+Votre accord lors de l'achat, le ${quand} (heure de Paris) : « ${CONSENTEMENT_RETRACTATION} »`,
             metadata: { slug, ...accord },
           },
         },

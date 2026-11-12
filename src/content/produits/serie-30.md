@@ -18,7 +18,7 @@ contains:
 specs:
   - { label: Format, value: "PDF, format téléphone et A4 imprimable" }
   - { label: Nombre de pages, value: "Environ 45 pages" }
-  - { label: Livraison, value: Téléchargement immédiat }
+  - { label: Livraison, value: Accès dès le paiement }
 ---
 
 Vous voulez reprendre votre quotidien en main : mieux vous organiser, tenir vos objectifs, retrouver de l'énergie ? Série 30 vous accompagne pendant 30 jours, à raison d'une étape courte par jour, pour installer une habitude à la fois.

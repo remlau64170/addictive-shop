@@ -32,11 +32,24 @@ Seuls les produits numériques sont achetables. Le prix vient toujours de Stripe
 4. `GET /api/telecharger` envoie le PDF depuis le stockage privé `FICHIERS` (jamais dans un dossier public).
 5. `POST /api/webhook` : signature vérifiée, rejeu et doublons refusés. Point d'entrée de Printful plus tard.
 
+## Confirmation écrite après l'achat
+
+La facture Stripe, envoyée par e-mail, sert de confirmation écrite sur un support durable. Elle porte en pied de page :
+« TVA non applicable, art. 293 B du CGI », puis la date et l'heure de l'accord (heure de Paris) et la phrase exacte
+de la case « Accès dès le paiement ». La même phrase et la date sont enregistrées dans les métadonnées Stripe
+(session, paiement, facture).
+
+Coût accepté : une facture créée par Checkout (`invoice_creation`) coûte 0,4 % de la vente, plafonné à 2 $,
+soit environ 0,05 € pour un produit à 12 €, en plus des frais de paiement Stripe.
+
 ## Avant une mise en ligne (rien n'est fait)
 
+- Dans le compte Stripe réel : activer Paramètres > Entreprise > E-mails clients > Paiements réussis, pour que la
+  facture et le reçu partent par e-mail.
+- Dans le compte Stripe réel : remplir les informations publiques obligatoires (nom légal, adresse et e-mail du
+  support, lien vers la politique de confidentialité).
 - Créer les deux espaces KV (`wrangler kv namespace create`) et remplacer les `id` de `wrangler.toml`.
 - Charger les vrais PDF dans `FICHIERS` (clés `pdf:serie-30`, `pdf:sos-envie`).
 - Secrets Cloudflare : `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` (point de terminaison Stripe), `DOWNLOAD_SIGNING_SECRET`.
 - Le code refuse aujourd'hui toute clé qui n'est pas une clé de test : à revoir le jour du passage en mode réel.
-- Activer dans Stripe : reçus par e-mail (Paramètres > E-mails clients), informations légales de l'entreprise.
 - CGV et page de confidentialité, dont la renonciation au droit de rétractation pour le contenu numérique.
