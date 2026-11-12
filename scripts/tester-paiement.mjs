@@ -84,7 +84,7 @@ verifier("paiement : produit invalide refusé", r.status === 303 && /paiement=in
 r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "t-shirt-sois-addict", consentement: "oui" }), redirect: "manual" });
 verifier("paiement : produit physique pas encore achetable", r.status === 303 && /paiement=(indisponible|erreur)/.test(r.headers.get("location") ?? ""), r.headers.get("location"));
 
-// 4 bis. Case « Téléchargement immédiat »
+// 4 bis. Case « Accès dès le paiement »
 r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "serie-30" }), redirect: "manual" });
 verifier("paiement sans la case cochée : refusé", r.status === 303 && /paiement=consentement/.test(r.headers.get("location") ?? ""), r.headers.get("location"));
 r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "serie-30", consentement: "oui" }), redirect: "manual" });

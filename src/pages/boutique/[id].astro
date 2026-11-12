@@ -117,7 +117,7 @@ const structured = {
               <fieldset class="consent">
                 <legend class="consent-title">
                   <Download size={16} aria-hidden="true" />
-                  Téléchargement immédiat
+                  Accès dès le paiement
                 </legend>
                 <label class="consent-choice">
                   <input type="checkbox" name="consentement" value={CONSENTEMENT_VALEUR} required aria-describedby={`consent-hint-${produit.id}`} />
@@ -576,7 +576,7 @@ const structured = {
   };
   // « consentement » n'a pas de message ici : il s'affiche sous la case (voir plus bas).
 
-  // Case « Téléchargement immédiat » : sans elle, pas de paiement, et un message calme sous la case (pas d'alerte).
+  // Case « Accès dès le paiement » : sans elle, pas de paiement, et un message calme sous la case (pas d'alerte).
   for (const form of document.querySelectorAll<HTMLFormElement>(".buy-form")) {
     const box = form.querySelector<HTMLInputElement>('input[name="consentement"]');
     const hint = form.querySelector<HTMLElement>(".consent-hint");

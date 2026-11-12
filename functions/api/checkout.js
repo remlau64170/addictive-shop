@@ -16,7 +16,7 @@ export async function onRequestPost({ request, env }) {
   // Le slug ne sert qu'à retrouver un produit de la boutique : lettres, chiffres et tirets seulement.
   if (!/^[a-z0-9-]{1,60}$/.test(slug)) return back(origin, "", "invalide");
   if (!checkoutEnabled(env)) return back(origin, slug, "indisponible");
-  // Contenu numérique livré tout de suite : la case « Téléchargement immédiat » doit être cochée (vérifié aussi ici).
+  // Contenu numérique livré tout de suite : la case « Accès dès le paiement » doit être cochée (vérifié aussi ici).
   if (form?.get("consentement") !== CONSENTEMENT_VALEUR) return back(origin, slug, "consentement");
 
   try {
