@@ -1,6 +1,7 @@
 ---
 import { render } from "astro:content";
-import { Check, Package, ShieldCheck } from "@lucide/astro";
+import { Check, Download, Package, ShieldCheck } from "@lucide/astro";
+import { CONSENTEMENT_RETRACTATION, CONSENTEMENT_VALEUR } from "../../data/consentement.js";
 import Base from "../../layouts/Base.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import ProductCard from "../../components/ProductCard.astro";
@@ -111,8 +112,19 @@ const structured = {
         }
         {
           achat ? (
-            <form class="buy-form" method="post" action="/api/checkout">
+            <form class="buy-form" method="post" action="/api/checkout" novalidate>
               <input type="hidden" name="produit" value={produit.id} />
+              <fieldset class="consent">
+                <legend class="consent-title">
+                  <Download size={16} aria-hidden="true" />
+                  Téléchargement immédiat
+                </legend>
+                <label class="consent-choice">
+                  <input type="checkbox" name="consentement" value={CONSENTEMENT_VALEUR} required aria-describedby={`consent-hint-${produit.id}`} />
+                  <span>{CONSENTEMENT_RETRACTATION}</span>
+                </label>
+                <p class="consent-hint" id={`consent-hint-${produit.id}`} hidden>Cochez la case pour recevoir votre guide immédiatement.</p>
+              </fieldset>
               <button class="button add" type="submit">Acheter</button>
               <p class="soon">Paiement sécurisé sur la page Stripe. Téléchargement juste après le paiement.</p>
               <p class="pay-message" role="status" hidden></p>
@@ -306,6 +318,57 @@ const structured = {
     margin-top: 0.5rem;
     color: var(--muted-foreground);
     font-size: 0.875rem;
+  }
+
+  .consent {
+    margin: 1.5rem 0 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .consent-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+    padding: 0;
+    color: var(--foreground);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .consent-title :global(svg) {
+    color: var(--primary);
+  }
+
+  .consent-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+
+  .consent-choice input {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0.15rem 0 0;
+    accent-color: var(--primary);
+    cursor: pointer;
+  }
+
+  .consent-hint {
+    margin: 0.5rem 0 0 1.75rem;
+    color: var(--foreground);
+    font-size: 0.875rem;
+  }
+
+  .consent + .add {
+    margin-top: 1rem;
   }
 
   .pay-message {
@@ -511,6 +574,28 @@ const structured = {
     erreur: "Le paiement n'a pas pu démarrer. Réessayez dans un instant.",
     invalide: "Ce produit n'a pas été reconnu.",
   };
+  // « consentement » n'a pas de message ici : il s'affiche sous la case (voir plus bas).
+
+  // Case « Téléchargement immédiat » : sans elle, pas de paiement, et un message calme sous la case (pas d'alerte).
+  for (const form of document.querySelectorAll<HTMLFormElement>(".buy-form")) {
+    const box = form.querySelector<HTMLInputElement>('input[name="consentement"]');
+    const hint = form.querySelector<HTMLElement>(".consent-hint");
+    if (!box || !hint) continue;
+    form.addEventListener("submit", (event) => {
+      if (box.checked) return;
+      event.preventDefault();
+      hint.hidden = false;
+      box.focus();
+    });
+    box.addEventListener("change", () => {
+      if (box.checked) hint.hidden = true;
+    });
+  }
+  // Retour du serveur sans la case cochée (navigateur sans JavaScript) : même message, au même endroit.
+  if (new URLSearchParams(location.search).get("paiement") === "consentement") {
+    const hint = document.querySelector<HTMLElement>(".consent-hint");
+    if (hint) hint.hidden = false;
+  }
   const zone = document.querySelector<HTMLElement>(".pay-message");
   const motif = new URLSearchParams(location.search).get("paiement");
   if (zone && motif && MESSAGES[motif]) {

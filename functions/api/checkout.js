@@ -1,6 +1,7 @@
 // POST /api/checkout : crée une session Stripe Checkout (page hébergée par Stripe) et y renvoie le visiteur.
 // Aucune carte, aucune donnée client ne passe par ici : on envoie seulement un produit et des adresses de retour.
 import { checkoutEnabled, stripe } from "../_lib/stripe.js";
+import { CONSENTEMENT_RETRACTATION, CONSENTEMENT_VALEUR } from "../../src/data/consentement.js";
 
 const MENTION_TVA = "TVA non applicable, art. 293 B du CGI";
 
@@ -15,6 +16,8 @@ export async function onRequestPost({ request, env }) {
   // Le slug ne sert qu'à retrouver un produit de la boutique : lettres, chiffres et tirets seulement.
   if (!/^[a-z0-9-]{1,60}$/.test(slug)) return back(origin, "", "invalide");
   if (!checkoutEnabled(env)) return back(origin, slug, "indisponible");
+  // Contenu numérique livré tout de suite : la case « Téléchargement immédiat » doit être cochée (vérifié aussi ici).
+  if (form?.get("consentement") !== CONSENTEMENT_VALEUR) return back(origin, slug, "consentement");
 
   try {
     // Le prix vient de Stripe, jamais du navigateur : il est impossible de modifier le montant depuis la page.
@@ -23,6 +26,11 @@ export async function onRequestPost({ request, env }) {
     if (!product.active || product.metadata?.delivery !== "digital") return back(origin, slug, "indisponible");
     if (!price?.active || price.currency !== "eur" || !price.unit_amount) return back(origin, slug, "indisponible");
 
+    // Preuve de l'accord, avec la formulation exacte de la case, enregistrée sur la session, le paiement et la facture.
+    const accord = {
+      consentement_retractation: CONSENTEMENT_RETRACTATION,
+      consentement_date: new Date().toISOString(),
+    };
     const session = await stripe(env, "/checkout/sessions", {
       method: "POST",
       body: {
@@ -35,14 +43,16 @@ export async function onRequestPost({ request, env }) {
           enabled: true,
           invoice_data: {
             description: product.name,
-            footer: MENTION_TVA,
-            metadata: { slug },
+            footer: `${MENTION_TVA}
+
+Votre accord lors de l'achat : « ${CONSENTEMENT_RETRACTATION} »`,
+            metadata: { slug, ...accord },
           },
         },
         custom_text: { submit: { message: MENTION_TVA } },
-        payment_intent_data: { description: product.name },
+        payment_intent_data: { description: product.name, metadata: { slug, ...accord } },
         adaptive_pricing: { enabled: false },
-        metadata: { slug, delivery: "digital" },
+        metadata: { slug, delivery: "digital", ...accord },
         success_url: `${origin}/merci/?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/boutique/${slug}/?paiement=annule`,
       },

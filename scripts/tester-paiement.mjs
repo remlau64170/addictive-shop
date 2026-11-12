@@ -6,6 +6,7 @@
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { hmacSha256, signToken } from "../functions/_lib/stripe.js";
+import { CONSENTEMENT_RETRACTATION } from "../src/data/consentement.js";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:8788";
 const racine = resolve(import.meta.dirname, "..");
@@ -80,8 +81,24 @@ r = await fetch(`${BASE}/api/commande?session_id=nimporte-quoi`);
 verifier("commande : identifiant de session invalide refusé", r.status === 400, r.status);
 r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "../etc" }), redirect: "manual" });
 verifier("paiement : produit invalide refusé", r.status === 303 && /paiement=invalide/.test(r.headers.get("location") ?? ""), r.status);
-r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "t-shirt-sois-addict" }), redirect: "manual" });
+r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "t-shirt-sois-addict", consentement: "oui" }), redirect: "manual" });
 verifier("paiement : produit physique pas encore achetable", r.status === 303 && /paiement=(indisponible|erreur)/.test(r.headers.get("location") ?? ""), r.headers.get("location"));
+
+// 4 bis. Case « Téléchargement immédiat »
+r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "serie-30" }), redirect: "manual" });
+verifier("paiement sans la case cochée : refusé", r.status === 303 && /paiement=consentement/.test(r.headers.get("location") ?? ""), r.headers.get("location"));
+r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "serie-30", consentement: "oui" }), redirect: "manual" });
+const versStripe = r.headers.get("location") ?? "";
+verifier("paiement avec la case cochée : page Stripe", r.status === 303 && versStripe.startsWith("https://checkout.stripe.com/"), r.status);
+const idSession = versStripe.match(/cs_test_[A-Za-z0-9]+/)?.[0];
+if (idSession && vars.STRIPE_SECRET_KEY) {
+  const lire = (chemin) => fetch(`https://api.stripe.com/v1${chemin}`, { headers: { Authorization: `Bearer ${vars.STRIPE_SECRET_KEY}` } }).then((x) => x.json());
+  const s = await lire(`/checkout/sessions/${idSession}`);
+  verifier("preuve dans Stripe : formulation exacte de la case", s.metadata?.consentement_retractation === CONSENTEMENT_RETRACTATION);
+  verifier("preuve dans Stripe : date de l'accord", !Number.isNaN(Date.parse(s.metadata?.consentement_date ?? "")));
+  verifier("facture : même formulation que la case", (s.invoice_creation?.invoice_data?.footer ?? "").includes(`« ${CONSENTEMENT_RETRACTATION} »`));
+  await fetch(`https://api.stripe.com/v1/checkout/sessions/${idSession}/expire`, { method: "POST", headers: { Authorization: `Bearer ${vars.STRIPE_SECRET_KEY}` } });
+}
 
 // 5. Commande réelle de test (après un paiement avec la carte 4242…)
 if (session) {

@@ -44,5 +44,8 @@ export async function onRequestGet({ request, env }) {
     lien: `/api/telecharger?token=${encodeURIComponent(token)}`,
     minutes: TOKEN_MINUTES,
     liensRestants: MAX_LINKS_PER_ORDER - count - 1,
+    // Confirmation écrite de l'accord donné lors de l'achat, tel qu'enregistré dans Stripe.
+    accord: session.metadata?.consentement_retractation ?? null,
+    accordDate: session.metadata?.consentement_date ?? null,
   });
 }

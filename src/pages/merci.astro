@@ -12,6 +12,10 @@ import Base from "../layouts/Base.astro";
       <div data-show="paye" hidden>
         <p class="lead">Votre paiement est confirmé. <strong data-produit></strong> est prêt.</p>
         <p class="section"><a class="button" data-lien href="#">Télécharger mon PDF</a></p>
+        <p class="note accord" data-accord-zone hidden>
+          Votre accord lors de l'achat, le <span data-accord-date></span> : « <span data-accord></span> » Il figure aussi sur
+          votre facture.
+        </p>
         <p class="note">
           Ce lien personnel fonctionne une seule fois, pendant <span data-minutes>15</span> minutes. Besoin d'un nouveau lien ? Rechargez
           cette page (encore <span data-restants></span> possible(s)). Le reçu de Stripe vous est envoyé par e-mail.
@@ -66,6 +70,13 @@ import Base from "../layouts/Base.astro";
           root.querySelector<HTMLAnchorElement>("[data-lien]")!.href = data.lien;
           root.querySelector("[data-minutes]")!.textContent = String(data.minutes);
           root.querySelector("[data-restants]")!.textContent = String(data.liensRestants);
+          if (data.accord) {
+            root.querySelector("[data-accord]")!.textContent = data.accord;
+            root.querySelector("[data-accord-date]")!.textContent = data.accordDate
+              ? new Date(data.accordDate).toLocaleString("fr-FR", { dateStyle: "long", timeStyle: "short" })
+              : "";
+            root.querySelector<HTMLElement>("[data-accord-zone]")!.hidden = false;
+          }
           show("paye");
         } else if (data.etat === "non_paye") show("non_paye");
         else if (data.etat === "limite") show("limite");
