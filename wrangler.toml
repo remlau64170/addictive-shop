@@ -1,0 +1,15 @@
+# Cloudflare Pages : site statique dans dist/, Functions dans functions/.
+# Rien n'est déployé : ce fichier sert aujourd'hui aux essais en local (npm run paiement:local).
+name = "addictive-shop"
+compatibility_date = "2026-11-01"
+pages_build_output_dir = "./dist"
+
+# Stockages privés (offre gratuite). Les identifiants ci-dessous sont des valeurs d'essai locales :
+# avant une mise en ligne, créer les vrais espaces (wrangler kv namespace create) et remplacer les « id ».
+[[kv_namespaces]]
+binding = "FICHIERS"        # les PDF vendus : jamais accessibles par une adresse publique
+id = "local-fichiers"
+
+[[kv_namespaces]]
+binding = "TELECHARGEMENTS" # compteurs et liens déjà utilisés : identifiants seulement, aucune donnée client
+id = "local-telechargements"

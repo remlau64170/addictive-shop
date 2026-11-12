@@ -43,3 +43,11 @@ export const LEGAL_PAGES = [
 /** L'appli Addictive : publiée sur Google Play depuis le 4 novembre 2026, et en version web pour iPhone et ordinateur. */
 export const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.addictive_app.twa";
 export const WEB_APP_URL = "https://addictive-app.com";
+
+/**
+ * Achat en ligne. Désactivé sur le site public tant que la boutique n'est pas ouverte (« La boutique ouvre bientôt »).
+ * Pour l'activer : variable d'environnement PUBLIC_BOUTIQUE_OUVERTE=true au moment de la construction du site,
+ * ET CHECKOUT_ENABLED=true côté Functions (le serveur refuse tout paiement sans ce second réglage).
+ * Seuls les produits numériques sont achetables pour l'instant ; les produits physiques viendront avec Printful.
+ */
+export const BOUTIQUE_OUVERTE = import.meta.env.PUBLIC_BOUTIQUE_OUVERTE === "true";

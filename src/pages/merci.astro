@@ -1,0 +1,77 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<!-- Page de retour après le paiement Stripe. Le lien de téléchargement n'est donné qu'après une vérification côté serveur. -->
+<Base title="Merci pour votre commande" description="Votre commande Addictive : vérification du paiement et lien de téléchargement personnel de votre produit numérique." noindex>
+  <div class="empty merci">
+    <h1>Merci pour votre commande</h1>
+    <div class="state" data-state="verification" role="status" aria-live="polite">
+      <p class="lead" data-show="verification">Vérification de votre paiement…</p>
+
+      <div data-show="paye" hidden>
+        <p class="lead">Votre paiement est confirmé. <strong data-produit></strong> est prêt.</p>
+        <p class="section"><a class="button" data-lien href="#">Télécharger mon PDF</a></p>
+        <p class="note">
+          Ce lien personnel fonctionne une seule fois, pendant <span data-minutes>15</span> minutes. Besoin d'un nouveau lien ? Rechargez
+          cette page (encore <span data-restants></span> possible(s)). Le reçu de Stripe vous est envoyé par e-mail.
+        </p>
+      </div>
+
+      <div data-show="non_paye" hidden>
+        <p class="lead">Votre paiement n'est pas encore confirmé. Si vous venez de payer, patientez un instant puis rechargez cette page.</p>
+      </div>
+
+      <div data-show="limite" hidden>
+        <p class="lead">Vous avez utilisé tous les liens de téléchargement de cette commande. Écrivez-nous et nous vous renverrons votre fichier.</p>
+        <p class="section"><a class="button" href="/contact/">Nous écrire</a></p>
+      </div>
+
+      <div data-show="invalide" hidden>
+        <p class="lead">Nous ne retrouvons pas cette commande. Si vous avez été débité, écrivez-nous avec l'e-mail de votre reçu Stripe.</p>
+        <p class="section"><a class="button" href="/contact/">Nous écrire</a></p>
+      </div>
+
+      <div data-show="erreur" hidden>
+        <p class="lead">La vérification n'a pas abouti pour le moment. Rechargez cette page dans un instant.</p>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .merci .note {
+    max-width: 34rem;
+    margin: 1rem auto 0;
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>(".state")!;
+  const show = (state: string) => {
+    for (const block of root.querySelectorAll<HTMLElement>("[data-show]")) block.hidden = block.dataset.show !== state;
+  };
+
+  const sessionId = new URLSearchParams(location.search).get("session_id");
+  if (!sessionId) {
+    show("invalide");
+  } else {
+    fetch(`/api/commande?session_id=${encodeURIComponent(sessionId)}`, { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.etat === "paye") {
+          root.querySelector("[data-produit]")!.textContent = data.produit;
+          root.querySelector<HTMLAnchorElement>("[data-lien]")!.href = data.lien;
+          root.querySelector("[data-minutes]")!.textContent = String(data.minutes);
+          root.querySelector("[data-restants]")!.textContent = String(data.liensRestants);
+          show("paye");
+        } else if (data.etat === "non_paye") show("non_paye");
+        else if (data.etat === "limite") show("limite");
+        else if (data.etat === "erreur") show("erreur");
+        else show("invalide");
+      })
+      .catch(() => show("erreur"));
+  }
+</script>

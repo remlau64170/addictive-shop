@@ -7,3 +7,9 @@ dist/
 
 # Vidéos et fichiers de travail hors du site (par exemple la vidéo TikTok) : jamais dans git
 medias/
+
+# Paiement : clés et état local de wrangler, jamais dans git
+.dev.vars*
+.wrangler/
+prive/pdf-reels/
+!.dev.vars.example

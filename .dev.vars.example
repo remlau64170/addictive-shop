@@ -1,0 +1,9 @@
+# Copiez ce fichier en .dev.vars (jamais dans git) et renseignez vos clés de TEST Stripe.
+# STRIPE_SECRET_KEY : clé secrète ou restreinte de TEST (sk_test_… ou rk_test_…). Tableau de bord Stripe, mode test, Développeurs > Clés API.
+STRIPE_SECRET_KEY=
+# STRIPE_WEBHOOK_SECRET : secret de signature du webhook (whsec_…), donné par « stripe listen » ou par le point de terminaison de test.
+STRIPE_WEBHOOK_SECRET=
+# DOWNLOAD_SIGNING_SECRET : texte aléatoire long, propre à ce site, qui signe les liens de téléchargement.
+DOWNLOAD_SIGNING_SECRET=
+# CHECKOUT_ENABLED : « true » autorise la création d'un paiement. Absent ou autre valeur : le paiement est refusé côté serveur.
+CHECKOUT_ENABLED=true

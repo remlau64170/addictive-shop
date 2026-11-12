@@ -4,7 +4,7 @@ import { Check, Package, ShieldCheck } from "@lucide/astro";
 import Base from "../../layouts/Base.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import ProductCard from "../../components/ProductCard.astro";
-import { SHOP_SHELVES } from "../../data/site";
+import { BOUTIQUE_OUVERTE, SHOP_SHELVES } from "../../data/site";
 import JsonLd from "../../components/JsonLd.astro";
 import { formatPrice, getProduits, productName, thumbnail } from "../../lib/produits";
 import { PUBLISHER, absolute } from "../../lib/seo";
@@ -21,6 +21,8 @@ const { Content } = await render(produit);
 const name = productName(produit);
 const shelf = SHOP_SHELVES.find((item) => item.id === produit.data.shelf);
 const numerique = produit.data.shelf === "numeriques";
+/** Achat possible seulement si la boutique est ouverte (réglage de construction) et pour un produit numérique. */
+const achat = BOUTIQUE_OUVERTE && numerique && produit.data.price !== null;
 const images = produit.data.images;
 // Produits liés : ceux du même rayon d'abord.
 const liees = produits
@@ -107,8 +109,21 @@ const structured = {
             </div>
           )
         }
-        <button class="button add" type="button" disabled>Ajouter au panier</button>
-        <p class="soon">La boutique ouvre bientôt.</p>
+        {
+          achat ? (
+            <form class="buy-form" method="post" action="/api/checkout">
+              <input type="hidden" name="produit" value={produit.id} />
+              <button class="button add" type="submit">Acheter</button>
+              <p class="soon">Paiement sécurisé sur la page Stripe. Téléchargement juste après le paiement.</p>
+              <p class="pay-message" role="status" hidden></p>
+            </form>
+          ) : (
+            <>
+              <button class="button add" type="button" disabled>Ajouter au panier</button>
+              <p class="soon">La boutique ouvre bientôt.</p>
+            </>
+          )
+        }
         {
           !numerique && (
             <p class="delivery">
@@ -291,6 +306,15 @@ const structured = {
     margin-top: 0.5rem;
     color: var(--muted-foreground);
     font-size: 0.875rem;
+  }
+
+  .pay-message {
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-inner);
+    background: var(--card);
+    font-size: 0.9375rem;
   }
 
   .delivery,
@@ -476,5 +500,21 @@ const structured = {
       for (const other of thumbs) other.removeAttribute("aria-current");
       thumb.setAttribute("aria-current", "true");
     });
+  }
+</script>
+
+<script>
+  // Retour de Stripe (paiement annulé, indisponible…) : un message court sous le bouton « Acheter ».
+  const MESSAGES: Record<string, string> = {
+    annule: "Paiement annulé : rien n'a été débité. Vous pouvez réessayer quand vous voulez.",
+    indisponible: "L'achat de ce produit n'est pas encore disponible.",
+    erreur: "Le paiement n'a pas pu démarrer. Réessayez dans un instant.",
+    invalide: "Ce produit n'a pas été reconnu.",
+  };
+  const zone = document.querySelector<HTMLElement>(".pay-message");
+  const motif = new URLSearchParams(location.search).get("paiement");
+  if (zone && motif && MESSAGES[motif]) {
+    zone.textContent = MESSAGES[motif];
+    zone.hidden = false;
   }
 </script>

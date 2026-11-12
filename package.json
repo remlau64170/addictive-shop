@@ -6,7 +6,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "paiement:local": "node scripts/paiement-local.mjs",
+    "paiement:tester": "node scripts/tester-paiement.mjs"
   },
   "dependencies": {
     "@lucide/astro": "1.66.0",
@@ -15,6 +17,7 @@
   "devDependencies": {
     "@astrojs/check": "0.9.12",
     "lucide-static": "1.66.0",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "wrangler": "^4.161.0"
   }
 }
