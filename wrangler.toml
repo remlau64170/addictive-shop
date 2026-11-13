@@ -1,15 +1,22 @@
 # Cloudflare Pages : site statique dans dist/, Functions dans functions/.
-# Rien n'est déployé : ce fichier sert aujourd'hui aux essais en local (npm run paiement:local).
+# En production (projet Pages « addictive-shop », branche main), Cloudflare lit ce fichier : liaisons et variables ci-dessous.
+# En local (npm run paiement:local), wrangler utilise des copies locales de ces stockages, et .dev.vars remplace [vars].
 name = "addictive-shop"
 compatibility_date = "2026-11-01"
 pages_build_output_dir = "./dist"
 
-# Stockages privés (offre gratuite). Les identifiants ci-dessous sont des valeurs d'essai locales :
-# avant une mise en ligne, créer les vrais espaces (wrangler kv namespace create) et remplacer les « id ».
+# Variables publiques de production : boutique visible, paiement BLOQUÉ (« La boutique ouvre bientôt »).
+# Pour ouvrir les paiements, il faudra passer ces deux réglages à "true" ET ajouter les secrets (Stripe, signature,
+# Printful) dans Cloudflare, jamais ici. Version de Node pour la construction : fichier .node-version (Astro 7 demande Node 22.23 ou plus).
+[vars]
+PUBLIC_BOUTIQUE_OUVERTE = "false"
+CHECKOUT_ENABLED = "false"
+
+# Stockages privés (offre gratuite), créés le 13 novembre 2026. Les identifiants ne sont pas secrets.
 [[kv_namespaces]]
-binding = "FICHIERS"        # les PDF vendus : jamais accessibles par une adresse publique
-id = "local-fichiers"
+binding = "FICHIERS"        # les PDF vendus : jamais accessibles par une adresse publique (vide tant que la vente est fermée)
+id = "95519c1efb50445bace07f930e1dc2c0"
 
 [[kv_namespaces]]
 binding = "TELECHARGEMENTS" # compteurs et liens déjà utilisés : identifiants seulement, aucune donnée client
-id = "local-telechargements"
+id = "4f804dccec1c4580afe25567d7219f55"
