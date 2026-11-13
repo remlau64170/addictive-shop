@@ -20,9 +20,8 @@ export const LIVRES = {
   },
   "ose-ton-projet": {
     titre: "Ose ton projet",
-    // Les PDF actuels (v4) n'ont pas de champs à remplir : à repasser à true avec des PDF remplissables.
-    remplissable: false,
-    fichiers: fichiers("ose-ton-projet", { source: "ose-ton-projet-telephone-v4.pdf", pages: 89 }, { source: "ose-ton-projet-A4-v4.pdf", pages: 88 }),
+    remplissable: true,
+    fichiers: fichiers("ose-ton-projet", { source: "ose-ton-projet-telephone-v5.pdf", pages: 89 }, { source: "ose-ton-projet-A4-v5.pdf", pages: 88 }),
   },
 };
 

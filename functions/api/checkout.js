@@ -41,7 +41,7 @@ export async function onRequestPost({ request, env }) {
       if (!vente.couleurs.some((c) => c.id === ligne.couleur) || !vente.tailles.includes(ligne.taille)) return retour(origin, "invalide");
       propres.push({ id, quantite, couleur: ligne.couleur, taille: ligne.taille });
     } else if (!propres.some((p) => p.id === id)) {
-      propres.push({ id, quantite: 1 }); // un guide PDF ne s'achète qu'une fois
+      propres.push({ id, quantite: 1 }); // un livre numérique ne s'achète qu'une fois
     }
   }
 

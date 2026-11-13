@@ -101,11 +101,20 @@ export async function creerCommandePrintful(env, session) {
   const confirmer = confirmationAutorisee(env, session);
   const items = articlesPrintful(env, session, !confirmer);
   if (items.length === 0) return { statut: "aucun", externalId: ext };
-  const commande = await printful(env, "POST", `/orders?confirm=${confirmer ? "true" : "false"}`, {
-    external_id: ext,
-    shipping: "STANDARD",
-    recipient: destinataire(session),
-    items,
-  });
+  let commande;
+  try {
+    commande = await printful(env, "POST", `/orders?confirm=${confirmer ? "true" : "false"}`, {
+      external_id: ext,
+      shipping: "STANDARD",
+      recipient: destinataire(session),
+      items,
+    });
+  } catch (error) {
+    // Printful peut répondre « already exists » alors que la commande vient d'être enregistrée
+    // (événement reçu deux fois en même temps, ou réponse tardive) : on relit la commande, sans en créer une autre.
+    if (!/already exists/i.test(error.message)) throw error;
+    const existante = await printful(env, "GET", `/orders/@${ext}`);
+    return { statut: "existante", id: existante.id, externalId: ext, brouillon: existante.status === "draft" };
+  }
   return { statut: "creee", id: commande.id, externalId: ext, brouillon: commande.status === "draft" };
 }

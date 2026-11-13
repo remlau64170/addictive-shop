@@ -33,7 +33,7 @@ Le t-shirt brodé est le seul produit physique de la boutique. Le prix vient tou
 ## Panier
 
 - Gardé dans le navigateur (localStorage), sans compte client ; nombre d'articles sur l'icône de l'en-tête.
-- Un guide PDF ne s'achète qu'une fois par commande ; un article livré jusqu'à 10 fois par ligne (couleur, taille).
+- Un livre numérique ne s'achète qu'une fois par commande ; un article livré jusqu'à 10 fois par ligne (couleur, taille).
 - Le navigateur n'envoie que des choix. `/api/checkout` revérifie tout : produits, couleurs, tailles, quantités, prix.
 - Le panier est vidé sur la page de remerciement, une fois le paiement confirmé.
 
@@ -43,14 +43,17 @@ Le t-shirt brodé est le seul produit physique de la boutique. Le prix vient tou
 - Pays : France, Belgique, Luxembourg, Allemagne, Espagne, Italie, Pays-Bas, Portugal. Suisse exclue (port double
   et frais de douane pour le client).
 - Adresse demandée seulement si le panier contient un article livré.
-- **Livraison offerte** si le panier contient au moins un article livré ET au moins un guide PDF (calcul côté serveur).
+- **Livraison offerte** si le panier contient au moins un article livré ET au moins un livre numérique (calcul côté serveur).
 - Le forfait ne couvre pas le port réel Printful (4,49 € HT + TVA = 5,39 € pour 1 article, 6,89 € pour 2 en France
   et dans l'UE) : la différence est absorbée, et entièrement prise en charge quand la livraison est offerte.
 
 ## Rétractation
 
-- Guides PDF : la case « Accès dès le paiement » est obligatoire (accord exprès et renonciation). Dans un panier
-  mixte, son texte précise qu'elle concerne uniquement les contenus numériques.
+- Livres numériques : la case « Accès dès le paiement » est obligatoire (accord exprès et renonciation). Texte,
+  valable pour un livre, plusieurs livres ou le pack (`src/data/consentement.js`) :
+  « Je demande l'accès immédiat à mes livres numériques et je renonce à mon droit de rétractation pour ces contenus. »
+  Dans un panier mixte, il est suivi de : « Cet accord concerne uniquement les contenus numériques : les articles
+  livrés gardent leur délai de rétractation de 14 jours. »
 - **Articles livrés : 14 jours de rétractation à compter de la réception.** À reprendre dans les CGV (droit de
   rétractation, modalités et frais de retour). Mention sur la facture, dans le panier et sur la page de remerciement.
 
@@ -62,7 +65,8 @@ Le t-shirt brodé est le seul produit physique de la boutique. Le prix vient tou
   et refusé par le code tant que Stripe est en mode test.
 - `external_id` : Printful limite ce champ à 32 caractères ; c'est l'empreinte SHA-256 (32 premiers caractères) de
   l'identifiant de session Stripe. Même session, même identifiant : Printful est interrogé avant toute création,
-  donc aucun doublon, même si l'événement arrive deux fois. Le numéro de commande Printful est inscrit sur le paiement
+  donc aucun doublon, même si l'événement arrive deux fois. Si Printful répond « already exists » à la création
+  (commande enregistrée juste avant), la commande existante est relue et le webhook répond 200. Le numéro de commande Printful est inscrit sur le paiement
   Stripe (métadonnées `printful_commande`, `printful_external_id`).
 - Correspondance produit, couleur, taille → variantes Printful : `functions/_lib/printful-catalogue.js`.
 - Fichier du blason : variables `PRINTFUL_FICHIER_BLASON_NOIR` et `PRINTFUL_FICHIER_BLASON_BLANC` (adresse publique
@@ -96,8 +100,7 @@ Le t-shirt brodé est le seul produit physique de la boutique. Le prix vient tou
 - Fichiers : `prive/pdf/` (exclu de git, jamais publics). Correspondance livre → fichiers, libellés et nombre de pages :
   `src/data/livres.js`. Le pack donne les 6 fichiers ; un livre déjà inclus dans un pack du panier est refusé
   (le panier propose de le retirer).
-- « Ose ton projet » (v4) : les deux PDF n'ont **aucun champ remplissable**, contrairement aux deux autres livres.
-  La fiche ne l'annonce donc pas comme remplissable (`remplissable: false` dans `src/data/livres.js`).
+- Les 6 PDF sont remplissables (« Ose ton projet » en v5 : 327 champs par fichier).
 - Visuels : `npm run visuels:livres` (couverture et pages intérieures rendues depuis les PDF, visuel du pack), puis
   `node scripts/visuels/generate.mjs hero` pour le visuel d'accueil.
 
@@ -123,7 +126,7 @@ aujourd'hui). Aucune donnée de paiement.
 
 La facture Stripe, envoyée par e-mail, sert de confirmation écrite sur un support durable. Elle porte en pied de page :
 « TVA non applicable, art. 293 B du CGI », puis la date et l'heure de l'accord (heure de Paris) et la phrase exacte
-de la case « Accès dès le paiement ». La même phrase et la date sont enregistrées dans les métadonnées Stripe
+de la case « Accès dès le paiement » (version panier mixte comprise). La même phrase et la date sont enregistrées dans les métadonnées Stripe
 (session, paiement, facture).
 
 Coût accepté : une facture créée par Checkout (`invoice_creation`) coûte 0,4 % de la vente, plafonné à 2 $,

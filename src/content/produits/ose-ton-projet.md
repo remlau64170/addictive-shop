@@ -5,7 +5,7 @@ kind: Livre numérique
 shelf: numeriques
 slogan: "Sois addict à avancer"
 summary: "Un programme de 60 jours pour choisir un projet personnel, le lancer et le tenir : un sport, une passion créative, un apprentissage, la cuisine ou une entreprise. Une action par jour, 5 à 10 minutes, à votre rythme."
-note: "Version téléphone et version A4 incluses."
+note: "Version téléphone et version A4 incluses, toutes deux remplissables. À ouvrir avec Adobe Acrobat Reader ou Xodo pour écrire dedans."
 images:
   - { src: /produits/ose-ton-projet-1.webp, alt: "Couverture du livre Ose ton projet, Série 60" }
   - { src: /produits/ose-ton-projet-2.webp, alt: "Page du jour 1, Un seul projet, dans la version téléphone" }
@@ -21,7 +21,7 @@ contains:
   - "5 fiches par type de projet : sport, créatif, apprendre, cuisine, entreprendre"
   - "Les sources"
 specs:
-  - { label: Format, value: "PDF, version téléphone et version A4" }
+  - { label: Format, value: "PDF remplissable, version téléphone et version A4" }
   - { label: Pages, value: "89 (téléphone) et 88 (A4)" }
   - { label: Livraison, value: "Accès dès le paiement" }
 ---

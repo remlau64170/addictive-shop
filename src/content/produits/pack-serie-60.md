@@ -4,7 +4,7 @@ name: "Pack Série 60 : les 3 livres"
 kind: Pack de livres numériques
 shelf: numeriques
 summary: "Les trois livres de la Série 60 réunis : Sors de ton addiction, Aiguise ton mental et Ose ton projet. Chaque livre en version téléphone et en version A4, soit 6 PDF."
-note: "Sors de ton addiction et Aiguise ton mental sont remplissables : à ouvrir avec Adobe Acrobat Reader ou Xodo pour écrire dedans."
+note: "Les 6 PDF sont remplissables. À ouvrir avec Adobe Acrobat Reader ou Xodo pour écrire dedans."
 prixSepare: 44.7
 images:
   - { src: /produits/pack-serie-60-1.webp, alt: "Les couvertures des trois livres de la Série 60" }
@@ -19,7 +19,7 @@ contains:
   - "Ose ton projet : 60 jours pour lancer un projet personnel et le tenir"
   - "6 PDF : chaque livre en version téléphone et en version A4"
 specs:
-  - { label: Format, value: "6 PDF, versions téléphone et A4" }
+  - { label: Format, value: "6 PDF remplissables, versions téléphone et A4" }
   - { label: Pages, value: "293 (téléphone) et 264 (A4) au total" }
   - { label: Livraison, value: "Accès dès le paiement" }
 ---
