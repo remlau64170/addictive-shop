@@ -71,6 +71,17 @@ La gourde n'est pas en vente. Le prix vient toujours de Stripe, jamais du naviga
   Tableau de bord > Settings > Store settings > Branding (apparence des e-mails d'expédition), et
   Settings > Notifications (préférences par boutique). À vérifier et activer dans le compte.
 
+## Blason brodé
+
+- Fichiers prêts pour la broderie (PNG transparent, couleurs exactes des fils, taille réelle 56,5 × 42 mm à 300 dpi) :
+  `prive/broderie/blason-tshirt-noir.png` (fils Aqua/Teal #3399FF et blanc #FFFFFF) et
+  `prive/broderie/blason-tshirt-blanc.png` (fils Royal #005397 et noir #000000). Aperçus dans le même dossier.
+- Logo de l'appli (icon-only-512.png) redessiné : même flèche, ruban simplifié en 3 bandes séparées de 2,2 mm ;
+  « Addictive » en dessous, lettres de 9 mm (minimum Printful : 6,35 mm). Pas de slogan.
+- Régénérer : `npm run broderie:blason` (script `scripts/blason-broderie.mjs`).
+- Après dépôt dans la bibliothèque Printful : `npm run printful:fichier -- <identifiant>` vérifie le fichier et donne
+  la ligne pour `.dev.vars`, puis `npm run printful:maquettes` crée les maquettes et remplace les photos de la fiche.
+
 ## Données envoyées à Printful
 
 Nom et adresse de livraison, articles commandés (modèle, couleur, taille, quantité), identifiant de commande dérivé de

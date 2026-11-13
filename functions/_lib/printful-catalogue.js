@@ -14,7 +14,7 @@ export const CATALOGUE_PRINTFUL = {
         variantes: { XS: 9527, S: 4016, M: 4017, L: 4018, XL: 4019, "2XL": 4020, "3XL": 5295, "4XL": 5310 },
       },
       blanc: {
-        fils: ["#6B5294", "#000000"], // Purple (logo) et noir (textes)
+        fils: ["#005397", "#000000"], // Royal (logo) et noir (textes)
         fichier: "PRINTFUL_FICHIER_BLASON_BLANC",
         variantes: { XS: 9526, S: 4011, M: 4012, L: 4013, XL: 4014, "2XL": 4015, "3XL": 5294, "4XL": 5309 },
       },
