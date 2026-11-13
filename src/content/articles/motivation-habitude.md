@@ -63,5 +63,5 @@ Voir ses jours réussis s'accumuler est une vraie source d'encouragement. Une cr
 
 ## Sources
 
-- Lally P., van Jaarsveld C., Potts H., Wardle J., « How are habits formed: Modelling habit formation in the real world », *European Journal of Social Psychology*, 2010 (étude présentée par [l'University College London](https://www.ucl.ac.uk/news/2009/aug/how-long-does-it-take-form-habit) ; détails de la méthode : [The Behavioral Scientist](https://www.thebehavioralscientist.com/articles/how-long-to-form-a-habit)).
+- Lally P., van Jaarsveld C., Potts H., Wardle J., « How are habits formed: Modelling habit formation in the real world », *European Journal of Social Psychology*, 2010 ([publication](https://doi.org/10.1002/ejsp.674) ; détails de la méthode : [The Behavioral Scientist](https://www.thebehavioralscientist.com/articles/how-long-to-form-a-habit)).
 - Gollwitzer P. M., Sheeran P., « Implementation intentions and goal achievement: A meta-analysis of effects and processes », *Advances in Experimental Social Psychology*, 2006 (synthèse présentée par le [National Cancer Institute](https://cancercontrol.cancer.gov/brp/research/constructs/implementation-intentions)).

@@ -4,15 +4,17 @@ import { formatPrice, productName, thumbnail, type Produit } from "../lib/produi
 interface Props {
   produit: Produit;
   heading?: "h2" | "h3";
+  /** Première carte visible : image chargée tout de suite (image principale de la page). */
+  eager?: boolean;
 }
 
-const { produit, heading: Heading = "h3" } = Astro.props;
+const { produit, heading: Heading = "h3", eager = false } = Astro.props;
 const href = `/boutique/${produit.id}/`;
 ---
 
 <article>
   <a class="visual" href={href} tabindex="-1">
-    <img src={thumbnail(produit.data.images[0]!.src)} width="480" height="480" loading="lazy" alt={produit.data.images[0]!.alt} />
+    <img src={thumbnail(produit.data.images[0]!.src)} width="480" height="480" loading={eager ? "eager" : "lazy"} fetchpriority={eager ? "high" : undefined} alt={produit.data.images[0]!.alt} />
     <span class="demo-note">Visuel de démonstration</span>
   </a>
   <Heading class="name"><a href={href}>{productName(produit)}</a></Heading>

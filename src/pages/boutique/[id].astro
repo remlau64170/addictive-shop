@@ -76,7 +76,7 @@ const structured = {
 };
 ---
 
-<Base title={name} description={descriptionSeo} wide image={images[0]!.src} ogType="product">
+<Base title={name} description={descriptionSeo} wide image={`/partage/produits/${produit.id}.jpg`} ogType="product">
   <JsonLd data={structured} />
   <div class="wrap wrap-page">
     <Breadcrumb
@@ -91,14 +91,14 @@ const structured = {
     <div class="top">
       <div class="gallery">
         <div class="visual">
-          <img id="gallery-main" src={images[0]!.src} width="1000" height="1000" alt={images[0]!.alt} />
+          <img id="gallery-main" src={images[0]!.src} srcset={`${thumbnail(images[0]!.src)} 480w, ${images[0]!.src} 1000w`} sizes="(min-width: 900px) 50vw, 100vw" width="1000" height="1000" fetchpriority="high" alt={images[0]!.alt} />
           <span class="demo-note">Visuel de démonstration</span>
         </div>
         <ul class="thumbs" aria-label="Images du produit">
           {
             images.map((image, index) => (
               <li>
-                <a href={image.src} data-thumb={image.src} data-alt={image.alt} aria-label={`Image ${index + 1} : ${image.alt}`} aria-current={index === 0 ? "true" : undefined}>
+                <a href={image.src} data-thumb={image.src} data-srcset={`${thumbnail(image.src)} 480w, ${image.src} 1000w`} data-alt={image.alt} aria-label={`Image ${index + 1} : ${image.alt}`} aria-current={index === 0 ? "true" : undefined}>
                   <img src={thumbnail(image.src)} width="480" height="480" loading="lazy" alt={image.alt} />
                 </a>
               </li>
@@ -701,6 +701,7 @@ const structured = {
     thumb.addEventListener("click", (event) => {
       event.preventDefault();
       if (main) {
+        main.srcset = thumb.dataset.srcset ?? "";
         main.src = thumb.dataset.thumb ?? main.src;
         main.alt = thumb.dataset.alt ?? "";
       }

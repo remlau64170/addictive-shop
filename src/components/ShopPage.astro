@@ -48,9 +48,9 @@ const TABS = [{ href: "/boutique/", label: "Tout", id: undefined as string | und
 
     <ul id="shop-grid" class="product-grid">
       {
-        produits.map((produit) => (
+        produits.map((produit, index) => (
           <li data-order={produit.data.order} data-price={produit.data.price ?? ""}>
-            <ProductCard produit={produit} heading="h2" />
+            <ProductCard produit={produit} heading="h2" eager={index < 2} />
           </li>
         ))
       }

@@ -49,7 +49,7 @@ const faqStructured = faq.length
   : undefined;
 ---
 
-<Base title={article.data.seoTitle ?? article.data.title} description={article.data.description} ogType="article" noindex={article.data.draft} image={cover?.src}>
+<Base title={article.data.seoTitle ?? article.data.title} description={article.data.description} ogType="article" noindex={article.data.draft} image={`/partage/articles/${article.id}.jpg`}>
   <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Articles", href: "/articles/" }, ...(category ? [{ label: category.label, href: categoryHref }] : []), { label: article.data.title }]} />
   <JsonLd data={structured} />
   {faqStructured && <JsonLd data={faqStructured} />}

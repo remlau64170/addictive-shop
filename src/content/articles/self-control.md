@@ -62,4 +62,4 @@ Non. Les chercheurs décrivent les personnes disciplinées comme ayant non pas u
 
 ## Sources
 
-- Hofmann W., Baumeister R. F., Förster G., Vohs K. D., « Everyday temptations: An experience sampling study of desire, conflict, and self-control », *Journal of Personality and Social Psychology*, 2012 ([article](https://carlsonschool-d8.prd.umn.edu/sites/carlsonschool.umn.edu/files/2019-04/hofmann_baumeister_forster_vohs_2012_jpsp.pdf) ; résumé par la [British Psychological Society](https://bps.org.uk/research-digest/already-struggling-keep-new-year-resolutions-heres-first-detailed-study-daily)).
+- Hofmann W., Baumeister R. F., Förster G., Vohs K. D., « Everyday temptations: An experience sampling study of desire, conflict, and self-control », *Journal of Personality and Social Psychology*, 2012 ([article](https://doi.org/10.1037/a0026545) ; résumé par la [British Psychological Society](https://bps.org.uk/research-digest/already-struggling-keep-new-year-resolutions-heres-first-detailed-study-daily)).
