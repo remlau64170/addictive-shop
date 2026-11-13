@@ -1,0 +1,57 @@
+---
+// Gabarit des pages légales. Tant que des informations manquent ([À COMPLÉTER]), les pages restent hors des moteurs de recherche.
+import Base from "../layouts/Base.astro";
+import Breadcrumb from "./Breadcrumb.astro";
+import { EDITEUR, MEDIATEUR, ADRESSE_RETOUR, DIRECTEUR_PUBLICATION, MESSAGERIE } from "../data/legal.js";
+
+interface Props {
+  title: string;
+  description: string;
+  miseAJour: string;
+}
+
+const { title, description, miseAJour } = Astro.props;
+const complet = [EDITEUR.nom, EDITEUR.adresse, EDITEUR.telephone, EDITEUR.siret, EDITEUR.immatriculation, MEDIATEUR, ADRESSE_RETOUR, DIRECTEUR_PUBLICATION, MESSAGERIE].every(Boolean);
+---
+
+<Base title={title} description={description} noindex={!complet}>
+  <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: title }]} />
+  <h1>{title}</h1>
+  <p class="lead">Dernière mise à jour : {miseAJour}.</p>
+  <div class="prose legal">
+    <slot />
+  </div>
+</Base>
+
+<style>
+  .legal :global(.encadre) {
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-card);
+    background: color-mix(in oklch, var(--card) 70%, transparent);
+  }
+
+  .legal :global(.encadre > * + *) {
+    margin-top: 0.75rem;
+  }
+
+  .legal :global(.citation) {
+    padding-left: 1rem;
+    border-left: 3px solid var(--primary);
+    font-weight: 600;
+  }
+
+  .legal :global(address) {
+    font-style: normal;
+  }
+
+  .legal :global(.formulaire) {
+    padding: 1rem 1.25rem;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-card);
+  }
+
+  .legal :global(.formulaire > * + *) {
+    margin-top: 0.75rem;
+  }
+</style>

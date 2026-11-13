@@ -7,6 +7,7 @@ import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { hmacSha256, signToken } from "../functions/_lib/stripe.js";
 import { CONSENTEMENT_RETRACTATION, CONSENTEMENT_RETRACTATION_MIXTE } from "../src/data/consentement.js";
+import { CGV_VERSION } from "../src/data/legal.js";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:8788";
 const racine = resolve(import.meta.dirname, "..");
@@ -86,6 +87,8 @@ verifier("paiement : produit invalide refusé", r.status === 303 && /paiement=in
 r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "sors-de-ton-addiction" }), redirect: "manual" });
 verifier("paiement sans la case cochée : refusé", r.status === 303 && /paiement=consentement/.test(r.headers.get("location") ?? ""), r.headers.get("location"));
 r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "sors-de-ton-addiction", consentement: "oui" }), redirect: "manual" });
+verifier("paiement sans accepter les CGV : refusé", r.status === 303 && /paiement=cgv/.test(r.headers.get("location") ?? ""), r.headers.get("location"));
+r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "sors-de-ton-addiction", consentement: "oui", cgv: "oui" }), redirect: "manual" });
 const versStripe = r.headers.get("location") ?? "";
 verifier("paiement avec la case cochée : page Stripe", r.status === 303 && versStripe.startsWith("https://checkout.stripe.com/"), r.status);
 const idSession = versStripe.match(/cs_test_[A-Za-z0-9]+/)?.[0];
@@ -94,6 +97,8 @@ if (idSession && vars.STRIPE_SECRET_KEY) {
   const s = await lire(`/checkout/sessions/${idSession}`);
   verifier("preuve dans Stripe : formulation exacte de la case", s.metadata?.consentement_retractation === CONSENTEMENT_RETRACTATION);
   verifier("preuve dans Stripe : date de l'accord", !Number.isNaN(Date.parse(s.metadata?.consentement_date ?? "")));
+  verifier("preuve dans Stripe : version des CGV acceptées", s.metadata?.cgv_version === CGV_VERSION, s.metadata?.cgv_version);
+  verifier("pied de facture : lien vers les CGV", (s.invoice_creation?.invoice_data?.footer ?? "").includes("/cgv/"));
   verifier("facture créée par Checkout (invoice_creation)", s.invoice_creation?.enabled === true);
   const pied = s.invoice_creation?.invoice_data?.footer ?? "";
   verifier("pied de facture : phrase exacte de la case", pied.includes(`« ${CONSENTEMENT_RETRACTATION} »`));
@@ -104,7 +109,7 @@ if (idSession && vars.STRIPE_SECRET_KEY) {
 
 // 4 ter. Panier : t-shirt seul, t-shirt + PDF, PDF seul, produit retiré
 const sessionDe = async (panier, consentement) => {
-  const corps = new URLSearchParams({ panier: JSON.stringify(panier) });
+  const corps = new URLSearchParams({ panier: JSON.stringify(panier), cgv: "oui" });
   if (consentement) corps.set("consentement", "oui");
   const rep = await fetch(`${BASE}/api/checkout`, { method: "POST", body: corps, redirect: "manual" });
   const id = (rep.headers.get("location") ?? "").match(/cs_test_[A-Za-z0-9]+/)?.[0];
@@ -143,9 +148,9 @@ if (vars.STRIPE_SECRET_KEY) {
   const { s } = await sessionDe([{ id: "pack-serie-60", quantite: 1 }], true);
   verifier("pack seul : 34,90 €, sans livraison", s?.amount_total === 3490 && !s?.shipping_address_collection, s?.amount_total);
   verifier("pack seul : lien de téléchargement dans la facture", /\/merci\/\?ref=[a-f0-9]{32}/.test(s?.invoice_creation?.invoice_data?.footer ?? ""));
-  const doublon = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ panier: JSON.stringify([{ id: "pack-serie-60", quantite: 1 }, { id: "ose-ton-projet", quantite: 1 }]), consentement: "oui" }), redirect: "manual" });
+  const doublon = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ panier: JSON.stringify([{ id: "pack-serie-60", quantite: 1 }, { id: "ose-ton-projet", quantite: 1 }]), consentement: "oui", cgv: "oui" }), redirect: "manual" });
   verifier("pack + livre déjà inclus : refusé (doublon)", /paiement=doublon/.test(doublon.headers.get("location") ?? ""), doublon.headers.get("location"));
-  const ancien = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ panier: JSON.stringify([{ id: "serie-30", quantite: 1 }]), consentement: "oui" }), redirect: "manual" });
+  const ancien = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ panier: JSON.stringify([{ id: "serie-30", quantite: 1 }]), consentement: "oui", cgv: "oui" }), redirect: "manual" });
   verifier("ancien produit Série 30 : refusé", /paiement=(indisponible|invalide)/.test(ancien.headers.get("location") ?? ""), ancien.headers.get("location"));
 }
 

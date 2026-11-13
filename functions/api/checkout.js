@@ -6,7 +6,7 @@ import { CONSENTEMENT_VALEUR, RETRACTATION_PHYSIQUE, texteConsentement } from ".
 import { LIGNES_MAX, LIVRAISON, PHYSIQUES_EN_VENTE, QUANTITE_MAX, livraisonOfferte } from "../../src/data/boutique.js";
 import { fichiersDuProduit, livresEnDouble } from "../../src/data/livres.js";
 
-const MENTION_TVA = "TVA non applicable, art. 293 B du CGI";
+import { ACCEPTATION_CGV, ACCEPTATION_CGV_VALEUR, CGV_VERSION, CGV_VERSION_TEXTE, MENTION_TVA } from "../../src/data/legal.js";
 const SLUG = /^[a-z0-9-]{1,60}$/;
 
 const retour = (origin, raison, page = "/panier/") => Response.redirect(`${origin}${page}?paiement=${raison}`, 303);
@@ -68,6 +68,8 @@ export async function onRequestPost({ request, env }) {
 
     // Contenu numérique : la case « Accès dès le paiement » doit être cochée (vérifié ici aussi, pas seulement dans la page).
     if (numeriques.length > 0 && form?.get("consentement") !== CONSENTEMENT_VALEUR) return retour(origin, "consentement");
+    // Conditions générales de vente : case du panier obligatoire pour toute commande (vérifiée ici aussi).
+    if (form?.get("cgv") !== ACCEPTATION_CGV_VALEUR) return retour(origin, "cgv");
 
     const line_items = [
       ...numeriques.map((p) => ({ price: produits.get(p.id).default_price.id, quantity: 1 })),
@@ -91,7 +93,7 @@ export async function onRequestPost({ request, env }) {
     // Panier compact, relu par le webhook : « slug » pour un PDF, « slug:couleur:taille:quantité » pour un article.
     const panier = [...numeriques.map((p) => p.id), ...physiques.map((p) => `${p.id}:${p.couleur}:${p.taille}:${p.quantite}`)].join(";");
     const nature = physiques.length && numeriques.length ? "mixed" : physiques.length ? "physical" : "digital";
-    const metadata = { delivery: nature, panier: panier.slice(0, 500) };
+    const metadata = { delivery: nature, panier: panier.slice(0, 500), cgv_version: CGV_VERSION, cgv_acceptees: ACCEPTATION_CGV };
     if (numeriques.length === 1 && physiques.length === 0) metadata.slug = numeriques[0].id;
 
     // Preuve de l'accord (formulation exacte de la case affichée pour ce panier) et date.
@@ -112,6 +114,7 @@ export async function onRequestPost({ request, env }) {
       pied.push(`Vos téléchargements (version téléphone et version A4) : ${origin}/merci/?ref=${ref}`);
     }
     if (physiques.length > 0) pied.push(RETRACTATION_PHYSIQUE);
+    pied.push(`Conditions générales de vente acceptées (version du ${CGV_VERSION_TEXTE}) : ${origin}/cgv/ · Confidentialité : ${origin}/confidentialite/`);
 
     const body = {
       mode: "payment",

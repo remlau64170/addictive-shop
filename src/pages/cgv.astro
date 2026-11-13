@@ -1,0 +1,283 @@
+---
+import LegalPage from "../components/LegalPage.astro";
+import Info from "../components/Info.astro";
+import { ADRESSE_RETOUR, CGV_VERSION_TEXTE, EDITEUR, MEDIATEUR, MENTION_TVA } from "../data/legal.js";
+import { CONSENTEMENT_RETRACTATION, CONSENTEMENT_RETRACTATION_MIXTE } from "../data/consentement.js";
+import { LIVRAISON } from "../data/boutique.js";
+
+const PAYS = "France, Belgique, Luxembourg, Allemagne, Espagne, Italie, Pays-Bas et Portugal";
+const forfait = (LIVRAISON.montant / 100).toFixed(2).replace(".", ",");
+---
+
+<LegalPage
+  title="Conditions générales de vente"
+  description="Conditions générales de vente de la boutique Addictive : livres numériques, t-shirt brodé, prix, livraison, rétractation et garanties."
+  miseAJour={CGV_VERSION_TEXTE}
+>
+  <h2>1. Le vendeur</h2>
+  <p>
+    La boutique Addictive est exploitée par <Info valeur={EDITEUR.nom} quoi="prénom et nom" />, entrepreneur individuel (EI),
+    micro-entreprise.
+  </p>
+  <ul>
+    <li>Adresse : <Info valeur={EDITEUR.adresse} quoi="adresse de l'entreprise" /></li>
+    <li>E-mail : <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a></li>
+    <li>Téléphone : <Info valeur={EDITEUR.telephone} quoi="numéro de téléphone" /></li>
+    <li>SIRET : <Info valeur={EDITEUR.siret} quoi="numéro SIRET" /></li>
+    <li>Immatriculation : <Info valeur={EDITEUR.immatriculation} quoi="registre et numéro d'immatriculation" /></li>
+  </ul>
+  <p>Les présentes conditions s'appliquent aux achats faits sur la boutique par des particuliers (consommateurs).</p>
+
+  <h2>2. Les produits</h2>
+  <ul>
+    <li>
+      <strong>Livres numériques de la Série 60</strong> (« Sors de ton addiction », « Aiguise ton mental », « Ose ton projet ») et le
+      <strong>Pack Série 60</strong> qui réunit les trois. Chaque livre est un fichier PDF fourni en deux versions : une version
+      pour téléphone et une version A4 à imprimer. Les PDF sont remplissables : pour écrire dedans, ouvrez-les avec une application
+      qui gère les formulaires PDF, comme Adobe Acrobat Reader ou Xodo. Ils se lisent sur téléphone, tablette ou ordinateur, sans
+      compte ni protection technique. Le nombre de pages et le contenu de chaque livre figurent sur sa fiche.
+    </li>
+    <li>
+      <strong>T-shirt brodé Addictive</strong> : Bella+Canvas 3001, 100 % coton peigné, brodé du blason Addictive, en noir ou en blanc,
+      tailles XS à 4XL. Il est fabriqué à la commande par notre partenaire Printful. Le guide des tailles figure sur la fiche.
+    </li>
+  </ul>
+  <p>
+    Les livres sont des outils de développement personnel : ils ne remplacent pas l'avis d'un professionnel de santé.
+  </p>
+
+  <h2>3. Prix</h2>
+  <p>
+    Les prix sont indiqués en euros, toutes taxes comprises. {MENTION_TVA} : aucune TVA n'est facturée. Le prix à payer est celui
+    affiché au moment de la commande, sur la fiche du produit, dans le panier et sur la page de paiement.
+  </p>
+  <p>
+    Livraison des articles livrés : forfait de {forfait} € par commande, quel que soit le nombre d'articles. La livraison est
+    offerte quand la commande contient au moins un livre numérique et au moins un article livré. Les livres numériques n'ont
+    aucun frais de livraison. Le montant total, livraison comprise, est affiché avant le paiement.
+  </p>
+
+  <h2>4. Commande</h2>
+  <ol>
+    <li>Vous ajoutez les produits au panier (couleur et taille pour le t-shirt).</li>
+    <li>
+      Dans le panier, vous vérifiez votre commande, vous cochez la case d'acceptation des présentes conditions et, si la commande
+      contient un livre numérique, la case « Accès dès le paiement » (voir l'article 8).
+    </li>
+    <li>
+      Vous êtes dirigé vers la page de paiement sécurisée de Stripe, où vous saisissez votre e-mail, votre adresse de livraison si
+      nécessaire et votre moyen de paiement. Le récapitulatif et le total y sont affichés une dernière fois.
+    </li>
+    <li>
+      La commande est conclue au moment où le paiement est confirmé. Vous recevez alors par e-mail une facture, qui vaut
+      confirmation de la commande sur un support durable. Elle reprend la date et le texte des accords donnés au moment de l'achat.
+    </li>
+  </ol>
+  <p>Un livre déjà inclus dans le pack de votre panier ne peut pas être payé deux fois : le panier vous propose de le retirer.</p>
+
+  <h2>5. Paiement</h2>
+  <p>
+    Le paiement se fait en une fois, au moment de la commande, sur la page sécurisée de Stripe : carte bancaire ou autre moyen de
+    paiement proposé sur cette page. Les données de paiement sont traitées par Stripe et ne transitent jamais par le site Addictive.
+  </p>
+
+  <h2>6. Livraison des livres numériques</h2>
+  <p>
+    Dès la confirmation du paiement, la page de remerciement donne un lien de téléchargement personnel pour chaque fichier
+    (version téléphone et version A4 de chaque livre). Chaque lien fonctionne une seule fois, pendant 15 minutes ; vous pouvez
+    obtenir de nouveaux liens en rechargeant la page (3 liens par fichier au total), pendant 30 jours. La facture envoyée par e-mail
+    contient le lien de cette page. Pensez à enregistrer vos fichiers sur votre appareil. En cas de difficulté, écrivez-nous à{" "}
+    <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a>.
+  </p>
+
+  <h2>7. Livraison du t-shirt</h2>
+  <ul>
+    <li>Pays de livraison : {PAYS}.</li>
+    <li>
+      Délai indicatif : {LIVRAISON.delaiJours.min} à {LIVRAISON.delaiJours.max} jours ouvrés (fabrication à la commande, puis
+      expédition). Dans tous les cas, l'article est livré au plus tard 30 jours après la commande.
+    </li>
+    <li>Le suivi du colis vous est envoyé par e-mail par Printful, au moment de l'expédition.</li>
+    <li>
+      Les risques de perte ou d'endommagement vous sont transférés quand vous (ou la personne que vous avez désignée) prenez
+      physiquement possession de l'article.
+    </li>
+    <li>
+      Retard : si l'article n'est pas livré dans ce délai, vous pouvez nous demander de le livrer dans un délai supplémentaire
+      raisonnable, puis, à défaut, mettre fin au contrat par écrit et être remboursé au plus tard 14 jours après.
+    </li>
+    <li>Colis abîmé ou article non conforme à la réception : écrivez-nous avec une photo, nous trouverons une solution.</li>
+  </ul>
+
+  <h2>8. Livres numériques : pas de droit de rétractation après l'accès</h2>
+  <p>
+    Un livre numérique est un contenu numérique fourni sans support matériel. Le droit de rétractation ne s'applique pas lorsque
+    son exécution a commencé avec votre accord préalable et exprès et votre renoncement exprès à ce droit (article L. 221-28, 13°,
+    du Code de la consommation). Pour accéder à vos livres dès le paiement, le panier vous demande donc de cocher, sans qu'elle soit
+    cochée d'avance, la case suivante :
+  </p>
+  <p class="citation">« {CONSENTEMENT_RETRACTATION} »</p>
+  <p>Si votre commande contient aussi un article livré, le texte de la case est complété ainsi :</p>
+  <p class="citation">« {CONSENTEMENT_RETRACTATION_MIXTE} »</p>
+  <p>
+    Sans cette case, le paiement d'un livre numérique n'est pas possible. La date, l'heure et le texte exact de votre accord sont
+    enregistrés et figurent sur la facture envoyée par e-mail.
+  </p>
+
+  <h2>9. T-shirt : droit de rétractation de 14 jours</h2>
+  <p>
+    Vous disposez de 14 jours pour vous rétracter, sans avoir à donner de motif. Le délai court à partir du jour où vous (ou une
+    personne que vous désignez, autre que le transporteur) recevez l'article. Si une commande contient plusieurs articles livrés
+    séparément, il court à partir de la réception du dernier.
+  </p>
+  <ul>
+    <li>
+      <strong>Comment faire</strong> : envoyez-nous, avant la fin du délai, une déclaration claire, par exemple un e-mail à{" "}
+      <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a> ou le formulaire type en annexe (son utilisation n'est pas
+      obligatoire).
+    </li>
+    <li>
+      <strong>Retour de l'article</strong> : renvoyez-le au plus tard 14 jours après nous avoir informé de votre décision, à
+      l'adresse suivante : <Info valeur={ADRESSE_RETOUR} quoi="adresse de retour des articles" />. Les frais de retour sont à votre
+      charge.
+    </li>
+    <li>
+      <strong>Remboursement</strong> : nous vous remboursons au plus tard 14 jours après avoir été informés de votre décision, avec
+      le même moyen de paiement que celui utilisé pour la commande, sauf accord de votre part pour un autre moyen, sans frais pour
+      vous. Le remboursement comprend les frais de livraison payés, dans la limite du forfait standard. Il peut être différé jusqu'à
+      la réception de l'article ou jusqu'à ce que vous ayez fourni une preuve de son expédition, à la première de ces dates.
+    </li>
+    <li>
+      <strong>État de l'article</strong> : vous pouvez l'essayer comme en magasin. Votre responsabilité n'est engagée qu'en cas de
+      dépréciation résultant de manipulations autres que celles nécessaires pour vérifier sa nature, ses caractéristiques et son bon
+      fonctionnement.
+    </li>
+  </ul>
+  <p>
+    Commande mixte : votre rétractation sur le t-shirt ne remet pas en cause l'achat des livres numériques, auxquels vous avez déjà
+    accédé (article 8).
+  </p>
+
+  <h2>10. Garanties légales</h2>
+  <p>
+    Le t-shirt bénéficie de la garantie légale de conformité et de la garantie des vices cachés, présentées dans l'encadré
+    ci-dessous. Les livres numériques bénéficient de la garantie légale de conformité des contenus numériques (articles L. 224-25-1
+    et suivants du Code de la consommation) : si un fichier est illisible ou ne correspond pas à sa description, écrivez-nous et
+    nous le remplacerons. Pour mettre en œuvre une garantie, contactez-nous à{" "}
+    <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a>.
+  </p>
+  <div class="encadre">
+    <p>
+      Le consommateur dispose d'un délai de deux ans à compter de la délivrance du bien pour obtenir la mise en œuvre de la garantie
+      légale de conformité en cas d'apparition d'un défaut de conformité. Durant ce délai, le consommateur n'est tenu d'établir que
+      l'existence du défaut de conformité et non la date d'apparition de celui-ci.
+    </p>
+    <p>
+      Lorsque le contrat de vente du bien prévoit la fourniture d'un contenu numérique ou d'un service numérique de manière continue
+      pendant une durée supérieure à deux ans, la garantie légale est applicable à ce contenu numérique ou ce service numérique tout
+      au long de la période de fourniture prévue. Durant ce délai, le consommateur n'est tenu d'établir que l'existence du défaut de
+      conformité affectant le contenu numérique ou le service numérique et non la date d'apparition de celui-ci.
+    </p>
+    <p>
+      La garantie légale de conformité emporte obligation pour le professionnel, le cas échéant, de fournir toutes les mises à jour
+      nécessaires au maintien de la conformité du bien.
+    </p>
+    <p>
+      La garantie légale de conformité donne au consommateur droit à la réparation ou au remplacement du bien dans un délai de trente
+      jours suivant sa demande, sans frais et sans inconvénient majeur pour lui.
+    </p>
+    <p>
+      Si le bien est réparé dans le cadre de la garantie légale de conformité, le consommateur bénéficie d'une extension de six mois
+      de la garantie initiale.
+    </p>
+    <p>
+      Si le consommateur demande la réparation du bien, mais que le vendeur impose le remplacement, la garantie légale de conformité
+      est renouvelée pour une période de deux ans à compter de la date de remplacement du bien.
+    </p>
+    <p>
+      Le consommateur peut obtenir une réduction du prix d'achat en conservant le bien ou mettre fin au contrat en se faisant
+      rembourser intégralement contre restitution du bien, si :
+    </p>
+    <p>1° Le professionnel refuse de réparer ou de remplacer le bien ;</p>
+    <p>2° La réparation ou le remplacement du bien intervient après un délai de trente jours ;</p>
+    <p>
+      3° La réparation ou le remplacement du bien occasionne un inconvénient majeur pour le consommateur, notamment lorsque le
+      consommateur supporte définitivement les frais de reprise ou d'enlèvement du bien non conforme, ou s'il supporte les frais
+      d'installation du bien réparé ou de remplacement ;
+    </p>
+    <p>4° La non-conformité du bien persiste en dépit de la tentative de mise en conformité du vendeur restée infructueuse.</p>
+    <p>
+      Le consommateur a également droit à une réduction du prix du bien ou à la résolution du contrat lorsque le défaut de conformité
+      est si grave qu'il justifie que la réduction du prix ou la résolution du contrat soit immédiate. Le consommateur n'est alors pas
+      tenu de demander la réparation ou le remplacement du bien au préalable.
+    </p>
+    <p>Le consommateur n'a pas droit à la résolution de la vente si le défaut de conformité est mineur.</p>
+    <p>
+      Toute période d'immobilisation du bien en vue de sa réparation ou de son remplacement suspend la garantie qui restait à courir
+      jusqu'à la délivrance du bien remis en état.
+    </p>
+    <p>Les droits mentionnés ci-dessus résultent de l'application des articles L. 217-1 à L. 217-32 du code de la consommation.</p>
+    <p>
+      Le vendeur qui fait obstacle de mauvaise foi à la mise en œuvre de la garantie légale de conformité encourt une amende civile
+      d'un montant maximal de 300 000 euros, qui peut être porté jusqu'à 10 % du chiffre d'affaires moyen annuel (article L. 241-5 du
+      code de la consommation).
+    </p>
+    <p>
+      Le consommateur bénéficie également de la garantie légale des vices cachés en application des articles 1641 à 1649 du code
+      civil, pendant une durée de deux ans à compter de la découverte du défaut. Cette garantie donne droit à une réduction de prix si
+      le bien est conservé ou à un remboursement intégral contre restitution du bien.
+    </p>
+  </div>
+
+  <h2>11. Service client et réclamations</h2>
+  <p>
+    Pour toute question ou réclamation : <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a>. Nous vous répondons dans les
+    meilleurs délais.
+  </p>
+
+  <h2>12. Médiation de la consommation</h2>
+  <p>
+    En cas de litige, vous pouvez recourir gratuitement au médiateur de la consommation dont nous relevons, après avoir tenté de le
+    résoudre directement avec nous par une réclamation écrite :
+    <Info valeur={MEDIATEUR} quoi="nom, adresse postale et site du médiateur de la consommation" />. Le médiateur peut être saisi
+    dans un délai d'un an à compter de votre réclamation écrite.
+  </p>
+
+  <h2>13. Données personnelles</h2>
+  <p>
+    Les données nécessaires à votre commande sont traitées comme indiqué dans la{" "}
+    <a href="/confidentialite/">politique de confidentialité</a>.
+  </p>
+
+  <h2>14. Droit applicable</h2>
+  <p>
+    Les présentes conditions sont soumises au droit français. Ce choix ne vous prive pas de la protection des règles impératives du
+    pays de l'Union européenne où vous résidez. En cas de litige, vous pouvez saisir, à votre choix, la juridiction du lieu où vous
+    demeuriez au moment de la commande ou de la survenance du fait dommageable, ou toute autre juridiction compétente.
+  </p>
+
+  <h2>15. Version des conditions</h2>
+  <p>
+    Version du {CGV_VERSION_TEXTE}. La version applicable est celle acceptée au moment de la commande ; elle est enregistrée avec
+    votre commande.
+  </p>
+
+  <h2>Annexe : formulaire de rétractation</h2>
+  <div class="formulaire">
+    <p>(Veuillez compléter et renvoyer le présent formulaire uniquement si vous souhaitez vous rétracter du contrat.)</p>
+    <p>
+      A l'attention de <Info valeur={EDITEUR.nom} quoi="prénom et nom" /> (EI), <Info valeur={ADRESSE_RETOUR ?? EDITEUR.adresse} quoi="adresse géographique" />,
+      {EDITEUR.email} :
+    </p>
+    <p>
+      Je/nous (*) vous notifie/notifions (*) par la présente ma/notre (*) rétractation du contrat portant sur la vente du bien
+      (*)/pour la prestation de services (*) ci-dessous :
+    </p>
+    <p>Commandé le (*)/reçu le (*) :</p>
+    <p>Nom du (des) consommateur(s) :</p>
+    <p>Adresse du (des) consommateur(s) :</p>
+    <p>Signature du (des) consommateur(s) (uniquement en cas de notification du présent formulaire sur papier) :</p>
+    <p>Date :</p>
+    <p>(*) Rayez la mention inutile.</p>
+  </div>
+</LegalPage>

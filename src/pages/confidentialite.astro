@@ -1,0 +1,158 @@
+---
+import LegalPage from "../components/LegalPage.astro";
+import Info from "../components/Info.astro";
+import { EDITEUR, HEBERGEUR, MESSAGERIE } from "../data/legal.js";
+---
+
+<LegalPage
+  title="Politique de confidentialité"
+  description="Quelles données la boutique Addictive utilise, pourquoi, avec qui elles sont partagées, combien de temps elles sont gardées et vos droits."
+  miseAJour="13 novembre 2026"
+>
+  <p>
+    Nous collectons le moins de données possible : pas de compte client, pas de cookie, pas de mesure d'audience, pas de publicité.
+    Cette page détaille ce qui est utilisé quand vous visitez le site et quand vous commandez.
+  </p>
+
+  <h2>Responsable du traitement</h2>
+  <p>
+    <Info valeur={EDITEUR.nom} quoi="prénom et nom" />, entrepreneur individuel (EI),{" "}
+    <Info valeur={EDITEUR.adresse} quoi="adresse de l'entreprise" />. Contact :
+    <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a>.
+  </p>
+
+  <h2>Les données utilisées</h2>
+  <h3>Quand vous visitez le site</h3>
+  <ul>
+    <li>
+      <strong>Données techniques de connexion</strong> (adresse IP, date et heure, page demandée, navigateur) : traitées par notre
+      hébergeur Cloudflare pour afficher le site et le protéger contre les abus. Nous n'utilisons pas d'outil de mesure d'audience.
+    </li>
+    <li>
+      <strong>Votre panier</strong> : les produits choisis (couleur, taille, quantité) sont gardés dans votre navigateur (stockage
+      local), sans nom ni e-mail. Ils ne nous sont envoyés qu'au moment où vous cliquez sur « Payer ». Vous pouvez les effacer en
+      vidant le panier ou les données du site dans votre navigateur.
+    </li>
+  </ul>
+
+  <h3>Quand vous commandez</h3>
+  <ul>
+    <li>
+      <strong>Sur la page de paiement Stripe</strong> : votre e-mail, votre nom, votre moyen de paiement et, pour un article livré,
+      votre adresse de livraison. Les données de carte sont traitées par Stripe ; nous n'y avons jamais accès.
+    </li>
+    <li>
+      <strong>Commande</strong> : produits, montants, date, e-mail, nom et adresse de livraison, consultables dans notre compte
+      Stripe. Pour un livre numérique, la date, l'heure et le texte de votre accord (case « Accès dès le paiement ») ; pour toute
+      commande, la version des conditions générales de vente acceptée.
+    </li>
+    <li>
+      <strong>Téléchargements</strong> : pour limiter les liens de téléchargement et éviter les abus, notre stockage chez Cloudflare
+      garde, sans nom ni e-mail, l'identifiant de la commande, le nombre de liens déjà donnés, les liens déjà utilisés et
+      l'identifiant aléatoire du lien envoyé dans la facture.
+    </li>
+    <li>
+      <strong>Article livré</strong> : le numéro de la commande Printful correspondante et, en cas de difficulté de transmission,
+      le message d'erreur et le nombre de tentatives.
+    </li>
+    <li>
+      <strong>Journaux techniques</strong> : identifiant de la commande et de l'événement de paiement, résultat de la transmission à
+      Printful, messages d'erreur. Ils ne contiennent ni nom, ni e-mail, ni adresse.
+    </li>
+  </ul>
+
+  <h3>Quand vous nous écrivez</h3>
+  <p>
+    Le formulaire de contact ouvre simplement votre messagerie : rien n'est envoyé ni conservé par le site. Votre e-mail et votre
+    message sont reçus dans notre messagerie (<Info valeur={MESSAGERIE} quoi="fournisseur de la messagerie de contact@addictive-app.com" />).
+  </p>
+
+  <h2>Pourquoi, et sur quelle base</h2>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th scope="col">Finalité</th><th scope="col">Base légale</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Traiter la commande, le paiement, l'envoi des livres et la livraison du t-shirt</td><td>Exécution du contrat</td></tr>
+        <tr><td>Répondre à vos questions, rétractations et demandes de garantie</td><td>Exécution du contrat, obligations légales</td></tr>
+        <tr><td>Tenir la comptabilité et conserver les factures</td><td>Obligation légale</td></tr>
+        <tr><td>Garder la preuve de votre accord pour l'accès immédiat aux livres numériques et de l'acceptation des CGV</td><td>Obligation légale et intérêt légitime (preuve)</td></tr>
+        <tr><td>Sécuriser le site, les paiements et les téléchargements, éviter les commandes en double</td><td>Intérêt légitime</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Vos données ne sont ni vendues, ni louées, ni utilisées pour de la publicité ou de la prospection.</p>
+
+  <h2>Qui reçoit vos données</h2>
+  <ul>
+    <li>
+      <strong>Stripe</strong> (paiement, factures) : e-mail, nom, adresse, moyen de paiement, contenu et montant de la commande.
+      Stripe agit pour notre compte et, pour certaines opérations (lutte contre la fraude, obligations financières), comme
+      responsable de traitement.
+    </li>
+    <li>
+      <strong>Printful</strong> (fabrication et expédition du t-shirt, seulement si votre commande en contient un) : nom et adresse de
+      livraison, articles commandés (modèle, couleur, taille, quantité), un identifiant de commande, et votre e-mail uniquement pour
+      le suivi du colis. Aucune donnée de paiement. Pour les clients de l'Espace économique européen, l'interlocuteur de Printful
+      est la société AS « Printful Latvia », Raina Bulvaris 25, Riga, LV-1050, Lettonie.
+    </li>
+    <li>
+      <strong>Cloudflare</strong> ({HEBERGEUR.nom}, {HEBERGEUR.adresse}) : hébergement du site, fonctions de paiement et de
+      téléchargement, stockage décrit plus haut.
+    </li>
+    <li>Les transporteurs choisis par Printful, pour livrer le colis.</li>
+    <li>Les autorités, uniquement si la loi l'impose.</li>
+  </ul>
+
+  <h2>Transferts hors de l'Union européenne</h2>
+  <p>
+    Cloudflare et Stripe peuvent traiter des données aux États-Unis. Ces transferts reposent sur leur certification au cadre de
+    protection des données UE-États-Unis (Data Privacy Framework), reconnu par la Commission européenne, et sur les clauses
+    contractuelles types de la Commission européenne. Printful peut faire fabriquer et expédier l'article depuis un de ses centres
+    de production, y compris hors de l'Union européenne ; ces traitements sont encadrés par les conditions de traitement des données
+    de Printful.
+  </p>
+
+  <h2>Combien de temps</h2>
+  <ul>
+    <li>Panier : dans votre navigateur, jusqu'à ce que vous le vidiez (il est vidé après un paiement confirmé).</li>
+    <li>Liens de téléchargement : 15 minutes ; liens déjà utilisés, 1 heure ; compteur de liens et lien de la facture, 30 jours.</li>
+    <li>Événements de paiement reçus (pour ne pas traiter deux fois le même) : 7 jours.</li>
+    <li>Numéro de commande Printful : 90 jours ; message d'erreur de transmission : 30 jours.</li>
+    <li>
+      Données de commande : pendant le suivi de la commande et les garanties légales (2 ans à compter de la livraison), puis archivées
+      avec les factures.
+    </li>
+    <li>Factures et pièces comptables : 10 ans (article L. 123-22 du Code de commerce).</li>
+    <li>E-mails échangés avec nous : 3 ans après le dernier échange.</li>
+    <li>Journaux techniques : selon les durées appliquées par Cloudflare.</li>
+  </ul>
+
+  <h2>Vos droits</h2>
+  <p>
+    Vous pouvez demander l'accès à vos données, leur rectification, leur effacement, la limitation de leur traitement, vous opposer
+    à un traitement fondé sur l'intérêt légitime et demander la portabilité des données que vous nous avez fournies. Certaines
+    données doivent toutefois être conservées pour respecter une obligation légale, comme les factures.
+  </p>
+  <p>
+    Écrivez-nous à <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a> ; nous répondons dans un délai d'un mois. Si vous
+    estimez, après nous avoir contactés, que vos droits ne sont pas respectés, vous pouvez adresser une réclamation à la CNIL
+    (<a href="https://www.cnil.fr/fr/plaintes" rel="noopener">cnil.fr/fr/plaintes</a>).
+  </p>
+
+  <h2>Sécurité</h2>
+  <p>
+    Le site est servi uniquement en HTTPS. Les liens de téléchargement sont personnels, signés et à usage unique ; les livres ne sont
+    jamais dans un dossier public. Les clés d'accès à Stripe et à Printful ne sont jamais dans le code du site.
+  </p>
+
+  <h2>Cookies</h2>
+  <p>Le site ne dépose aucun cookie. Détails sur la page <a href="/cookies/">cookies</a>.</p>
+</LegalPage>
+
+<style>
+  .table-scroll {
+    overflow-x: auto;
+  }
+</style>

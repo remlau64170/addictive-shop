@@ -4,6 +4,7 @@ import Base from "../layouts/Base.astro";
 import { BOUTIQUE_OUVERTE } from "../data/site";
 import { LIVRAISON, PHYSIQUES_EN_VENTE } from "../data/boutique.js";
 import { CONSENTEMENT_RETRACTATION, CONSENTEMENT_RETRACTATION_MIXTE, CONSENTEMENT_VALEUR, RETRACTATION_PHYSIQUE } from "../data/consentement.js";
+import { ACCEPTATION_CGV_VALEUR } from "../data/legal.js";
 import { getProduits, productName, thumbnail } from "../lib/produits";
 
 // Catalogue affiché par le panier (le serveur revérifie tout au moment de payer).
@@ -63,9 +64,17 @@ const donnees = JSON.stringify({ catalogue, livraison: LIVRAISON });
             <p class="consent-hint" id="consent-hint" hidden>Cochez la case pour accéder tout de suite à vos livres numériques.</p>
           </fieldset>
 
+          <div class="consent consent-cgv">
+            <label class="consent-choice">
+              <input type="checkbox" name="cgv" value={ACCEPTATION_CGV_VALEUR} aria-describedby="cgv-hint" />
+              <span>J'ai lu et j'accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions générales de vente<span class="sr-only"> (s'ouvre dans un nouvel onglet)</span></a>.</span>
+            </label>
+            <p class="consent-hint" id="cgv-hint" hidden>Cochez la case pour accepter les conditions générales de vente.</p>
+          </div>
+
           <input type="hidden" name="panier" />
           <button class="button pay" type="submit">Payer</button>
-          <p class="note">Paiement sécurisé sur la page Stripe.</p>
+          <p class="note">Paiement sécurisé sur la page Stripe. Vos données : <a href="/confidentialite/">politique de confidentialité</a>.</p>
           <p class="pay-message" role="status" hidden></p>
         </form>
         <script type="application/json" id="donnees-panier" set:html={donnees} />
@@ -291,6 +300,8 @@ const donnees = JSON.stringify({ catalogue, livraison: LIVRAISON });
     const consent = form.querySelector<HTMLElement>("[data-consent]")!;
     const caseAccord = consent.querySelector<HTMLInputElement>('input[name="consentement"]')!;
     const indice = consent.querySelector<HTMLElement>(".consent-hint")!;
+    const caseCgv = form.querySelector<HTMLInputElement>('input[name="cgv"]')!;
+    const indiceCgv = form.querySelector<HTMLElement>("#cgv-hint")!;
     const montrer = (selecteur: string, visible: boolean) => {
       const el = form.querySelector<HTMLElement>(selecteur);
       if (el) el.hidden = !visible;
@@ -399,14 +410,20 @@ const donnees = JSON.stringify({ catalogue, livraison: LIVRAISON });
         event.preventDefault();
         return;
       }
-      if (!consent.hidden && !caseAccord.checked) {
+      const manqueAccord = !consent.hidden && !caseAccord.checked;
+      const manqueCgv = !caseCgv.checked;
+      if (manqueAccord || manqueCgv) {
         event.preventDefault();
-        indice.hidden = false;
-        caseAccord.focus();
+        indice.hidden = !manqueAccord;
+        indiceCgv.hidden = !manqueCgv;
+        (manqueAccord ? caseAccord : caseCgv).focus();
       }
     });
     caseAccord.addEventListener("change", () => {
       if (caseAccord.checked) indice.hidden = true;
+    });
+    caseCgv.addEventListener("change", () => {
+      if (caseCgv.checked) indiceCgv.hidden = true;
     });
 
     // Retour de Stripe ou du serveur : un message court sous le bouton.
@@ -420,6 +437,7 @@ const donnees = JSON.stringify({ catalogue, livraison: LIVRAISON });
     const motif = new URLSearchParams(location.search).get("paiement");
     const zone = form.querySelector<HTMLElement>(".pay-message")!;
     if (motif === "consentement") indice.hidden = false;
+    else if (motif === "cgv") indiceCgv.hidden = false;
     else if (motif && MESSAGES[motif]) {
       zone.textContent = MESSAGES[motif];
       zone.hidden = false;

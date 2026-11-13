@@ -1,0 +1,23 @@
+---
+// Affiche une information légale, ou un repère visible « [À COMPLÉTER : …] » tant qu'elle manque.
+import { aCompleter } from "../data/legal.js";
+
+interface Props {
+  valeur: string | null | undefined;
+  quoi: string;
+}
+
+const { valeur, quoi } = Astro.props;
+---
+
+{valeur ? <Fragment>{valeur}</Fragment> : <mark class="a-completer">{aCompleter(quoi)}</mark>}
+
+<style>
+  .a-completer {
+    padding: 0 0.25rem;
+    border-radius: 0.25rem;
+    background: color-mix(in oklch, var(--warning, #f5a524) 30%, transparent);
+    color: var(--foreground);
+    font-weight: 600;
+  }
+</style>

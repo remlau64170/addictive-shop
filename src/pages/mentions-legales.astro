@@ -1,0 +1,60 @@
+---
+import LegalPage from "../components/LegalPage.astro";
+import Info from "../components/Info.astro";
+import { DIRECTEUR_PUBLICATION, EDITEUR, HEBERGEUR, MENTION_TVA } from "../data/legal.js";
+---
+
+<LegalPage
+  title="Mentions légales"
+  description="Mentions légales du site Addictive : éditeur, contact, immatriculation, directeur de la publication et hébergeur."
+  miseAJour="13 novembre 2026"
+>
+  <h2>Éditeur du site</h2>
+  <p>
+    Le site addictive-app.com et sa boutique sont édités par <Info valeur={EDITEUR.nom} quoi="prénom et nom" />, entrepreneur
+    individuel (EI), sous le régime de la micro-entreprise.
+  </p>
+  <ul>
+    <li>Adresse : <Info valeur={EDITEUR.adresse} quoi="adresse de l'entreprise" /></li>
+    <li>E-mail : <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a></li>
+    <li>Téléphone : <Info valeur={EDITEUR.telephone} quoi="numéro de téléphone" /></li>
+    <li>SIRET : <Info valeur={EDITEUR.siret} quoi="numéro SIRET" /></li>
+    <li>Immatriculation : <Info valeur={EDITEUR.immatriculation} quoi="registre et numéro d'immatriculation indiqués sur l'attestation" /></li>
+    <li>TVA : {MENTION_TVA}.</li>
+  </ul>
+
+  <h2>Directeur de la publication</h2>
+  <p><Info valeur={DIRECTEUR_PUBLICATION} quoi="prénom et nom du directeur de la publication" /></p>
+
+  <h2>Hébergeur</h2>
+  <address>
+    {HEBERGEUR.nom}<br />
+    {HEBERGEUR.adresse}<br />
+    Téléphone : {HEBERGEUR.telephone}<br />
+    Site : <a href={HEBERGEUR.site} rel="noopener">cloudflare.com</a>
+  </address>
+
+  <h2>Vente en ligne</h2>
+  <p>
+    Les ventes de la boutique sont régies par les <a href="/cgv/">conditions générales de vente</a>. Le paiement est traité par
+    Stripe ; les articles livrés sont fabriqués et expédiés par Printful.
+  </p>
+
+  <h2>Données personnelles et cookies</h2>
+  <p>
+    Voir la <a href="/confidentialite/">politique de confidentialité</a> et la page <a href="/cookies/">cookies</a>. Le site ne
+    dépose aucun cookie.
+  </p>
+
+  <h2>Propriété intellectuelle</h2>
+  <p>
+    Les textes, livres numériques, visuels et le logo Addictive sont protégés par le droit d'auteur. Les livres achetés sont
+    destinés à un usage personnel : merci de ne pas les diffuser ni les revendre.
+  </p>
+
+  <h2>Santé</h2>
+  <p>
+    Les contenus du site et de la boutique ne remplacent pas l'avis d'un professionnel de santé. Les numéros d'aide utiles sont
+    sur la page <a href="/aide/">Besoin d'aide ?</a>
+  </p>
+</LegalPage>

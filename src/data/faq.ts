@@ -29,7 +29,7 @@ export const FAQ = [
   },
   {
     question: "Que faites-vous de mes données personnelles ?",
-    answer: "Ce site ne dépose aucun cookie et n'utilise aucun traqueur. Le formulaire de contact ouvre simplement votre messagerie : rien n'est envoyé ni conservé par le site. La politique de confidentialité complète est en cours de rédaction.",
+    answer: "Ce site ne dépose aucun cookie et n'utilise aucun traqueur. Le formulaire de contact ouvre simplement votre messagerie : rien n'est envoyé ni conservé par le site. Tout est détaillé dans la politique de confidentialité, accessible en bas de chaque page.",
   },
   {
     question: "Ce site remplace-t-il un professionnel ?",
