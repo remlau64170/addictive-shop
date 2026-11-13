@@ -13,7 +13,7 @@ export const FAQ = [
   },
   {
     question: "Quels sont les délais pour les produits physiques ?",
-    answer: "Les t-shirts et les gourdes sont fabriqués à la demande. Ils sont prévus pour être expédiés sous 3 à 5 jours ouvrés, à titre indicatif. Les délais et les frais de livraison sont à confirmer.",
+    answer: "Le t-shirt est fabriqué à la demande. Il est prévu pour être expédié sous 3 à 5 jours ouvrés, à titre indicatif. Les délais et les frais de livraison sont à confirmer.",
   },
   {
     question: "Puis-je retourner un produit ?",

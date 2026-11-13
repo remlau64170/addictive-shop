@@ -27,6 +27,8 @@ async function makeLogo() {
     data[i + 3] = Math.max(0, Math.min(255, Math.round(((peak - 70) / 110) * 255)));
   }
   await sharp(data, { raw: info }).png().toFile(join(WORK, "logo.png"));
+  // Blason brodé du t-shirt (prive/broderie), pour le visuel d'accueil.
+  copyFileSync(join(ROOT, "prive/broderie/blason-tshirt-noir.png"), join(WORK, "blason.png"));
 }
 
 const GRADIENT = "linear-gradient(100deg, #2fd6c3, #4d9cf5 55%, #8a6cf0)";
@@ -126,10 +128,12 @@ const jour1 = sheet(`${eyebrow("SEMAINE 1")}
 
 const TEE = "M385 120 C420 150 580 150 615 120 L735 165 C775 180 800 200 825 245 L905 385 C912 398 908 410 895 416 L805 460 C792 466 782 462 775 450 L735 385 L742 880 C742 895 735 902 720 904 C580 925 420 925 280 904 C265 902 258 895 258 880 L265 385 L225 450 C218 462 208 466 195 460 L105 416 C92 410 88 398 95 385 L175 245 C200 200 225 180 265 165 Z";
 
-function tee({ viewBox = "0 0 1000 1000", back = false, weave = false }) {
+function tee({ viewBox = "0 0 1000 1000", back = false, weave = false, brode = false }) {
   const neckTop = back ? "M385 120 C420 150 580 150 615 120" : "M385 120 C420 205 580 205 615 120";
   const collarInside = back ? "" : `<path d="M385 120 C420 150 580 150 615 120 C580 205 420 205 385 120Z" fill="#0b0c10"/><rect x="474" y="148" width="52" height="24" rx="3" fill="#20242c"/>`;
-  const print = back
+  const print = brode
+    ? `<image href="blason.png" x="572" y="252" width="56" height="42"/>`
+    : back
     ? `<g filter="url(#ink)"><image href="logo.png" x="468" y="205" width="64" height="64"/><text x="500" y="298" text-anchor="middle" font-family="Jakarta" font-weight="800" font-size="20" fill="#eef2f8">Addictive</text></g>`
     : `<g filter="url(#ink)"><image href="logo.png" x="455" y="285" width="90" height="90"/>
        <text x="500" y="436" text-anchor="middle" font-family="Jakarta" font-weight="800" font-size="56" fill="#f1f4f9">Sois addict à</text>
@@ -174,45 +178,6 @@ function tee({ viewBox = "0 0 1000 1000", back = false, weave = false }) {
 }
 
 const teeStage = (inner) => `<div style="position:absolute; inset:0; background: radial-gradient(520px 520px at 50% 45%, #3c4a7c, transparent 76%), linear-gradient(180deg, #1c2448, #111733)"></div>${inner}`;
-
-/* ---------- Gourde ---------- */
-
-function bottle({ viewBox = "0 0 1000 1000", shadow = true }) {
-  const body = "M432 262 C432 296 372 312 372 372 L372 846 C372 884 396 900 430 900 L570 900 C604 900 628 884 628 846 L628 372 C628 312 568 296 568 262 Z";
-  return `<svg width="1000" height="1000" viewBox="${viewBox}" style="position:absolute; inset:0">
-    <defs>
-      <linearGradient id="coat" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#05081a"/><stop offset=".1" stop-color="#121a3c"/><stop offset=".24" stop-color="#3b4d8c"/><stop offset=".31" stop-color="#22305f"/><stop offset=".62" stop-color="#121a3c"/><stop offset=".86" stop-color="#0a1029"/><stop offset=".95" stop-color="#27365f"/><stop offset="1" stop-color="#060a1c"/></linearGradient>
-      <linearGradient id="steel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3b4254"/><stop offset=".18" stop-color="#c9d2e2"/><stop offset=".3" stop-color="#eef2f8"/><stop offset=".5" stop-color="#7c8598"/><stop offset=".8" stop-color="#3b4254"/><stop offset="1" stop-color="#a9b3c6"/></linearGradient>
-      <linearGradient id="cap" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#07090f"/><stop offset=".22" stop-color="#3a3e4a"/><stop offset=".34" stop-color="#20232b"/><stop offset=".8" stop-color="#101217"/><stop offset="1" stop-color="#2a2d36"/></linearGradient>
-      <linearGradient id="ring" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2fd6c3"/><stop offset=".55" stop-color="#4d9cf5"/><stop offset="1" stop-color="#8a6cf0"/></linearGradient>
-      <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>
-      <mask id="reflect"><rect x="300" y="900" width="400" height="170" fill="url(#fade)"/></mask>
-      <filter id="powder"><feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .8 -.3"/></filter>
-      <filter id="blur" filterUnits="userSpaceOnUse" x="0" y="0" width="1000" height="1000"><feGaussianBlur stdDeviation="3"/></filter>
-      <filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="1000" height="1000"><feGaussianBlur stdDeviation="20"/></filter>
-      <clipPath id="b"><path d="${body}"/></clipPath>
-      <g id="bottle-shape">
-        <path d="M512 118 C512 66 588 66 588 118" fill="none" stroke="url(#cap)" stroke-width="20" stroke-linecap="round"/>
-        <rect x="424" y="116" width="178" height="118" rx="20" fill="url(#cap)"/>
-        ${Array.from({ length: 22 }, (_, i) => `<rect x="${430 + i * 7.7}" y="124" width="2.4" height="102" fill="#000" opacity=".35"/>`).join("")}
-        <rect x="438" y="234" width="124" height="16" fill="url(#steel)"/>
-        <rect x="432" y="250" width="136" height="12" rx="2" fill="url(#ring)"/>
-        <path d="${body}" fill="url(#coat)"/>
-        <g clip-path="url(#b)">
-          <rect width="1000" height="1000" filter="url(#powder)" opacity=".2" style="mix-blend-mode:overlay"/>
-          <rect x="452" y="300" width="20" height="600" fill="#9fb6ea" opacity=".22" filter="url(#blur)"/>
-          <rect x="372" y="862" width="256" height="38" fill="url(#steel)"/>
-        </g>
-      </g>
-    </defs>
-    ${shadow ? `<ellipse cx="510" cy="912" rx="230" ry="28" fill="#000" filter="url(#glow)" opacity=".85"/>
-    <use href="#bottle-shape" transform="translate(0 1800) scale(1 -1)" mask="url(#reflect)" opacity=".5"/>` : ""}
-    <use href="#bottle-shape"/>
-    <image href="logo.png" x="424" y="470" width="152" height="152"/>
-    <text x="500" y="662" text-anchor="middle" font-family="Jakarta" font-weight="800" font-size="34" fill="#eef2f8">Addictive</text>
-    <text x="500" y="694" text-anchor="middle" font-family="Jakarta" font-weight="500" font-size="15.5" fill="#b6c3dc">Sois addict à ta sobriété</text>
-  </svg>`;
-}
 
 /* ---------- SOS Envie : jeu de cartes ---------- */
 
@@ -320,18 +285,14 @@ const VIEWS = {
   "tshirt-1": teeStage(tee({})),
   "tshirt-2": teeStage(tee({ back: true })),
   "tshirt-3": teeStage(tee({ viewBox: "310 265 380 380", weave: true })),
-  "gourde-1": `<div class="floor"></div>${bottle({})}`,
-  "gourde-2": `<div style="position:absolute; inset:0; background:#0a1029"></div>${bottle({ viewBox: "352 400 300 300", shadow: false })}`,
-  "gourde-3": `<div style="position:absolute; inset:0; background:radial-gradient(600px 500px at 40% 30%, #2a3768, transparent 75%), #0a1029"></div>${bottle({ viewBox: "300 50 400 400", shadow: false })}`,
 };
 
-/** Haut de page : les 4 produits réunis. */
+/** Haut de page : les 3 produits réunis. */
 const HERO = `<div class="stage" style="width:1600px; height:600px"><div class="floor" style="height:130px"></div>
   ${[
-    [-310, programmeBook, .58, -215],
-    [50, sosFan, .58, -200],
-    [460, tee({}), .58, -205],
-    [850, bottle({ shadow: false }), .56, -205],
+    [-170, programmeBook, .58, -215],
+    [300, sosFan, .58, -200],
+    [770, tee({ brode: true }), .58, -205],
   ]
     .map(([x, inner, scale, y]) => `<div style="position:absolute; left:${x}px; top:${y}px; width:1000px; height:1000px; transform:scale(${scale}); transform-origin:50% 50%">${String(inner).replace('<div class="floor"></div>', "").replace(/id="/g, `id="v${x}-`).replace(/url\(#/g, `url(#v${x}-`).replace(/href="#/g, `href="#v${x}-`)}</div>`)
     .join("")}</div>`;

@@ -22,7 +22,7 @@ Désactivé sur le site public (« La boutique ouvre bientôt »). Deux réglage
 - `CHECKOUT_ENABLED=true` côté Functions (sinon le serveur refuse tout paiement).
 
 Achetables : les guides PDF (`serie-30`, `sos-envie`) et le t-shirt brodé (`t-shirt-sois-addict`, 29 €).
-La gourde n'est pas en vente. Le prix vient toujours de Stripe, jamais du navigateur.
+Le t-shirt brodé est le seul produit physique de la boutique. Le prix vient toujours de Stripe, jamais du navigateur.
 
 ## Panier
 

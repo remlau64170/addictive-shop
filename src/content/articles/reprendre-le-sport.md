@@ -6,7 +6,7 @@ category: sport-corps
 date: 2026-11-02
 draft: false
 cover: { src: /articles/reprendre-le-sport.webp, alt: "Illustration de quatre barres qui montent de 15 à 30 minutes : une reprise du sport en 4 semaines" }
-related: gourde-addictive
+related: t-shirt-sois-addict
 ---
 
 Reprendre le sport après des mois, voire des années de pause, peut impressionner. Bonne nouvelle : vous n'avez pas besoin de tout faire d'un coup. La clé, c'est la **progressivité**. Voici comment repartir sur de bonnes bases, sans vous blesser ni vous décourager.

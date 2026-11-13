@@ -102,7 +102,7 @@ if (idSession && vars.STRIPE_SECRET_KEY) {
   await fetch(`https://api.stripe.com/v1/checkout/sessions/${idSession}/expire`, { method: "POST", headers: { Authorization: `Bearer ${vars.STRIPE_SECRET_KEY}` } });
 }
 
-// 4 ter. Panier : t-shirt seul, t-shirt + PDF, PDF seul, gourde (pas en vente)
+// 4 ter. Panier : t-shirt seul, t-shirt + PDF, PDF seul, produit retiré
 const sessionDe = async (panier, consentement) => {
   const corps = new URLSearchParams({ panier: JSON.stringify(panier) });
   if (consentement) corps.set("consentement", "oui");
@@ -133,7 +133,7 @@ if (vars.STRIPE_SECRET_KEY) {
   verifier("PDF seul : ni adresse ni livraison", !s?.shipping_address_collection && !(s?.shipping_options ?? []).length);
 
   const { rep } = await sessionDe([{ id: "gourde-addictive", quantite: 1 }]);
-  verifier("gourde (pas en vente) : refusée", /paiement=(invalide|indisponible)/.test(rep.headers.get("location") ?? ""), rep.headers.get("location"));
+  verifier("produit retiré (ancienne gourde) : refusé", /paiement=(invalide|indisponible)/.test(rep.headers.get("location") ?? ""), rep.headers.get("location"));
   const faux = await sessionDe([{ ...tshirt, taille: "XXXXL" }]);
   verifier("taille inconnue : refusée", /paiement=invalide/.test(faux.rep.headers.get("location") ?? ""));
 }
