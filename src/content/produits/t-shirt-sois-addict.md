@@ -5,9 +5,9 @@ kind: T-shirt
 shelf: physiques
 summary: "Un petit blason brodé côté cœur, le logo et le nom Addictive. Discret, facile à porter, au quotidien comme à la salle. Pour celles et ceux qui avancent un jour de plus."
 images:
-  - { src: /produits/tshirt-1.webp, alt: "T-shirt noir brodé côté cœur du logo et du nom Addictive, vu de face" }
-  - { src: /produits/tshirt-2.webp, alt: "T-shirt blanc brodé côté cœur du logo et du nom Addictive, vu de face" }
-  - { src: /produits/tshirt-3.webp, alt: "Gros plan sur la broderie Addictive : la flèche, le ruban et le nom" }
+  - { src: /produits/tshirt-brode-noir-face.webp, alt: "T-shirt noir brodé côté cœur du logo et du nom Addictive, vu de face" }
+  - { src: /produits/tshirt-brode-blanc-face.webp, alt: "T-shirt blanc brodé côté cœur du logo et du nom Addictive, vu de face" }
+  - { src: /produits/tshirt-brode-noir-porte.webp, alt: "T-shirt noir brodé Addictive porté, vu de face" }
 price: 29
 order: 3
 sizes: [XS, S, M, L, XL, 2XL, 3XL, 4XL]

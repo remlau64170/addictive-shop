@@ -76,6 +76,9 @@ Le t-shirt brodé est le seul produit physique de la boutique. Le prix vient tou
 - Fichiers prêts pour la broderie (PNG transparent, couleurs exactes des fils, taille réelle 56,5 × 42 mm à 300 dpi) :
   `prive/broderie/blason-tshirt-noir.png` (fils Aqua/Teal #3399FF et blanc #FFFFFF) et
   `prive/broderie/blason-tshirt-blanc.png` (fils Royal #005397 et noir #000000). Aperçus dans le même dossier.
+- Bibliothèque Printful : noir = fichier 1110619563, blanc = fichier 1110620012 (ajoutés par l API avec l adresse
+  « Voir en taille réelle », contenu identique aux fichiers locaux). Position à taille réelle : 56,5 × 42 mm, centré en
+  haut de la zone poitrine (10,2 cm), dans `functions/_lib/printful-catalogue.js`.
 - Logo de l'appli (icon-only-512.png) redessiné : même flèche, ruban simplifié en 3 bandes séparées de 2,2 mm ;
   « Addictive » en dessous, lettres de 9 mm (minimum Printful : 6,35 mm). Pas de slogan.
 - Régénérer : `npm run broderie:blason` (script `scripts/blason-broderie.mjs`).

@@ -22,13 +22,20 @@ const vars = Object.fromEntries(
 const jeton = vars.PRINTFUL_API_TOKEN;
 if (!jeton) throw new Error("PRINTFUL_API_TOKEN absent de .dev.vars");
 
-const api = async (method, chemin, corps) => {
+const api = async (method, chemin, corps, essai = 0) => {
   const r = await fetch(`https://api.printful.com${chemin}`, {
     method,
     headers: { Authorization: `Bearer ${jeton}`, "Content-Type": "application/json" },
     body: corps ? JSON.stringify(corps) : undefined,
   });
   const data = await r.json().catch(() => ({}));
+  // Trop de requêtes : Printful indique combien de secondes attendre ; on attend puis on réessaie (5 fois au plus).
+  if (r.status === 429 && essai < 5) {
+    const secondes = Number(String(data.result ?? data.error?.message ?? "").match(/(d+) seconds?/)?.[1] ?? 60);
+    console.log(`Printful demande d'attendre ${secondes} s…`);
+    await new Promise((ok) => setTimeout(ok, (secondes + 2) * 1000));
+    return api(method, chemin, corps, essai + 1);
+  }
   if (!r.ok) throw new Error(`Printful ${r.status} : ${typeof data.result === "string" ? data.result : data.error?.message ?? ""}`);
   return data.result;
 };
@@ -64,7 +71,7 @@ async function maquettes(couleur) {
     width: 1600,
     option_groups: [...new Set(VUES.map((v) => v.groupe))],
     options: [...new Set(VUES.map((v) => v.option))],
-    files: [{ placement: t.emplacement, image_url }],
+    files: [{ placement: t.emplacement, image_url, position: t.position }],
     product_options: { [t.optionFils]: config.fils },
   });
   // Printful génère les maquettes en différé : on attend la fin de la tâche.
@@ -111,4 +118,3 @@ const nouveau = texte.replace(/^images:\n(?:  - .*\n)+/m, `images:\n${images.joi
 if (nouveau === texte) throw new Error("Bloc « images » introuvable dans la fiche : rien n'est modifié.");
 writeFileSync(fiche, nouveau);
 console.log(`Fiche mise à jour avec ${images.length} maquettes :\n${images.join("\n")}`);
-console.log("Les anciennes photos (tshirt-1/2/3.webp) restent dans public/produits/ : à supprimer après vérification.");

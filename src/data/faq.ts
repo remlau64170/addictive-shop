@@ -1,27 +1,27 @@
 /**
- * Questions fréquentes : à relire par Rémy. « À confirmer » signale tout ce qui n'est pas encore décidé. Les réponses sont en texte
+ * Questions fréquentes, alignées sur la fiche produit et le panier. Les réponses sont en texte
  * simple : elles servent aussi aux données structurées FAQPage, qui doivent reprendre exactement ce qui est affiché.
  */
 export const FAQ = [
   {
     question: "Comment passer commande ?",
-    answer: "La boutique ouvre bientôt : aucune commande n'est possible pour l'instant. Le déroulement exact de la commande est à confirmer avant l'ouverture.",
+    answer: "La boutique ouvre bientôt. Vous ajouterez vos articles au panier, puis vous paierez sur la page sécurisée de Stripe. Aucun compte client n'est nécessaire.",
   },
   {
     question: "Comment recevrai-je un produit numérique ?",
-    answer: "Les produits numériques sont prévus au format PDF, avec un téléchargement immédiat après l'achat. Le mode de téléchargement exact est à confirmer avant l'ouverture.",
+    answer: "Les produits numériques sont des guides PDF. Juste après le paiement, la page de confirmation vous donne un lien de téléchargement personnel. Votre facture vous est aussi envoyée par e-mail.",
   },
   {
     question: "Quels sont les délais pour les produits physiques ?",
-    answer: "Le t-shirt est fabriqué à la demande. Il est prévu pour être expédié sous 3 à 5 jours ouvrés, à titre indicatif. Les délais et les frais de livraison sont à confirmer.",
+    answer: "Le t-shirt est fabriqué à la commande, puis livré en 4 à 7 jours. La livraison coûte 4,90 € par commande en France, en Belgique, au Luxembourg, en Allemagne, en Espagne, en Italie, aux Pays-Bas et au Portugal. Elle est offerte si votre commande contient aussi un guide PDF.",
   },
   {
     question: "Puis-je retourner un produit ?",
-    answer: "Les conditions de retour et de remboursement sont à confirmer. Elles seront précisées dans les conditions générales de vente avant l'ouverture de la boutique.",
+    answer: "Oui pour le t-shirt : vous disposez de 14 jours après sa réception pour le retourner. Pour un guide PDF, le téléchargement est disponible tout de suite : vous acceptez, en cochant une case avant de payer, de ne plus pouvoir vous rétracter une fois le téléchargement disponible.",
   },
   {
     question: "Le paiement sera-t-il sécurisé ?",
-    answer: "Aucun paiement n'est demandé sur le site pour l'instant. Le paiement passera par un prestataire spécialisé, dont le choix est à confirmer.",
+    answer: "Oui. Le paiement se fait sur la page sécurisée de Stripe : vos données de carte ne passent jamais par ce site.",
   },
   {
     question: "Qu'est-ce que l'appli Addictive ?",

@@ -177,8 +177,6 @@ function tee({ viewBox = "0 0 1000 1000", back = false, weave = false, brode = f
   </svg>`;
 }
 
-const teeStage = (inner) => `<div style="position:absolute; inset:0; background: radial-gradient(520px 520px at 50% 45%, #3c4a7c, transparent 76%), linear-gradient(180deg, #1c2448, #111733)"></div>${inner}`;
-
 /* ---------- SOS Envie : jeu de cartes ---------- */
 
 const PROTOCOLE = [
@@ -282,9 +280,7 @@ const VIEWS = {
   "sos-envie-1": sosFan,
   "sos-envie-2": sosCloseUp,
   "sos-envie-3": sosPhone,
-  "tshirt-1": teeStage(tee({})),
-  "tshirt-2": teeStage(tee({ back: true })),
-  "tshirt-3": teeStage(tee({ viewBox: "310 265 380 380", weave: true })),
+  // T-shirt : les photos de la fiche sont les maquettes Printful (npm run printful:maquettes).
 };
 
 /** Haut de page : les 3 produits réunis. */

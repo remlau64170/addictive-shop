@@ -5,6 +5,9 @@ export const CATALOGUE_PRINTFUL = {
     produit: 71,
     emplacement: "embroidery_chest_left",
     optionFils: "thread_colors_chest_left",
+    // Position du blason à taille réelle : zone poitrine 1200 × 1200 px à 300 dpi (10,2 cm), blason 667 × 496 px
+    // (56,5 × 42 mm), centré, en haut de la zone. Sans position, Printful agrandirait le motif à toute la zone.
+    position: { area_width: 1200, area_height: 1200, width: 667, height: 496, top: 0, left: 267 },
     couleurs: {
       noir: {
         fils: ["#3399FF", "#FFFFFF"], // Aqua/Teal (logo) et blanc (textes)

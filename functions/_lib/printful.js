@@ -61,7 +61,7 @@ export function articlesPrintful(env, session, brouillon) {
       variant_id: variante,
       quantity: ligne.quantity,
       name: produit.name,
-      files: [{ type: catalogue.emplacement, ...fichier(env, config.fichier, brouillon) }],
+      files: [{ type: catalogue.emplacement, ...fichier(env, config.fichier, brouillon), position: catalogue.position }],
       options: [{ id: catalogue.optionFils, value: config.fils }],
     });
   }
