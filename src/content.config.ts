@@ -39,6 +39,14 @@ const produits = defineCollection({
     specs: z.array(z.object({ label: z.string(), value: z.string() })).min(1),
     sizes: z.array(z.string()).optional(),
     order: z.number().int(),
+    /** Slogan affiché sous le titre (livres). */
+    slogan: z.string().optional(),
+    /** Prix total des éléments vendus séparément (pack), en euros, affiché barré. */
+    prixSepare: z.number().positive().optional(),
+    /** Avertissement santé propre au produit (sinon le texte général des produits numériques). */
+    avertissement: z.string().optional(),
+    /** Mode d'emploi court affiché sous le prix (par exemple l'application pour remplir le PDF). */
+    note: z.string().optional(),
   }),
 });
 

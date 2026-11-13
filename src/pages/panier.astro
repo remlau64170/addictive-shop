@@ -42,8 +42,12 @@ const donnees = JSON.stringify({ catalogue, livraison: LIVRAISON });
             <div data-ligne-livraison hidden><dt>Livraison ({LIVRAISON.delaiJours.min} à {LIVRAISON.delaiJours.max} jours)</dt><dd data-livraison></dd></div>
             <div class="total"><dt>Total</dt><dd data-total></dd></div>
           </dl>
-          <p class="offer" data-offre hidden>Livraison offerte en ajoutant un guide PDF.</p>
-          <p class="note" data-offerte hidden>Livraison offerte : votre panier contient un guide PDF et un article livré.</p>
+          <div class="pay-message doublon" data-doublon hidden>
+            <p data-doublon-texte></p>
+            <button type="button" class="button button-soft" data-doublon-retirer>Retirer le livre en double</button>
+          </div>
+          <p class="offer" data-offre hidden>Livraison offerte en ajoutant un livre numérique.</p>
+          <p class="note" data-offerte hidden>Livraison offerte : votre panier contient un livre numérique et un article livré.</p>
           <p class="note" data-physique hidden>{RETRACTATION_PHYSIQUE} L'adresse de livraison vous sera demandée sur la page de paiement.</p>
 
           <fieldset class="consent" data-consent hidden>
@@ -244,6 +248,16 @@ const donnees = JSON.stringify({ catalogue, livraison: LIVRAISON });
     margin-top: 1.25rem;
   }
 
+  .doublon {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+  }
+
+  .doublon[hidden] {
+    display: none;
+  }
+
   .pay-message {
     margin-top: 0.75rem;
     padding: 0.75rem 1rem;
@@ -264,6 +278,7 @@ const donnees = JSON.stringify({ catalogue, livraison: LIVRAISON });
 <script>
   import { ecrirePanier, lirePanier, surChangementPanier, type LignePanier } from "../scripts/panier";
   import { formatEuros, livraisonOfferte } from "../data/boutique.js";
+  import { livresEnDouble } from "../data/livres.js";
 
   type Produit = { nom: string; prix: number; numerique: boolean; image: string; couleurs: Record<string, string> };
   const brut = document.getElementById("donnees-panier");
@@ -305,7 +320,7 @@ const donnees = JSON.stringify({ catalogue, livraison: LIVRAISON });
           nom.textContent = p.nom;
           const detail = document.createElement("p");
           detail.className = "detail";
-          detail.textContent = p.numerique ? "Guide PDF, téléchargement après le paiement" : `${p.couleurs[ligne.couleur ?? ""] ?? ""}, taille ${ligne.taille ?? ""}`;
+          detail.textContent = p.numerique ? "Livre numérique : version téléphone et version A4, après le paiement" : `${p.couleurs[ligne.couleur ?? ""] ?? ""}, taille ${ligne.taille ?? ""}`;
           const prix = document.createElement("p");
           prix.className = "prix-ligne";
           prix.textContent = `${formatEuros(p.prix)}${ligne.quantite > 1 ? ` × ${ligne.quantite}` : ""}`;
@@ -357,6 +372,11 @@ const donnees = JSON.stringify({ catalogue, livraison: LIVRAISON });
       montrer("[data-texte-seul]", physique === 0);
       montrer("[data-texte-mixte]", physique > 0);
       champ.value = JSON.stringify(panier);
+
+      // Pack + livre qu'il contient déjà : on propose de retirer le livre, sans le faire payer deux fois.
+      const doubles = livresEnDouble(panier.map((l) => l.id));
+      montrer("[data-doublon]", doubles.length > 0);
+      texte("[data-doublon-texte]", doubles.length ? `Le pack Série 60 contient déjà « ${doubles.map((id: string) => catalogue[id].nom).join(" », « ")} ».` : "");
     };
 
     const changer = (index: number, delta: number) => {
@@ -367,8 +387,18 @@ const donnees = JSON.stringify({ catalogue, livraison: LIVRAISON });
       ecrirePanier(panier.filter((l: LignePanier) => l.quantite > 0));
     };
 
+    form.querySelector("[data-doublon-retirer]")?.addEventListener("click", () => {
+      const panier = lirePanier();
+      const doubles = new Set(livresEnDouble(panier.map((l) => l.id)));
+      ecrirePanier(panier.filter((l) => !doubles.has(l.id)));
+    });
+
     form.addEventListener("submit", (event) => {
       rendre();
+      if (livresEnDouble(lirePanier().map((l) => l.id)).length > 0) {
+        event.preventDefault();
+        return;
+      }
       if (!consent.hidden && !caseAccord.checked) {
         event.preventDefault();
         indice.hidden = false;
@@ -385,6 +415,7 @@ const donnees = JSON.stringify({ catalogue, livraison: LIVRAISON });
       indisponible: "Un article du panier n'est pas encore disponible. Retirez-le pour continuer.",
       erreur: "Le paiement n'a pas pu démarrer. Réessayez dans un instant.",
       invalide: "Le panier n'a pas été reconnu. Retirez puis rajoutez vos articles.",
+      doublon: "Votre panier contient le pack et un livre qu'il inclut déjà : retirez le livre en double pour continuer.",
     };
     const motif = new URLSearchParams(location.search).get("paiement");
     const zone = form.querySelector<HTMLElement>(".pay-message")!;

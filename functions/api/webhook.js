@@ -35,6 +35,11 @@ export async function onRequestPost({ request, env }) {
     const livraison = resume.metadata?.delivery;
     console.log(JSON.stringify({ webhook: event.type, evenement: event.id, session: resume.id, livraison }));
 
+    // Lien de la facture (« /merci/?ref=… ») : on relie l'identifiant aléatoire à la session payée.
+    if (resume.payment_status === "paid" && /^[a-f0-9]{32}$/.test(resume.metadata?.ref ?? "")) {
+      await env.TELECHARGEMENTS?.put(`ref:${resume.metadata.ref}`, resume.id, { expirationTtl: 30 * 86400 });
+    }
+
     if (resume.payment_status === "paid" && (livraison === "physical" || livraison === "mixed")) {
       const cle = `printful:${resume.id}`;
       const deja = env.TELECHARGEMENTS ? await env.TELECHARGEMENTS.get(cle) : null;

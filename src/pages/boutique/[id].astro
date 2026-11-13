@@ -109,8 +109,13 @@ const structured = {
 
       <div class="buy">
         <h1>{name}</h1>
-        <p class="price">{formatPrice(produit.data.price)}</p>
+        {produit.data.slogan && <p class="slogan">« {produit.data.slogan} »</p>}
+        <p class="price">
+          {formatPrice(produit.data.price)}
+          {produit.data.prixSepare && <span class="was">au lieu de <s>{formatPrice(produit.data.prixSepare)}</s></span>}
+        </p>
         <p class="lead">{produit.data.summary}</p>
+        {produit.data.note && <p class="usage">{produit.data.note}</p>}
         {
           produit.data.sizes && !(achat && vente) && (
             <div class="sizes">
@@ -165,7 +170,7 @@ const structured = {
                 vente ? (
                   <>
                     <p class="soon">+ {formatEuros(LIVRAISON.montant)} de livraison, {LIVRAISON.delaiJours.min} à {LIVRAISON.delaiJours.max} jours.</p>
-                    <p class="offer">Livraison offerte en ajoutant un guide PDF.</p>
+                    <p class="offer">Livraison offerte en ajoutant un livre numérique.</p>
                   </>
                 ) : (
                   <p class="soon">Téléchargement juste après le paiement.</p>
@@ -256,7 +261,13 @@ const structured = {
         numerique && (
           <p class="notice">
             <ShieldCheck size={18} aria-hidden="true" />
-            <span>Ce produit ne remplace pas un professionnel de santé. Si vous en ressentez le besoin, <a href="/aide/">des services d'écoute sont là pour vous</a>.</span>
+            {
+              produit.data.avertissement ? (
+                <span>{produit.data.avertissement} <a href="/aide/">Numéros d'aide et services d'écoute</a>.</span>
+              ) : (
+                <span>Ce produit ne remplace pas un professionnel de santé. Si vous en ressentez le besoin, <a href="/aide/">des services d'écoute sont là pour vous</a>.</span>
+              )
+            }
           </p>
         )
       }
@@ -492,6 +503,28 @@ const structured = {
   }
 
   .delivery,
+  .slogan {
+    margin-top: 0.25rem;
+    color: var(--muted-foreground);
+    font-style: italic;
+  }
+
+  .was {
+    margin-left: 0.6rem;
+    color: var(--muted-foreground);
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .usage {
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-inner);
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
   .notice {
     display: flex;
     gap: 0.5rem;

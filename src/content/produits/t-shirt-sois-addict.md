@@ -9,7 +9,7 @@ images:
   - { src: /produits/tshirt-brode-blanc-face.webp, alt: "T-shirt blanc brodé côté cœur du logo et du nom Addictive, vu de face" }
   - { src: /produits/tshirt-brode-noir-porte.webp, alt: "T-shirt noir brodé Addictive porté, vu de face" }
 price: 29
-order: 3
+order: 4
 sizes: [XS, S, M, L, XL, 2XL, 3XL, 4XL]
 contains:
   - "Un t-shirt Bella+Canvas 3001, noir ou blanc"

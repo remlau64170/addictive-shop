@@ -4,6 +4,7 @@
 import { checkoutEnabled, stripe } from "../_lib/stripe.js";
 import { CONSENTEMENT_VALEUR, RETRACTATION_PHYSIQUE, texteConsentement } from "../../src/data/consentement.js";
 import { LIGNES_MAX, LIVRAISON, PHYSIQUES_EN_VENTE, QUANTITE_MAX, livraisonOfferte } from "../../src/data/boutique.js";
+import { fichiersDuProduit, livresEnDouble } from "../../src/data/livres.js";
 
 const MENTION_TVA = "TVA non applicable, art. 293 B du CGI";
 const SLUG = /^[a-z0-9-]{1,60}$/;
@@ -44,6 +45,9 @@ export async function onRequestPost({ request, env }) {
     }
   }
 
+  // Un livre déjà contenu dans le pack du panier : on ne le fait pas payer deux fois, le panier propose de le retirer.
+  if (livresEnDouble(propres.map((p) => p.id)).length > 0) return retour(origin, "doublon");
+
   try {
     // Produits Stripe (prix et nature lus chez Stripe, jamais dans le navigateur).
     const produits = new Map();
@@ -53,7 +57,7 @@ export async function onRequestPost({ request, env }) {
       const nature = produit.metadata?.delivery;
       if (!produit.active || !["digital", "physical"].includes(nature)) return retour(origin, "indisponible");
       if (nature === "physical" && !PHYSIQUES_EN_VENTE[id]) return retour(origin, "indisponible");
-      if (nature === "digital" && PHYSIQUES_EN_VENTE[id]) return retour(origin, "indisponible");
+      if (nature === "digital" && (PHYSIQUES_EN_VENTE[id] || fichiersDuProduit(id).length === 0)) return retour(origin, "indisponible");
       if (!prix?.active || prix.currency !== "eur" || !prix.unit_amount) return retour(origin, "indisponible");
       produits.set(id, produit);
     }
@@ -99,6 +103,13 @@ export async function onRequestPost({ request, env }) {
       metadata.consentement_date = maintenant.toISOString();
       const quand = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/Paris" }).format(maintenant);
       pied.push(`Votre accord lors de l'achat, le ${quand} (heure de Paris) : « ${texte} »`);
+    }
+    if (numeriques.length > 0) {
+      // Lien vers la page de téléchargement, dans la facture envoyée par e-mail : identifiant aléatoire, relié à la
+      // session par le webhook. La page donne un lien par fichier (version téléphone et version A4).
+      const ref = crypto.randomUUID().replaceAll("-", "");
+      metadata.ref = ref;
+      pied.push(`Vos téléchargements (version téléphone et version A4) : ${origin}/merci/?ref=${ref}`);
     }
     if (physiques.length > 0) pied.push(RETRACTATION_PHYSIQUE);
 

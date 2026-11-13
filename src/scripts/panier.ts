@@ -34,7 +34,7 @@ export function ajouterAuPanier(ligne: Omit<LignePanier, "quantite">, numerique 
   const panier = lirePanier();
   const existante = panier.find((l) => meme(l, ligne));
   if (existante) {
-    // Un guide PDF ne s'achète qu'une fois par commande.
+    // Un livre numérique ne s'achète qu'une fois par commande.
     if (!numerique) existante.quantite = Math.min(10, existante.quantite + 1);
   } else {
     panier.push({ ...ligne, quantite: 1 });

@@ -36,7 +36,7 @@ const evenement = (id) => ({
   object: "event",
   type: "checkout.session.completed",
   livemode: false,
-  data: { object: { id: "cs_test_essai", object: "checkout.session", payment_status: "paid", metadata: { slug: "serie-30", delivery: "digital" } } },
+  data: { object: { id: "cs_test_essai", object: "checkout.session", payment_status: "paid", metadata: { slug: "sors-de-ton-addiction", delivery: "digital" } } },
 });
 
 // 1. Webhook
@@ -53,7 +53,7 @@ r = await fetch(`${BASE}/api/webhook`, { method: "POST", body: "{}" });
 verifier("webhook sans signature refusé", r.status === 400, r.status);
 
 // 2. Liens de téléchargement
-const jeton = (exp, j = crypto.randomUUID()) => signToken(vars.DOWNLOAD_SIGNING_SECRET, { s: "cs_test_essai", p: "serie-30", j, exp });
+const jeton = (exp, j = crypto.randomUUID()) => signToken(vars.DOWNLOAD_SIGNING_SECRET, { s: "cs_test_essai", p: "sors-de-ton-addiction-telephone", j, exp });
 const lien = async (token) => fetch(`${BASE}/api/telecharger?token=${encodeURIComponent(token)}`);
 const valide = await jeton(Date.now() + 60_000);
 r = await lien(valide);
@@ -70,7 +70,7 @@ r = await lien("");
 verifier("lien vide : refusé", r.status === 403, r.status);
 
 // 3. Les PDF ne sont accessibles par aucune adresse publique
-for (const chemin of ["/prive/exemples/serie-30.pdf", "/serie-30.pdf", "/pdf/serie-30.pdf", "/exemples/serie-30.pdf"]) {
+for (const chemin of ["/prive/pdf/sors-de-ton-addiction-A4-v3.pdf", "/pdf/sors-de-ton-addiction-A4-v3.pdf", "/sors-de-ton-addiction-a4.pdf", "/sors-de-ton-addiction-telephone.pdf", "/produits/sors-de-ton-addiction-a4.pdf"]) {
   r = await fetch(`${BASE}${chemin}`);
   const type = r.headers.get("content-type") ?? "";
   verifier(`aucun PDF à l'adresse ${chemin}`, !type.includes("pdf"), `${r.status} ${type.split(";")[0]}`);
@@ -83,9 +83,9 @@ r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchPar
 verifier("paiement : produit invalide refusé", r.status === 303 && /paiement=invalide/.test(r.headers.get("location") ?? ""), r.status);
 
 // 4 bis. Case « Accès dès le paiement »
-r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "serie-30" }), redirect: "manual" });
+r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "sors-de-ton-addiction" }), redirect: "manual" });
 verifier("paiement sans la case cochée : refusé", r.status === 303 && /paiement=consentement/.test(r.headers.get("location") ?? ""), r.headers.get("location"));
-r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "serie-30", consentement: "oui" }), redirect: "manual" });
+r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "sors-de-ton-addiction", consentement: "oui" }), redirect: "manual" });
 const versStripe = r.headers.get("location") ?? "";
 verifier("paiement avec la case cochée : page Stripe", r.status === 303 && versStripe.startsWith("https://checkout.stripe.com/"), r.status);
 const idSession = versStripe.match(/cs_test_[A-Za-z0-9]+/)?.[0];
@@ -122,14 +122,14 @@ if (vars.STRIPE_SECRET_KEY) {
   verifier("t-shirt seul : 29 € et variante dans le nom", s?.line_items?.data?.[0]?.amount_total === 2900 && /Noir, taille M/.test(s?.line_items?.data?.[0]?.description ?? ""), s?.line_items?.data?.[0]?.description);
   verifier("t-shirt seul : pas de case, mention des 14 jours", !s?.metadata?.consentement_retractation && /14 jours/.test(s?.invoice_creation?.invoice_data?.footer ?? ""));
 
-  ({ s } = await sessionDe([tshirt, { id: "serie-30", quantite: 1 }], true));
+  ({ s } = await sessionDe([tshirt, { id: "sors-de-ton-addiction", quantite: 1 }], true));
   verifier("t-shirt + PDF : livraison offerte (0 €)", port(s) === 0, port(s));
   verifier("t-shirt + PDF : accord limité aux contenus numériques", s?.metadata?.consentement_retractation === CONSENTEMENT_RETRACTATION_MIXTE);
   verifier("t-shirt + PDF : facture avec l'accord et les 14 jours", (s?.invoice_creation?.invoice_data?.footer ?? "").includes(CONSENTEMENT_RETRACTATION_MIXTE) && /14 jours/.test(s?.invoice_creation?.invoice_data?.footer ?? ""));
-  const mixteSansCase = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ panier: JSON.stringify([tshirt, { id: "serie-30", quantite: 1 }]) }), redirect: "manual" });
+  const mixteSansCase = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ panier: JSON.stringify([tshirt, { id: "sors-de-ton-addiction", quantite: 1 }]) }), redirect: "manual" });
   verifier("t-shirt + PDF sans la case : refusé", /paiement=consentement/.test(mixteSansCase.headers.get("location") ?? ""));
 
-  ({ s } = await sessionDe([{ id: "serie-30", quantite: 1 }], true));
+  ({ s } = await sessionDe([{ id: "sors-de-ton-addiction", quantite: 1 }], true));
   verifier("PDF seul : ni adresse ni livraison", !s?.shipping_address_collection && !(s?.shipping_options ?? []).length);
 
   const { rep } = await sessionDe([{ id: "gourde-addictive", quantite: 1 }]);
@@ -138,12 +138,25 @@ if (vars.STRIPE_SECRET_KEY) {
   verifier("taille inconnue : refusée", /paiement=invalide/.test(faux.rep.headers.get("location") ?? ""));
 }
 
+// 4 quater. Pack Série 60 : accepté seul, refusé avec un livre qu'il contient déjà
+if (vars.STRIPE_SECRET_KEY) {
+  const { s } = await sessionDe([{ id: "pack-serie-60", quantite: 1 }], true);
+  verifier("pack seul : 34,90 €, sans livraison", s?.amount_total === 3490 && !s?.shipping_address_collection, s?.amount_total);
+  verifier("pack seul : lien de téléchargement dans la facture", /\/merci\/\?ref=[a-f0-9]{32}/.test(s?.invoice_creation?.invoice_data?.footer ?? ""));
+  const doublon = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ panier: JSON.stringify([{ id: "pack-serie-60", quantite: 1 }, { id: "ose-ton-projet", quantite: 1 }]), consentement: "oui" }), redirect: "manual" });
+  verifier("pack + livre déjà inclus : refusé (doublon)", /paiement=doublon/.test(doublon.headers.get("location") ?? ""), doublon.headers.get("location"));
+  const ancien = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ panier: JSON.stringify([{ id: "serie-30", quantite: 1 }]), consentement: "oui" }), redirect: "manual" });
+  verifier("ancien produit Série 30 : refusé", /paiement=(indisponible|invalide)/.test(ancien.headers.get("location") ?? ""), ancien.headers.get("location"));
+}
+
 // 5. Commande réelle de test (après un paiement avec la carte 4242…)
 if (session) {
   r = await fetch(`${BASE}/api/commande?session_id=${session}`);
   const data = await r.json();
   verifier("commande payée : lien remis", r.status === 200 && data.etat === "paye", data.etat);
-  if (data.lien) {
+  verifier("commande payée : un lien par fichier", (data.liens ?? []).length >= 2, (data.liens ?? []).map((l) => `${l.livre} – ${l.libelle}`).join(" | "));
+  if (data.liens?.[0]) {
+    data.lien = data.liens[0].lien;
     r = await fetch(`${BASE}${data.lien}`);
     verifier("téléchargement depuis la commande payée", r.status === 200 && r.headers.get("content-type") === "application/pdf", r.status);
     r = await fetch(`${BASE}${data.lien}`);

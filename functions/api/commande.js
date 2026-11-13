@@ -1,16 +1,28 @@
-// GET /api/commande?session_id=cs_… : vérifie auprès de Stripe que la session est bien payée, puis remet un lien de
-// téléchargement personnel par guide PDF payé, et le récapitulatif des articles livrés.
-// Conservé chez nous : un compteur par session et l'identifiant de chaque lien (aucune donnée client).
+// GET /api/commande?session_id=cs_… (retour de Stripe) ou ?ref=… (lien de la facture envoyée par e-mail) :
+// vérifie auprès de Stripe que la session est payée, puis remet un lien de téléchargement personnel par fichier
+// (version téléphone et version A4 de chaque livre, 6 fichiers pour le pack) et le récapitulatif des articles livrés.
+// Conservé chez nous : un compteur par commande, l'identifiant de chaque lien, la correspondance ref → session.
 import { json, signToken, stripe } from "../_lib/stripe.js";
+import { fichiersDuProduit } from "../../src/data/livres.js";
 
 const TOKEN_MINUTES = 15;
-const MAX_LINKS_PER_ORDER = 3;
-const ORDER_DAYS = 7;
+const LIENS_PAR_FICHIER = 3;
+const ORDER_DAYS = 30;
+
+async function sessionDemandee(url, env) {
+  const sessionId = url.searchParams.get("session_id");
+  if (sessionId) return /^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(sessionId) ? sessionId : null;
+  const ref = url.searchParams.get("ref") ?? "";
+  if (!/^[a-f0-9]{32}$/.test(ref)) return null;
+  return (await env.TELECHARGEMENTS.get(`ref:${ref}`)) ?? "attente";
+}
 
 export async function onRequestGet({ request, env }) {
-  const sessionId = new URL(request.url).searchParams.get("session_id") ?? "";
-  if (!/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(sessionId)) return json({ etat: "invalide" }, 400);
   if (!env.DOWNLOAD_SIGNING_SECRET || !env.TELECHARGEMENTS) return json({ etat: "erreur" }, 500);
+  const sessionId = await sessionDemandee(new URL(request.url), env);
+  if (!sessionId) return json({ etat: "invalide" }, 400);
+  // Lien de facture pas encore relié (webhook pas encore reçu) : la page invite à réessayer dans un instant.
+  if (sessionId === "attente") return json({ etat: "non_paye" }, 402);
 
   let session;
   try {
@@ -29,35 +41,40 @@ export async function onRequestGet({ request, env }) {
 
   // Ce qui est livré est ce qui a été payé : on le lit dans les lignes de la session, pas dans l'adresse.
   const lignes = (session.line_items?.data ?? []).map((l) => ({ produit: l.price?.product, quantite: l.quantity }));
-  const guides = lignes.filter((l) => typeof l.produit === "object" && l.produit?.metadata?.delivery === "digital");
+  const numeriques = lignes.filter((l) => typeof l.produit === "object" && l.produit?.metadata?.delivery === "digital");
   const articles = lignes.filter((l) => typeof l.produit === "object" && l.produit?.metadata?.delivery === "physical");
-  if (guides.length === 0 && articles.length === 0) return json({ etat: "invalide" }, 400);
+  if (numeriques.length === 0 && articles.length === 0) return json({ etat: "invalide" }, 400);
+
+  // Fichiers à livrer, sans doublon (un livre peut être dans le pack et acheté seul).
+  const fichiers = [];
+  for (const { produit } of numeriques) {
+    for (const f of fichiersDuProduit(produit.id)) if (!fichiers.some((x) => x.cle === f.cle)) fichiers.push(f);
+  }
 
   let liens = [];
-  let liensRestants = 0;
-  if (guides.length > 0) {
-    const counterKey = `commande:${sessionId}`;
-    const count = Number(await env.TELECHARGEMENTS.get(counterKey)) || 0;
-    if (count >= MAX_LINKS_PER_ORDER) return json({ etat: "limite" }, 429);
-    await env.TELECHARGEMENTS.put(counterKey, String(count + 1), { expirationTtl: ORDER_DAYS * 86400 });
-    liensRestants = MAX_LINKS_PER_ORDER - count - 1;
+  let visitesRestantes = 0;
+  if (fichiers.length > 0) {
+    // 3 liens par fichier au total : chaque visite de la page en crée un par fichier.
+    const counterKey = `commande:${session.id}`;
+    const deja = Number(await env.TELECHARGEMENTS.get(counterKey)) || 0;
+    const limite = LIENS_PAR_FICHIER * fichiers.length;
+    if (deja + fichiers.length > limite) return json({ etat: "limite" }, 429);
+    await env.TELECHARGEMENTS.put(counterKey, String(deja + fichiers.length), { expirationTtl: ORDER_DAYS * 86400 });
+    visitesRestantes = Math.floor((limite - deja - fichiers.length) / fichiers.length);
     liens = await Promise.all(
-      guides.map(async ({ produit }) => {
-        const token = await signToken(env.DOWNLOAD_SIGNING_SECRET, { s: sessionId, p: produit.id, j: crypto.randomUUID(), exp: Date.now() + TOKEN_MINUTES * 60_000 });
-        return { produit: produit.name, lien: `/api/telecharger?token=${encodeURIComponent(token)}` };
+      fichiers.map(async (f) => {
+        const token = await signToken(env.DOWNLOAD_SIGNING_SECRET, { s: session.id, p: f.cle, j: crypto.randomUUID(), exp: Date.now() + TOKEN_MINUTES * 60_000 });
+        return { livre: f.livre, libelle: f.libelle, pages: f.pages, lien: `/api/telecharger?token=${encodeURIComponent(token)}` };
       }),
     );
   }
 
   return json({
     etat: "paye",
-    // Ancien format (un seul guide) gardé pour la page de remerciement et les contrôles.
-    produit: liens[0]?.produit ?? null,
-    lien: liens[0]?.lien ?? null,
     liens,
     articles: articles.map(({ produit, quantite }) => ({ produit: produit.name, quantite })),
     minutes: TOKEN_MINUTES,
-    liensRestants,
+    liensRestants: visitesRestantes,
     // Confirmation écrite de l'accord donné lors de l'achat, tel qu'enregistré dans Stripe.
     accord: session.metadata?.consentement_retractation ?? null,
     accordDate: session.metadata?.consentement_date ?? null,

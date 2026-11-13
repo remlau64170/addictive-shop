@@ -11,7 +11,8 @@
     "paiement:tester": "node scripts/tester-paiement.mjs",
     "printful:maquettes": "node scripts/maquettes-tshirt.mjs",
     "printful:fichier": "node scripts/printful-fichier.mjs",
-    "broderie:blason": "node scripts/blason-broderie.mjs"
+    "broderie:blason": "node scripts/blason-broderie.mjs",
+    "visuels:livres": "node scripts/visuels-livres.mjs"
   },
   "dependencies": {
     "@lucide/astro": "1.66.0",

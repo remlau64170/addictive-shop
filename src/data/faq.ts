@@ -9,15 +9,15 @@ export const FAQ = [
   },
   {
     question: "Comment recevrai-je un produit numérique ?",
-    answer: "Les produits numériques sont des guides PDF. Juste après le paiement, la page de confirmation vous donne un lien de téléchargement personnel. Votre facture vous est aussi envoyée par e-mail.",
+    answer: "Les produits numériques sont des livres au format PDF, chacun en version téléphone et en version A4 à imprimer. Juste après le paiement, la page de confirmation vous donne un lien de téléchargement par fichier. Votre facture vous est aussi envoyée par e-mail.",
   },
   {
     question: "Quels sont les délais pour les produits physiques ?",
-    answer: "Le t-shirt est fabriqué à la commande, puis livré en 4 à 7 jours. La livraison coûte 4,90 € par commande en France, en Belgique, au Luxembourg, en Allemagne, en Espagne, en Italie, aux Pays-Bas et au Portugal. Elle est offerte si votre commande contient aussi un guide PDF.",
+    answer: "Le t-shirt est fabriqué à la commande, puis livré en 4 à 7 jours. La livraison coûte 4,90 € par commande en France, en Belgique, au Luxembourg, en Allemagne, en Espagne, en Italie, aux Pays-Bas et au Portugal. Elle est offerte si votre commande contient aussi un livre numérique.",
   },
   {
     question: "Puis-je retourner un produit ?",
-    answer: "Oui pour le t-shirt : vous disposez de 14 jours après sa réception pour le retourner. Pour un guide PDF, le téléchargement est disponible tout de suite : vous acceptez, en cochant une case avant de payer, de ne plus pouvoir vous rétracter une fois le téléchargement disponible.",
+    answer: "Oui pour le t-shirt : vous disposez de 14 jours après sa réception pour le retourner. Pour un livre numérique, le téléchargement est disponible tout de suite : vous acceptez, en cochant une case avant de payer, de ne plus pouvoir vous rétracter une fois le téléchargement disponible.",
   },
   {
     question: "Le paiement sera-t-il sécurisé ?",

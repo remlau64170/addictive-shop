@@ -9,7 +9,7 @@ export const CONSENTEMENT_RETRACTATION =
 export const CONSENTEMENT_VALEUR = "oui";
 
 /**
- * Panier mixte (guide PDF + article livré) : même accord, précisé pour ne viser que les contenus numériques.
+ * Panier mixte (livre numérique + article livré) : même accord, précisé pour ne viser que les contenus numériques.
  * Les articles livrés gardent leur délai de rétractation de 14 jours.
  */
 export const CONSENTEMENT_RETRACTATION_MIXTE = `${CONSENTEMENT_RETRACTATION} Cet accord concerne uniquement les contenus numériques : les articles livrés gardent leur délai de rétractation de 14 jours.`;

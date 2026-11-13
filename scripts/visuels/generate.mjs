@@ -29,6 +29,8 @@ async function makeLogo() {
   await sharp(data, { raw: info }).png().toFile(join(WORK, "logo.png"));
   // Blason brodé du t-shirt (prive/broderie), pour le visuel d'accueil.
   copyFileSync(join(ROOT, "prive/broderie/blason-tshirt-noir.png"), join(WORK, "blason.png"));
+  // Couvertures des livres (npm run visuels:livres les crée dans prive/couvertures).
+  for (const livre of ["sors-de-ton-addiction", "aiguise-ton-mental", "ose-ton-projet"]) copyFileSync(join(ROOT, `prive/couvertures/${livre}.png`), join(WORK, `couverture-${livre}.png`));
 }
 
 const GRADIENT = "linear-gradient(100deg, #2fd6c3, #4d9cf5 55%, #8a6cf0)";
@@ -49,80 +51,10 @@ html, body { width: var(--w); height: var(--h); overflow: hidden; background: #0
 .grad { background: ${GRADIENT}; -webkit-background-clip: text; background-clip: text; color: transparent; }
 `;
 
-/* ---------- Livre en 3D ---------- */
-
-function book({ width = 500, height = 690, depth = 46, cover, rotate = -30, top = 130, left = 270, depthColor = "#101735" }) {
-  const pages = "repeating-linear-gradient(90deg, #e9ecf4 0 2px, #b7bdce 2px 3px)";
-  return `<div class="floor"></div>
-  <div class="cast" style="left:${left - 30}px; top:${top + height - 60}px; width:${width + 190}px; height:120px"></div>
-  <div style="position:absolute; left:${left}px; top:${top}px; width:${width}px; height:${height}px; perspective:1700px">
-    <div style="position:relative; width:100%; height:100%; transform-style:preserve-3d; transform:rotateX(5deg) rotateY(${rotate}deg) rotateZ(1deg)">
-      <div style="position:absolute; inset:0; transform:translateZ(${depth / 2}px); overflow:hidden; border-radius:3px 10px 10px 3px; box-shadow:inset 3px 0 6px rgb(255 255 255 / .1), inset 14px 0 18px rgb(0 0 0 / .4)">${cover}
-        <div style="position:absolute; inset:0; background:linear-gradient(115deg, rgb(255 255 255 / .13), transparent 32%, transparent 68%, rgb(255 255 255 / .05))"></div></div>
-      <div style="position:absolute; inset:0; transform:translateZ(${-depth / 2}px); background:${depthColor}"></div>
-      <div style="position:absolute; top:6px; bottom:6px; right:${-depth / 2}px; width:${depth}px; transform:rotateY(90deg); background:${pages}"></div>
-      <div style="position:absolute; left:0; right:8px; top:${-depth / 2}px; height:${depth}px; transform:rotateX(90deg); background:repeating-linear-gradient(0deg, #e9ecf4 0 2px, #b7bdce 2px 3px)"></div>
-      <div style="position:absolute; top:0; bottom:0; left:${-depth / 2}px; width:${depth}px; transform:rotateY(-90deg); background:linear-gradient(90deg, #0a1028, #1a2452 50%, #0a1028)"></div>
-    </div>
-  </div>`;
-}
-
-const coverBase = `position:absolute; inset:0; padding:44px 40px; display:flex; flex-direction:column;
-  background: radial-gradient(420px 380px at 88% 8%, rgb(138 108 240 / .5), transparent 70%), radial-gradient(420px 360px at 4% 96%, rgb(47 214 195 / .36), transparent 70%), linear-gradient(160deg, #111a42, #0a1029);`;
+/* ---------- Logo et nom (image de partage) ---------- */
 
 const lockup = (size = 34) =>
   `<div style="display:flex; align-items:center; gap:10px; font-weight:800; font-size:${size * 0.66}px"><img src="logo.png" width="${size}" height="${size}" alt=""> Addictive</div>`;
-
-const programmeCover = `<div style="${coverBase}">
-  ${lockup()}
-  <p style="margin-top:52px; font-size:17px; font-weight:600; letter-spacing:.2em; color:#9fb3d9">PROGRAMME</p>
-  <p style="font-size:58px; line-height:1; font-weight:800; margin-top:8px">Série <span class="grad" style="font-size:150px; letter-spacing:-.04em">30</span></p>
-  <p style="font-size:33px; line-height:1.16; font-weight:700; margin-top:16px">30 jours pour<br>reprendre la main</p>
-  <p style="margin-top:auto; font-size:17px; color:#b6c3dc">Une étape par jour, à votre rythme.</p>
-</div>`;
-
-/* ---------- Pages intérieures ---------- */
-
-function sheet(content, { rotate = -3, back = true } = {}) {
-  return `<div class="floor"></div>
-  ${back ? `<div style="position:absolute; left:215px; top:92px; width:590px; height:820px; border-radius:8px; background:#141b3d; transform:rotate(${rotate + 5}deg); box-shadow:0 22px 50px rgb(0 0 0 / .5)"></div>` : ""}
-  <div style="position:absolute; left:205px; top:85px; width:590px; height:830px; padding:56px 52px; border-radius:8px; overflow:hidden; transform:rotate(${rotate}deg);
-    background: radial-gradient(360px 300px at 100% 0, rgb(138 108 240 / .24), transparent 70%), radial-gradient(340px 280px at 0 100%, rgb(47 214 195 / .16), transparent 70%), #0e1533;
-    box-shadow:0 34px 70px rgb(0 0 0 / .65), inset 0 0 0 1px rgb(255 255 255 / .06)">${content}</div>`;
-}
-
-const pageNo = (n) => `<p style="position:absolute; bottom:30px; right:52px; font-size:15px; color:#8c9abb">${n}</p>`;
-const eyebrow = (text) => `<p style="font-size:15px; font-weight:700; letter-spacing:.18em; color:#2fd6c3">${text}</p>`;
-
-const sommaire = sheet(`${lockup(28)}
-  <p style="margin-top:34px; font-size:44px; font-weight:800">Sommaire</p>
-  <div style="margin-top:26px; display:grid; gap:15px">
-  ${[
-    ["Bienvenue", "Comment utiliser ce programme", "3"],
-    ["Semaine 1", "Comprendre vos envies", "6"],
-    ["Semaine 2", "Installer de nouvelles habitudes", "14"],
-    ["Semaine 3", "Tenir dans les moments difficiles", "22"],
-    ["Semaine 4", "Consolider votre progression", "30"],
-    ["Votre plan", "« Si… alors… » à remplir", "40"],
-  ]
-    .map(
-      ([title, text, page]) => `<div style="display:flex; align-items:center; gap:18px; padding:14px 18px; border-radius:14px; background:rgb(255 255 255 / .05)">
-      <div style="flex:1"><p style="font-size:21px; font-weight:700">${title}</p><p style="font-size:17px; color:#b6c3dc; margin-top:2px">${text}</p></div>
-      <p class="grad" style="font-size:24px; font-weight:800">${page}</p></div>`,
-    )
-    .join("")}</div>${pageNo("2")}`);
-
-const jour1 = sheet(`${eyebrow("SEMAINE 1")}
-  <p style="margin-top:12px; font-size:58px; line-height:1; font-weight:800">Jour <span class="grad">1</span></p>
-  <p style="margin-top:12px; font-size:27px; font-weight:700">Votre point de départ</p>
-  <p style="margin-top:18px; font-size:19px; line-height:1.5; color:#c6d1e6">Aujourd'hui, rien à prouver. Prenez simplement cinq minutes pour noter où vous en êtes. Être ici est déjà un premier pas.</p>
-  <div style="margin-top:22px; padding:20px; border-radius:16px; background:rgb(77 156 245 / .14); border:1px solid rgb(77 156 245 / .35)">
-    <p style="font-size:19px; font-weight:700">L'exercice du jour</p>
-    <p style="margin-top:6px; font-size:18px; line-height:1.45; color:#c6d1e6">Écrivez trois raisons qui vous donnent envie de reprendre la main.</p></div>
-  <div style="margin-top:22px; display:grid; gap:12px; font-size:18px">
-    ${["Je note mes trois raisons", "Je choisis un moment de la journée", "Je me félicite d'avoir commencé"]
-      .map((text) => `<p style="display:flex; align-items:center; gap:12px"><span style="width:22px; height:22px; border-radius:7px; border:2px solid #2fd6c3"></span>${text}</p>`)
-      .join("")}</div>${pageNo("7")}`, { rotate: 2 });
 
 /* ---------- T-shirt ---------- */
 
@@ -177,59 +109,6 @@ function tee({ viewBox = "0 0 1000 1000", back = false, weave = false, brode = f
   </svg>`;
 }
 
-/* ---------- SOS Envie : jeu de cartes ---------- */
-
-const PROTOCOLE = [
-  ["0–1 min", "Stop", "Posez ce que vous faites. Dites-vous : « c'est une vague, elle va passer »."],
-  ["1–3 min", "Respirez", "Inspirez 4 secondes, expirez 6 secondes. Recommencez dix fois."],
-  ["3–5 min", "Bougez", "20 squats, une marche rapide ou quelques étirements."],
-  ["5–8 min", "Changez de décor", "Buvez un grand verre d'eau et changez de pièce."],
-  ["8–10 min", "Faites le point", "L'envie a baissé ? Notez ce qui vous a aidé."],
-];
-
-function sosCard([time, title, text], index, { width = 360 } = {}) {
-  const s = width / 360;
-  return `<div style="position:relative; width:${width}px; height:${500 * s}px; padding:${30 * s}px ${28 * s}px; border-radius:${22 * s}px; overflow:hidden; display:flex; flex-direction:column;
-    background: radial-gradient(${260 * s}px ${220 * s}px at 100% 0, rgb(138 108 240 / .45), transparent 70%), radial-gradient(${260 * s}px ${220 * s}px at 0 100%, rgb(47 214 195 / .3), transparent 70%), linear-gradient(160deg, #131c46, #0b1130);
-    box-shadow: 0 ${24 * s}px ${50 * s}px rgb(0 0 0 / .55), inset 0 0 0 ${2 * s}px rgb(255 255 255 / .08)">
-    <div style="display:flex; justify-content:space-between; align-items:center; font-size:${15 * s}px; font-weight:700; letter-spacing:.14em; color:#2fd6c3">
-      <span>ÉTAPE ${index + 1}/5</span><span style="padding:${5 * s}px ${12 * s}px; border-radius:999px; background:rgb(77 156 245 / .2); color:#cfe0ff; letter-spacing:0">${time}</span></div>
-    <p class="grad" style="margin-top:${26 * s}px; font-size:${120 * s}px; line-height:.9; font-weight:800">${index + 1}</p>
-    <p style="margin-top:${18 * s}px; font-size:${38 * s}px; line-height:1.05; font-weight:800">${title}</p>
-    <p style="margin-top:${14 * s}px; font-size:${19 * s}px; line-height:1.45; color:#c6d1e6">${text}</p>
-    <div style="margin-top:auto; display:flex; align-items:center; gap:${8 * s}px; font-size:${15 * s}px; font-weight:700; color:#9fb3d9">
-      <img src="logo.png" width="${22 * s}" height="${22 * s}" alt=""> SOS Envie</div>
-  </div>`;
-}
-
-const sosFan = `<div class="floor"></div>
-  <div class="cast" style="left:220px; top:760px; width:560px; height:110px"></div>
-  ${PROTOCOLE.map((step, index) => [step, index]).reverse().map(([step, index]) => {
-    const angle = (index - 2) * 11;
-    return `<div style="position:absolute; left:320px; top:210px; transform-origin:50% 120%; transform:rotate(${angle}deg) translateY(${Math.abs(index - 2) * 14}px)">${sosCard(step, index)}</div>`;
-  }).join("")}`;
-
-const sosCloseUp = `<div class="floor"></div>
-  <div class="cast" style="left:260px; top:800px; width:500px; height:100px"></div>
-  <div style="position:absolute; left:255px; top:115px; transform:rotate(-4deg)">${sosCard(PROTOCOLE[1], 1, { width: 490 })}</div>`;
-
-const sosPhone = `<div class="floor"></div>
-  <div class="cast" style="left:330px; top:850px; width:360px; height:90px"></div>
-  <div style="position:absolute; left:340px; top:70px; width:330px; height:690px; padding:12px; border-radius:52px; transform:rotate(-6deg);
-    background:linear-gradient(135deg, #4a5168, #1d2233 45%, #3a4156); box-shadow:inset 0 0 0 2px rgb(255 255 255 / .2), 10px 30px 60px rgb(0 0 0 / .6)">
-    <div style="position:relative; width:100%; height:100%; border-radius:42px; overflow:hidden; padding:70px 26px 30px;
-      background: radial-gradient(260px 240px at 100% 0, rgb(138 108 240 / .55), transparent 70%), radial-gradient(260px 260px at 0 100%, rgb(47 214 195 / .35), transparent 70%), linear-gradient(170deg, #121b45, #070b1a)">
-      <span style="position:absolute; top:14px; left:50%; width:96px; height:26px; margin-left:-48px; border-radius:999px; background:#000"></span>
-      <div style="display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; color:#9fb3d9"><img src="logo.png" width="22" height="22" alt=""> SOS Envie</div>
-      <p style="margin-top:14px; font-size:30px; line-height:1.1; font-weight:800">La vague<br><span class="grad">va passer.</span></p>
-      <div style="margin-top:22px; display:grid; gap:10px">
-        ${PROTOCOLE.map(([time, title], index) => `<div style="display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:14px; background:rgb(255 255 255 / .07)">
-          <span class="grad" style="width:22px; font-size:24px; font-weight:800">${index + 1}</span>
-          <span style="flex:1"><span style="display:block; font-size:16px; font-weight:700">${title}</span><span style="font-size:13px; color:#b6c3dc">${time}</span></span></div>`).join("")}
-      </div>
-    </div>
-  </div>`;
-
 /* ---------- Couvertures d'articles (1600 × 900) ---------- */
 
 const articleFrame = (eyebrow, title, visual) => `<div style="position:relative; width:1600px; height:900px; overflow:hidden; padding:96px 110px;
@@ -271,23 +150,20 @@ const ARTICLE_COVERS = {
 
 /* ---------- Scènes ---------- */
 
-const programmeBook = book({ cover: programmeCover });
-
 const VIEWS = {
-  "serie-30-1": programmeBook,
-  "serie-30-2": sommaire,
-  "serie-30-3": jour1,
-  "sos-envie-1": sosFan,
-  "sos-envie-2": sosCloseUp,
-  "sos-envie-3": sosPhone,
+  // Livres : visuels tirés des vrais PDF (npm run visuels:livres).
   // T-shirt : les photos de la fiche sont les maquettes Printful (npm run printful:maquettes).
 };
 
-/** Haut de page : les 3 produits réunis. */
+/** Une couverture de livre posée, avec ombre. */
+const couverture = (livre, rotation) => `<img src="couverture-${livre}.png" style="position:absolute; left:290px; top:170px; width:420px; border-radius:6px; box-shadow:0 40px 80px rgba(0,0,0,.6); transform:rotate(${rotation}deg)">`;
+
+/** Haut de page : les livres de la Série 60 et le t-shirt brodé. */
 const HERO = `<div class="stage" style="width:1600px; height:600px"><div class="floor" style="height:130px"></div>
   ${[
-    [-170, programmeBook, .58, -215],
-    [300, sosFan, .58, -200],
+    [-260, couverture("aiguise-ton-mental", -6), .58, -215],
+    [20, couverture("sors-de-ton-addiction", 0), .58, -230],
+    [300, couverture("ose-ton-projet", 6), .58, -215],
     [770, tee({ brode: true }), .58, -205],
   ]
     .map(([x, inner, scale, y]) => `<div style="position:absolute; left:${x}px; top:${y}px; width:1000px; height:1000px; transform:scale(${scale}); transform-origin:50% 50%">${String(inner).replace('<div class="floor"></div>', "").replace(/id="/g, `id="v${x}-`).replace(/url\(#/g, `url(#v${x}-`).replace(/href="#/g, `href="#v${x}-`)}</div>`)

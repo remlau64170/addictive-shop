@@ -24,8 +24,9 @@ import Base from "../layouts/Base.astro";
           votre facture.
         </p>
         <p class="note" data-note-liens>
-          Ce lien personnel fonctionne une seule fois, pendant <span data-minutes>15</span> minutes. Besoin d'un nouveau lien ? Rechargez
-          cette page (encore <span data-restants></span> possible(s)). Le reçu de Stripe vous est envoyé par e-mail.
+          Chaque lien personnel fonctionne une seule fois, pendant <span data-minutes>15</span> minutes. Besoin de nouveaux liens ?
+          Rechargez cette page (encore <span data-restants></span> fois). Votre facture, envoyée par e-mail, contient aussi le lien de
+          cette page. Pour écrire dans les livres remplissables, ouvrez-les avec Adobe Acrobat Reader ou Xodo.
         </p>
       </div>
 
@@ -63,6 +64,18 @@ import Base from "../layouts/Base.astro";
     margin-top: 1.5rem;
   }
 
+  .downloads :global(.livre-titre) {
+    font-weight: 700;
+  }
+
+  .downloads :global(.livre-liens) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
   .merci .note {
     max-width: 34rem;
     margin: 1rem auto 0;
@@ -78,27 +91,42 @@ import Base from "../layouts/Base.astro";
     for (const block of root.querySelectorAll<HTMLElement>("[data-show]")) block.hidden = block.dataset.show !== state;
   };
 
-  const sessionId = new URLSearchParams(location.search).get("session_id");
-  if (!sessionId) {
+  // Retour de Stripe (session_id) ou lien de la facture envoyée par e-mail (ref).
+  const params = new URLSearchParams(location.search);
+  const sessionId = params.get("session_id");
+  const ref = params.get("ref");
+  if (!sessionId && !ref) {
     show("invalide");
   } else {
-    fetch(`/api/commande?session_id=${encodeURIComponent(sessionId)}`, { cache: "no-store" })
+    const requete = sessionId ? `session_id=${encodeURIComponent(sessionId)}` : `ref=${encodeURIComponent(ref!)}`;
+    fetch(`/api/commande?${requete}`, { cache: "no-store" })
       .then((response) => response.json())
       .then((data) => {
         if (data.etat === "paye") {
           // Paiement confirmé : le panier de ce navigateur est vidé.
           ecrirePanier([]);
-          const guides: { produit: string; lien: string }[] = data.liens ?? [];
+          const guides: { livre: string; libelle: string; pages: number; lien: string }[] = data.liens ?? [];
           const articles: { produit: string; quantite: number }[] = data.articles ?? [];
           const listeGuides = root.querySelector("[data-liste-guides]")!;
+          // Un bloc par livre, avec un lien par fichier : version téléphone et version A4 à imprimer.
+          const livres = [...new Set(guides.map((g) => g.livre))];
           listeGuides.replaceChildren(
-            ...guides.map((g) => {
+            ...livres.map((livre) => {
               const li = document.createElement("li");
-              const a = document.createElement("a");
-              a.className = "button";
-              a.href = g.lien;
-              a.textContent = `Télécharger « ${g.produit} »`;
-              li.append(a);
+              li.className = "livre";
+              const titre = document.createElement("p");
+              titre.className = "livre-titre";
+              titre.textContent = livre;
+              const boutons = document.createElement("div");
+              boutons.className = "livre-liens";
+              for (const g of guides.filter((x) => x.livre === livre)) {
+                const a = document.createElement("a");
+                a.className = "button";
+                a.href = g.lien;
+                a.textContent = `${g.libelle} (${g.pages} pages)`;
+                boutons.append(a);
+              }
+              li.append(titre, boutons);
               return li;
             }),
           );

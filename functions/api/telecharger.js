@@ -29,7 +29,7 @@ export async function onRequestGet({ request, env }) {
   return new Response(file, {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="addictive-${payload.p}.pdf"`,
+      "Content-Disposition": `attachment; filename="${payload.p}.pdf"`,
       "Cache-Control": "private, no-store",
       "X-Robots-Tag": "noindex",
       "X-Content-Type-Options": "nosniff",

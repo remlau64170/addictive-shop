@@ -6,7 +6,7 @@ category: mental-discipline
 date: 2026-11-02
 draft: false
 cover: { src: /articles/motivation-habitude.webp, alt: "Illustration d'un calendrier de série avec 25 jours cochés et un seul jour manqué" }
-related: serie-30
+related: aiguise-ton-mental
 ---
 
 Vous avez sans doute déjà vécu ce scénario : un lundi plein d'énergie, de bonnes résolutions, puis une semaine plus tard, plus rien. Ce n'est pas un manque de volonté. C'est simplement que **la motivation est une émotion**, et qu'une émotion va et vient. Pour avancer dans la durée, il faut autre chose : une habitude.

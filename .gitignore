@@ -13,3 +13,6 @@ medias/
 .wrangler/
 prive/pdf-reels/
 !.dev.vars.example
+# Vrais livres numériques : jamais dans git, jamais publics
+prive/pdf/
+prive/couvertures/

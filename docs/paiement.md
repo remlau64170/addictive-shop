@@ -9,7 +9,7 @@ mention « TVA non applicable, art. 293 B du CGI » sur la page de paiement et s
 1. Copier `.dev.vars.example` en `.dev.vars` (jamais dans git) et y mettre la clé secrète de **test** (`sk_test_…`).
 2. Relier le webhook : `stripe listen --forward-to http://localhost:8788/api/webhook` (Stripe CLI, gratuit).
    Mettre le secret `whsec_…` qu'il affiche dans `STRIPE_WEBHOOK_SECRET`.
-3. `npm run paiement:local` : construit le site avec l'achat activé, charge les PDF d'exemple, lance http://localhost:8788
+3. `npm run paiement:local` : construit le site avec l'achat activé, charge les 6 PDF des livres (prive/pdf, hors git), lance http://localhost:8788
 4. `npm run paiement:tester` : contrôles automatiques (webhook, liens, PDF privés, entrées invalides).
 
 Cartes de test : `4242 4242 4242 4242` (accepté), `4000 0000 0000 0002` (refusé), date future, CVC quelconque.
@@ -21,7 +21,13 @@ Désactivé sur le site public (« La boutique ouvre bientôt »). Deux réglage
 - `PUBLIC_BOUTIQUE_OUVERTE=true` au moment de construire le site (sinon le bouton n'existe pas) ;
 - `CHECKOUT_ENABLED=true` côté Functions (sinon le serveur refuse tout paiement).
 
-Achetables : les guides PDF (`serie-30`, `sos-envie`) et le t-shirt brodé (`t-shirt-sois-addict`, 29 €).
+Achetables :
+
+- livres numériques « Série 60 », 14,90 € chacun : `sors-de-ton-addiction`, `aiguise-ton-mental`, `ose-ton-projet` ;
+- `pack-serie-60`, les 3 livres, 34,90 € (au lieu de 44,70 €) ;
+- le t-shirt brodé (`t-shirt-sois-addict`, 29 €).
+
+Les anciens produits de test (Série 30, SOS Envie) sont retirés du site et archivés dans Stripe (mode test).
 Le t-shirt brodé est le seul produit physique de la boutique. Le prix vient toujours de Stripe, jamais du navigateur.
 
 ## Panier
@@ -85,6 +91,16 @@ Le t-shirt brodé est le seul produit physique de la boutique. Le prix vient tou
 - Après dépôt dans la bibliothèque Printful : `npm run printful:fichier -- <identifiant>` vérifie le fichier et donne
   la ligne pour `.dev.vars`, puis `npm run printful:maquettes` crée les maquettes et remplace les photos de la fiche.
 
+## Livres numériques
+
+- Fichiers : `prive/pdf/` (exclu de git, jamais publics). Correspondance livre → fichiers, libellés et nombre de pages :
+  `src/data/livres.js`. Le pack donne les 6 fichiers ; un livre déjà inclus dans un pack du panier est refusé
+  (le panier propose de le retirer).
+- « Ose ton projet » (v4) : les deux PDF n'ont **aucun champ remplissable**, contrairement aux deux autres livres.
+  La fiche ne l'annonce donc pas comme remplissable (`remplissable: false` dans `src/data/livres.js`).
+- Visuels : `npm run visuels:livres` (couverture et pages intérieures rendues depuis les PDF, visuel du pack), puis
+  `node scripts/visuels/generate.mjs hero` pour le visuel d'accueil.
+
 ## Données envoyées à Printful
 
 Nom et adresse de livraison, articles commandés (modèle, couleur, taille, quantité), identifiant de commande dérivé de
@@ -96,7 +112,10 @@ aujourd'hui). Aucune donnée de paiement.
 1. `POST /api/checkout` : crée la session Checkout et renvoie vers Stripe.
 2. Stripe renvoie vers `/merci/?session_id=…`.
 3. `GET /api/commande` vérifie auprès de Stripe que la session est payée, puis donne un lien personnel :
-   valable 15 minutes, utilisable une seule fois, 3 liens au maximum par commande, commande valable 7 jours.
+   un lien par fichier (version téléphone et version A4 de chaque livre, 6 pour le pack), chacun valable 15 minutes et
+   utilisable une seule fois ; 3 liens au maximum par fichier ; commande valable 30 jours.
+   La facture envoyée par e-mail contient le lien de cette page (`/merci/?ref=…`, identifiant aléatoire relié à la
+   session par le webhook) : un e-mail avec un lien direct par fichier demanderait un service d'envoi d'e-mails.
 4. `GET /api/telecharger` envoie le PDF depuis le stockage privé `FICHIERS` (jamais dans un dossier public).
 5. `POST /api/webhook` : signature vérifiée, rejeu et doublons refusés ; brouillon Printful pour les articles livrés.
 
@@ -117,7 +136,7 @@ soit environ 0,05 € pour un produit à 12 €, en plus des frais de paiement S
 - Dans le compte Stripe réel : remplir les informations publiques obligatoires (nom légal, adresse et e-mail du
   support, lien vers la politique de confidentialité).
 - Créer les deux espaces KV (`wrangler kv namespace create`) et remplacer les `id` de `wrangler.toml`.
-- Charger les vrais PDF dans `FICHIERS` (clés `pdf:serie-30`, `pdf:sos-envie`).
+- Charger les 6 PDF dans `FICHIERS` (clés `pdf:<livre>-telephone` et `pdf:<livre>-a4`, voir `src/data/livres.js`).
 - Secrets Cloudflare : `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` (point de terminaison Stripe), `DOWNLOAD_SIGNING_SECRET`,
   `PRINTFUL_API_TOKEN`, `PRINTFUL_FICHIER_BLASON_NOIR`, `PRINTFUL_FICHIER_BLASON_BLANC`.
 - Blason validé, envoyé à Printful, puis maquettes du t-shirt pour remplacer les visuels actuels de la fiche.
