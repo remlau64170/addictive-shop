@@ -1,19 +1,19 @@
 // Informations légales de la boutique, partagées par les pages légales, le panier et les Functions (facture).
 // Une valeur à null s'affiche sur le site comme un repère visible « [À COMPLÉTER : …] » : ne jamais inventer ces données.
-// Liste complète des repères : docs/pages-legales.md.
+// Liste des choix et de ce qui reste à mettre à jour : docs/pages-legales.md.
 
-/** L'entrepreneur individuel (micro-entreprise en cours de création). */
+/** L'entrepreneur individuel (micro-entreprise en cours d'immatriculation). Pas de téléphone affiché (choix de Rémy). */
 export const EDITEUR = {
-  nom: null, // prénom et nom, suivis de « EI » sur le site
-  adresse: null, // adresse de l'entreprise (domicile ou domiciliation)
-  telephone: null,
-  siret: null,
-  immatriculation: null, // registre et numéro indiqués sur l'attestation d'immatriculation
+  nom: "Rémy ALLIOD",
+  nomEI: "Rémy ALLIOD EI",
+  adresse: "Adresse communiquée sur demande à contact@addictive-app.com",
+  siret: "En cours d'immatriculation",
+  immatriculation: "Immatriculation en cours au Registre national des entreprises",
   email: "contact@addictive-app.com",
 };
 
-/** Directeur de la publication : en principe l'entrepreneur lui-même. */
-export const DIRECTEUR_PUBLICATION = null;
+/** Directeur de la publication. */
+export const DIRECTEUR_PUBLICATION = "Rémy ALLIOD";
 
 /** Hébergeur (vérifié sur cloudflare.com/website-terms, novembre 2026). */
 export const HEBERGEUR = {
@@ -23,14 +23,14 @@ export const HEBERGEUR = {
   site: "https://www.cloudflare.com",
 };
 
-/** Médiateur de la consommation choisi (nom, adresse postale, site de saisie). */
-export const MEDIATEUR = null;
+/** Médiateur de la consommation. À remplacer par les coordonnées de CM2C après l'adhésion, avant d'ouvrir les paiements. */
+export const MEDIATEUR = "En cours de désignation";
 
-/** Adresse où renvoyer un article livré en cas de rétractation. */
-export const ADRESSE_RETOUR = null;
+/** Adresse de retour d'un article livré : jamais affichée, donnée par e-mail (dépend du centre Printful ou de Rémy). */
+export const ADRESSE_RETOUR = "communiquée par e-mail lors de la demande de rétractation";
 
-/** Messagerie qui reçoit les e-mails envoyés à contact@addictive-app.com (destinataire des messages de contact). */
-export const MESSAGERIE = null;
+/** Réception des e-mails de contact@addictive-app.com (enregistrements MX du domaine, vérifiés le 13 novembre 2026). */
+export const MESSAGERIE = "service de routage d'e-mails de Cloudflare (Email Routing), qui les transfère vers la boîte de réception de l'éditeur";
 
 export const MENTION_TVA = "TVA non applicable, art. 293 B du CGI";
 

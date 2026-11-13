@@ -11,13 +11,12 @@ import { DIRECTEUR_PUBLICATION, EDITEUR, HEBERGEUR, MENTION_TVA } from "../data/
 >
   <h2>Éditeur du site</h2>
   <p>
-    Le site addictive-app.com et sa boutique sont édités par <Info valeur={EDITEUR.nom} quoi="prénom et nom" />, entrepreneur
-    individuel (EI), sous le régime de la micro-entreprise.
+    Le site shop.addictive-app.com (boutique et articles Addictive) est édité par {EDITEUR.nomEI}, entrepreneur
+    individuel, sous le régime de la micro-entreprise.
   </p>
   <ul>
     <li>Adresse : <Info valeur={EDITEUR.adresse} quoi="adresse de l'entreprise" /></li>
     <li>E-mail : <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a></li>
-    <li>Téléphone : <Info valeur={EDITEUR.telephone} quoi="numéro de téléphone" /></li>
     <li>SIRET : <Info valeur={EDITEUR.siret} quoi="numéro SIRET" /></li>
     <li>Immatriculation : <Info valeur={EDITEUR.immatriculation} quoi="registre et numéro d'immatriculation indiqués sur l'attestation" /></li>
     <li>TVA : {MENTION_TVA}.</li>

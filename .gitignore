@@ -16,3 +16,6 @@ prive/pdf-reels/
 # Vrais livres numériques : jamais dans git, jamais publics
 prive/pdf/
 prive/couvertures/
+
+# Dossier privé entier (blason, PDF, couvertures) : jamais dans git
+prive/

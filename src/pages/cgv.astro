@@ -1,7 +1,7 @@
 ---
 import LegalPage from "../components/LegalPage.astro";
 import Info from "../components/Info.astro";
-import { ADRESSE_RETOUR, CGV_VERSION_TEXTE, EDITEUR, MEDIATEUR, MENTION_TVA } from "../data/legal.js";
+import { CGV_VERSION_TEXTE, EDITEUR, MEDIATEUR, MENTION_TVA } from "../data/legal.js";
 import { CONSENTEMENT_RETRACTATION, CONSENTEMENT_RETRACTATION_MIXTE } from "../data/consentement.js";
 import { LIVRAISON } from "../data/boutique.js";
 
@@ -16,13 +16,12 @@ const forfait = (LIVRAISON.montant / 100).toFixed(2).replace(".", ",");
 >
   <h2>1. Le vendeur</h2>
   <p>
-    La boutique Addictive est exploitée par <Info valeur={EDITEUR.nom} quoi="prénom et nom" />, entrepreneur individuel (EI),
+    La boutique Addictive est exploitée par {EDITEUR.nomEI}, entrepreneur individuel,
     micro-entreprise.
   </p>
   <ul>
     <li>Adresse : <Info valeur={EDITEUR.adresse} quoi="adresse de l'entreprise" /></li>
     <li>E-mail : <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a></li>
-    <li>Téléphone : <Info valeur={EDITEUR.telephone} quoi="numéro de téléphone" /></li>
     <li>SIRET : <Info valeur={EDITEUR.siret} quoi="numéro SIRET" /></li>
     <li>Immatriculation : <Info valeur={EDITEUR.immatriculation} quoi="registre et numéro d'immatriculation" /></li>
   </ul>
@@ -94,8 +93,8 @@ const forfait = (LIVRAISON.montant / 100).toFixed(2).replace(".", ",");
   <ul>
     <li>Pays de livraison : {PAYS}.</li>
     <li>
-      Délai indicatif : {LIVRAISON.delaiJours.min} à {LIVRAISON.delaiJours.max} jours ouvrés (fabrication à la commande, puis
-      expédition). Dans tous les cas, l'article est livré au plus tard 30 jours après la commande.
+      Fabriqué à la commande, livré en {LIVRAISON.delaiJours.min} à {LIVRAISON.delaiJours.max} jours (délai indicatif). Dans
+      tous les cas, l'article est livré au plus tard 30 jours après la commande.
     </li>
     <li>Le suivi du colis vous est envoyé par e-mail par Printful, au moment de l'expédition.</li>
     <li>
@@ -137,9 +136,13 @@ const forfait = (LIVRAISON.montant / 100).toFixed(2).replace(".", ",");
       obligatoire).
     </li>
     <li>
-      <strong>Retour de l'article</strong> : renvoyez-le au plus tard 14 jours après nous avoir informé de votre décision, à
-      l'adresse suivante : <Info valeur={ADRESSE_RETOUR} quoi="adresse de retour des articles" />. Les frais de retour sont à votre
-      charge.
+      <strong>Retour de l'article</strong> : écrivez-nous d'abord à{" "}
+      <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a> ; l'adresse de retour vous est communiquée par e-mail. Renvoyez
+      ensuite l'article au plus tard 14 jours après nous avoir informés de votre décision. Les frais de retour sont à votre charge.
+    </li>
+    <li>
+      <strong>Remboursement sans retour</strong> : nous pouvons vous proposer d'être remboursé sans renvoyer l'article. Dans ce cas,
+      vous le gardez et n'avez rien à expédier.
     </li>
     <li>
       <strong>Remboursement</strong> : nous vous remboursons au plus tard 14 jours après avoir été informés de votre décision, avec
@@ -266,7 +269,7 @@ const forfait = (LIVRAISON.montant / 100).toFixed(2).replace(".", ",");
   <div class="formulaire">
     <p>(Veuillez compléter et renvoyer le présent formulaire uniquement si vous souhaitez vous rétracter du contrat.)</p>
     <p>
-      A l'attention de <Info valeur={EDITEUR.nom} quoi="prénom et nom" /> (EI), <Info valeur={ADRESSE_RETOUR ?? EDITEUR.adresse} quoi="adresse géographique" />,
+      A l'attention de {EDITEUR.nomEI} ({EDITEUR.adresse.toLowerCase()}),
       {EDITEUR.email} :
     </p>
     <p>

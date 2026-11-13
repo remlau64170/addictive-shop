@@ -19,6 +19,10 @@ export const GET: APIRoute = async () => {
     "/faq/",
     "/contact/",
     "/aide/",
+    "/mentions-legales/",
+    "/cgv/",
+    "/confidentialite/",
+    "/cookies/",
   ];
   const lastmod = new Map(articles.map((article) => [`/articles/${article.id}/`, lastModified(article).toISOString().slice(0, 10)]));
   const urls = paths

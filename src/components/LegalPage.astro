@@ -11,7 +11,7 @@ interface Props {
 }
 
 const { title, description, miseAJour } = Astro.props;
-const complet = [EDITEUR.nom, EDITEUR.adresse, EDITEUR.telephone, EDITEUR.siret, EDITEUR.immatriculation, MEDIATEUR, ADRESSE_RETOUR, DIRECTEUR_PUBLICATION, MESSAGERIE].every(Boolean);
+const complet = [EDITEUR.nom, EDITEUR.adresse, EDITEUR.siret, EDITEUR.immatriculation, MEDIATEUR, ADRESSE_RETOUR, DIRECTEUR_PUBLICATION, MESSAGERIE].every(Boolean);
 ---
 
 <Base title={title} description={description} noindex={!complet}>

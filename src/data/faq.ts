@@ -13,7 +13,7 @@ export const FAQ = [
   },
   {
     question: "Quels sont les délais pour les produits physiques ?",
-    answer: "Le t-shirt est fabriqué à la commande, puis livré en 4 à 7 jours. La livraison coûte 4,90 € par commande en France, en Belgique, au Luxembourg, en Allemagne, en Espagne, en Italie, aux Pays-Bas et au Portugal. Elle est offerte si votre commande contient aussi un livre numérique.",
+    answer: "Le t-shirt est fabriqué à la commande, puis livré en 4 à 7 jours (délai indicatif, 30 jours maximum). La livraison coûte 4,90 € par commande en France, en Belgique, au Luxembourg, en Allemagne, en Espagne, en Italie, aux Pays-Bas et au Portugal. Elle est offerte si votre commande contient aussi un livre numérique.",
   },
   {
     question: "Puis-je retourner un produit ?",

@@ -16,8 +16,8 @@ import { EDITEUR, HEBERGEUR, MESSAGERIE } from "../data/legal.js";
 
   <h2>Responsable du traitement</h2>
   <p>
-    <Info valeur={EDITEUR.nom} quoi="prénom et nom" />, entrepreneur individuel (EI),{" "}
-    <Info valeur={EDITEUR.adresse} quoi="adresse de l'entreprise" />. Contact :
+    {EDITEUR.nomEI}, entrepreneur individuel.{" "}
+    {EDITEUR.adresse}. Contact :
     <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a>.
   </p>
 
