@@ -22,6 +22,12 @@ const { Content } = await render(produit);
 const name = productName(produit);
 const shelf = SHOP_SHELVES.find((item) => item.id === produit.data.shelf);
 const numerique = produit.data.shelf === "numeriques";
+/** Description pour les moteurs : l'accroche entière si elle tient en 160 caractères, sinon ses phrases complètes qui tiennent. */
+const resume = produit.data.summary;
+const descriptionSeo =
+  resume.length <= 160
+    ? resume
+    : (resume.match(/[^.!?]+[.!?]+/g) ?? [resume]).reduce((acc, phrase) => ((acc + phrase).trim().length <= 160 ? acc + phrase : acc), "").trim() || resume.slice(0, 157) + "…";
 /** Produit physique réellement en vente (couleurs, tailles), sinon undefined. */
 const vente = numerique ? undefined : PHYSIQUES_EN_VENTE[produit.id as keyof typeof PHYSIQUES_EN_VENTE];
 const guideTailles = (vente?.guideTailles ?? {}) as Record<string, { largeur: number; longueur: number }>;
@@ -70,7 +76,7 @@ const structured = {
 };
 ---
 
-<Base title={name} description={produit.data.summary} wide image={images[0]!.src} ogType="product">
+<Base title={name} description={descriptionSeo} wide image={images[0]!.src} ogType="product">
   <JsonLd data={structured} />
   <div class="wrap wrap-page">
     <Breadcrumb
