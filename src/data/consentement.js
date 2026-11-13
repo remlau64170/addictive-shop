@@ -7,3 +7,15 @@ export const CONSENTEMENT_RETRACTATION =
 
 /** Valeur envoyée par la case cochée. */
 export const CONSENTEMENT_VALEUR = "oui";
+
+/**
+ * Panier mixte (guide PDF + article livré) : même accord, précisé pour ne viser que les contenus numériques.
+ * Les articles livrés gardent leur délai de rétractation de 14 jours.
+ */
+export const CONSENTEMENT_RETRACTATION_MIXTE = `${CONSENTEMENT_RETRACTATION} Cet accord concerne uniquement les contenus numériques : les articles livrés gardent leur délai de rétractation de 14 jours.`;
+
+/** Mention des articles livrés, sur la facture et dans le panier. */
+export const RETRACTATION_PHYSIQUE = "Articles livrés : délai de rétractation de 14 jours à compter de leur réception.";
+
+/** Le texte de la case selon le contenu du panier (le serveur fait le même choix et enregistre ce texte exact). */
+export const texteConsentement = (physique) => (physique ? CONSENTEMENT_RETRACTATION_MIXTE : CONSENTEMENT_RETRACTATION);

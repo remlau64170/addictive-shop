@@ -1,7 +1,7 @@
 ---
 import { render } from "astro:content";
-import { Check, Download, Package, ShieldCheck } from "@lucide/astro";
-import { CONSENTEMENT_RETRACTATION, CONSENTEMENT_VALEUR } from "../../data/consentement.js";
+import { Check, Package, ShieldCheck } from "@lucide/astro";
+import { LIVRAISON, PHYSIQUES_EN_VENTE, formatEuros } from "../../data/boutique.js";
 import Base from "../../layouts/Base.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import ProductCard from "../../components/ProductCard.astro";
@@ -22,8 +22,11 @@ const { Content } = await render(produit);
 const name = productName(produit);
 const shelf = SHOP_SHELVES.find((item) => item.id === produit.data.shelf);
 const numerique = produit.data.shelf === "numeriques";
-/** Achat possible seulement si la boutique est ouverte (réglage de construction) et pour un produit numérique. */
-const achat = BOUTIQUE_OUVERTE && numerique && produit.data.price !== null;
+/** Produit physique réellement en vente (couleurs, tailles), sinon undefined. */
+const vente = numerique ? undefined : PHYSIQUES_EN_VENTE[produit.id as keyof typeof PHYSIQUES_EN_VENTE];
+const guideTailles = (vente?.guideTailles ?? {}) as Record<string, { largeur: number; longueur: number }>;
+/** Achat possible seulement si la boutique est ouverte (réglage de construction), avec un prix, et pour un produit numérique ou un produit physique en vente. */
+const achat = BOUTIQUE_OUVERTE && produit.data.price !== null && (numerique || Boolean(vente));
 const images = produit.data.images;
 // Produits liés : ceux du même rayon d'abord.
 const liees = produits
@@ -103,7 +106,7 @@ const structured = {
         <p class="price">{formatPrice(produit.data.price)}</p>
         <p class="lead">{produit.data.summary}</p>
         {
-          produit.data.sizes && (
+          produit.data.sizes && !(achat && vente) && (
             <div class="sizes">
               <p class="label">Tailles</p>
               <ul>{produit.data.sizes.map((size) => <li>{size}</li>)}</ul>
@@ -112,22 +115,59 @@ const structured = {
         }
         {
           achat ? (
-            <form class="buy-form" method="post" action="/api/checkout" novalidate>
-              <input type="hidden" name="produit" value={produit.id} />
-              <fieldset class="consent">
-                <legend class="consent-title">
-                  <Download size={16} aria-hidden="true" />
-                  Accès dès le paiement
-                </legend>
-                <label class="consent-choice">
-                  <input type="checkbox" name="consentement" value={CONSENTEMENT_VALEUR} required aria-describedby={`consent-hint-${produit.id}`} />
-                  <span>{CONSENTEMENT_RETRACTATION}</span>
-                </label>
-                <p class="consent-hint" id={`consent-hint-${produit.id}`} hidden>Cochez la case pour recevoir votre guide immédiatement.</p>
-              </fieldset>
-              <button class="button add" type="submit">Acheter</button>
-              <p class="soon">Paiement sécurisé sur la page Stripe. Téléchargement juste après le paiement.</p>
-              <p class="pay-message" role="status" hidden></p>
+            <form class="buy-form" data-produit={produit.id} data-numerique={numerique ? "oui" : undefined} novalidate>
+              {
+                vente && (
+                  <>
+                    <fieldset class="choice">
+                      <legend class="label">Couleur</legend>
+                      <div class="swatches">
+                        {vente.couleurs.map((couleur, index) => (
+                          <label class="swatch">
+                            <input type="radio" name="couleur" value={couleur.id} checked={index === 0} />
+                            <span class={`dot dot-${couleur.id}`} aria-hidden="true" />
+                            {couleur.nom}
+                          </label>
+                        ))}
+                      </div>
+                    </fieldset>
+                    <div class="choice">
+                      <label class="label" for={`taille-${produit.id}`}>Taille</label>
+                      <select class="size-select" id={`taille-${produit.id}`} name="taille" required>
+                        <option value="">Choisir une taille</option>
+                        {vente.tailles.map((taille) => <option value={taille}>{taille}</option>)}
+                      </select>
+                      <p class="choice-hint" hidden>Choisissez une taille pour ajouter le t-shirt au panier.</p>
+                    </div>
+                    <details class="size-guide">
+                      <summary>Guide des tailles</summary>
+                      <p>Mesures du t-shirt posé à plat, en centimètres. Coupe unisexe ajustée : prenez votre taille habituelle.</p>
+                      <table>
+                        <thead><tr><th scope="col">Taille</th><th scope="col">Largeur</th><th scope="col">Longueur</th></tr></thead>
+                        <tbody>
+                          {vente.tailles.map((taille) => (
+                            <tr><th scope="row">{taille}</th><td>{guideTailles[taille].largeur}</td><td>{guideTailles[taille].longueur}</td></tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </details>
+                  </>
+                )
+              }
+              <button class="button add" type="submit">Ajouter au panier</button>
+              {
+                vente ? (
+                  <>
+                    <p class="soon">+ {formatEuros(LIVRAISON.montant)} de livraison, {LIVRAISON.delaiJours.min} à {LIVRAISON.delaiJours.max} jours.</p>
+                    <p class="offer">Livraison offerte en ajoutant un guide PDF.</p>
+                  </>
+                ) : (
+                  <p class="soon">Téléchargement juste après le paiement.</p>
+                )
+              }
+              <p class="pay-message" role="status" hidden>
+                Ajouté au panier. <a href="/panier/">Voir le panier</a>
+              </p>
             </form>
           ) : (
             <>
@@ -320,58 +360,123 @@ const structured = {
     font-size: 0.875rem;
   }
 
-  .consent {
-    margin: 1.5rem 0 0;
+  .choice {
+    margin: 1.25rem 0 0;
     padding: 0;
     border: 0;
     min-width: 0;
   }
 
-  .consent-title {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
+  .choice .label {
     margin-bottom: 0.5rem;
     padding: 0;
-    color: var(--foreground);
-    font-size: 0.875rem;
-    font-weight: 600;
   }
 
-  .consent-title :global(svg) {
-    color: var(--primary);
-  }
-
-  .consent-choice {
+  .swatches {
     display: flex;
-    align-items: flex-start;
-    gap: 0.625rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .swatch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    font-size: 0.9375rem;
+    cursor: pointer;
+  }
+
+  .swatch:has(input:checked) {
+    border-color: var(--primary);
+    background: color-mix(in oklch, var(--primary) 12%, transparent);
+  }
+
+  .swatch:has(input:focus-visible) {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .swatch input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .dot {
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+  }
+
+  .dot-noir {
+    background: #111;
+  }
+
+  .dot-blanc {
+    background: #f4f4f4;
+  }
+
+  .size-select {
+    width: 100%;
+    max-width: 18rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--card);
+    color: var(--foreground);
+    font: inherit;
+  }
+
+  .choice-hint {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .size-guide {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .size-guide summary {
+    width: fit-content;
+    color: var(--primary);
+    cursor: pointer;
+  }
+
+  .size-guide p {
+    margin-top: 0.5rem;
+    color: var(--muted-foreground);
+  }
+
+  .size-guide table {
+    width: 100%;
+    max-width: 22rem;
+    margin-top: 0.5rem;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .size-guide th,
+  .size-guide td {
+    padding: 0.35rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .offer {
+    margin-top: 0.25rem;
     color: var(--muted-foreground);
     font-size: 0.875rem;
-    line-height: 1.5;
-    cursor: pointer;
-  }
-
-  .consent-choice input {
-    flex: none;
-    width: 1.125rem;
-    height: 1.125rem;
-    margin: 0.15rem 0 0;
-    accent-color: var(--primary);
-    cursor: pointer;
-  }
-
-  .consent-hint {
-    margin: 0.5rem 0 0 1.75rem;
-    color: var(--foreground);
-    font-size: 0.875rem;
-  }
-
-  .consent + .add {
-    margin-top: 1rem;
   }
 
   .pay-message {
+
     margin-top: 0.75rem;
     padding: 0.75rem 1rem;
     border: 1px solid var(--border);
@@ -567,39 +672,26 @@ const structured = {
 </script>
 
 <script>
-  // Retour de Stripe (paiement annulé, indisponible…) : un message court sous le bouton « Acheter ».
-  const MESSAGES: Record<string, string> = {
-    annule: "Paiement annulé : rien n'a été débité. Vous pouvez réessayer quand vous voulez.",
-    indisponible: "L'achat de ce produit n'est pas encore disponible.",
-    erreur: "Le paiement n'a pas pu démarrer. Réessayez dans un instant.",
-    invalide: "Ce produit n'a pas été reconnu.",
-  };
-  // « consentement » n'a pas de message ici : il s'affiche sous la case (voir plus bas).
+  import { ajouterAuPanier } from "../../scripts/panier";
 
-  // Case « Accès dès le paiement » : sans elle, pas de paiement, et un message calme sous la case (pas d'alerte).
+  // « Ajouter au panier » : le panier est gardé dans ce navigateur, sans compte client.
   for (const form of document.querySelectorAll<HTMLFormElement>(".buy-form")) {
-    const box = form.querySelector<HTMLInputElement>('input[name="consentement"]');
-    const hint = form.querySelector<HTMLElement>(".consent-hint");
-    if (!box || !hint) continue;
+    const message = form.querySelector<HTMLElement>(".pay-message");
+    const taille = form.querySelector<HTMLSelectElement>('select[name="taille"]');
+    const indice = form.querySelector<HTMLElement>(".choice-hint");
+    taille?.addEventListener("change", () => {
+      if (taille.value && indice) indice.hidden = true;
+    });
     form.addEventListener("submit", (event) => {
-      if (box.checked) return;
       event.preventDefault();
-      hint.hidden = false;
-      box.focus();
+      if (taille && !taille.value) {
+        if (indice) indice.hidden = false;
+        taille.focus();
+        return;
+      }
+      const couleur = form.querySelector<HTMLInputElement>('input[name="couleur"]:checked')?.value;
+      ajouterAuPanier({ id: form.dataset.produit!, couleur, taille: taille?.value }, form.dataset.numerique === "oui");
+      if (message) message.hidden = false;
     });
-    box.addEventListener("change", () => {
-      if (box.checked) hint.hidden = true;
-    });
-  }
-  // Retour du serveur sans la case cochée (navigateur sans JavaScript) : même message, au même endroit.
-  if (new URLSearchParams(location.search).get("paiement") === "consentement") {
-    const hint = document.querySelector<HTMLElement>(".consent-hint");
-    if (hint) hint.hidden = false;
-  }
-  const zone = document.querySelector<HTMLElement>(".pay-message");
-  const motif = new URLSearchParams(location.search).get("paiement");
-  if (zone && motif && MESSAGES[motif]) {
-    zone.textContent = MESSAGES[motif];
-    zone.hidden = false;
   }
 </script>

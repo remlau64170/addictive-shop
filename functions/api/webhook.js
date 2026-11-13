@@ -1,9 +1,12 @@
 // POST /api/webhook : événements Stripe. La signature est vérifiée avant toute lecture du contenu.
-// Aujourd'hui : on enregistre seulement qu'une commande a été payée (identifiants, aucune donnée client).
-// Plus tard : c'est ici que partira la commande d'impression à la demande chez Printful.
-import { verifyWebhook } from "../_lib/stripe.js";
+// Commande payée avec un article livré : création de la commande Printful (brouillon tant que Stripe est en test).
+// En cas d'échec Printful, on répond 500 : Stripe renvoie l'événement automatiquement (pendant 3 jours, de plus en plus
+// espacé) et prévient le titulaire du compte Stripe par e-mail si les échecs durent. L'échec est aussi journalisé.
+import { stripe, verifyWebhook } from "../_lib/stripe.js";
+import { creerCommandePrintful } from "../_lib/printful.js";
 
 const reply = (message, status) => new Response(message, { status, headers: { "Cache-Control": "no-store" } });
+const SEPT_JOURS = 7 * 86400;
 
 export async function onRequestPost({ request, env }) {
   if (!env.STRIPE_WEBHOOK_SECRET) return reply("Webhook non configuré.", 500);
@@ -23,22 +26,46 @@ export async function onRequestPost({ request, env }) {
   // Mode test uniquement pendant cette phase.
   if (event.livemode) return reply("Événement du mode réel ignoré.", 200);
 
-  // Stripe peut renvoyer le même événement : on ne traite chaque identifiant qu'une fois.
-  if (env.TELECHARGEMENTS) {
-    const seen = `evenement:${event.id}`;
-    if (await env.TELECHARGEMENTS.get(seen)) return reply("Déjà reçu.", 200);
-    await env.TELECHARGEMENTS.put(seen, "1", { expirationTtl: 7 * 86400 });
-  }
+  // Stripe peut renvoyer le même événement : chaque identifiant n'est traité qu'une fois (marqué seulement après succès).
+  const vu = `evenement:${event.id}`;
+  if (env.TELECHARGEMENTS && (await env.TELECHARGEMENTS.get(vu))) return reply("Déjà reçu.", 200);
 
   if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
-    const session = event.data?.object ?? {};
-    if (session.payment_status === "paid") {
-      const delivery = session.metadata?.delivery;
-      console.log(JSON.stringify({ webhook: event.type, evenement: event.id, session: session.id, produit: session.metadata?.slug, livraison: delivery }));
-      if (delivery === "physical") {
-        // À venir (Printful) : créer la commande d'impression à partir de la session, adresse de livraison incluse.
+    const resume = event.data?.object ?? {};
+    const livraison = resume.metadata?.delivery;
+    console.log(JSON.stringify({ webhook: event.type, evenement: event.id, session: resume.id, livraison }));
+
+    if (resume.payment_status === "paid" && (livraison === "physical" || livraison === "mixed")) {
+      const cle = `printful:${resume.id}`;
+      const deja = env.TELECHARGEMENTS ? await env.TELECHARGEMENTS.get(cle) : null;
+      if (!deja) {
+        try {
+          // Session complète (lignes, adresse) relue chez Stripe : on ne se fie pas au seul contenu de l'événement.
+          const session = await stripe(env, `/checkout/sessions/${resume.id}`, { query: { expand: ["line_items.data.price.product"] } });
+          const resultat = await creerCommandePrintful(env, session);
+          await env.TELECHARGEMENTS?.put(cle, JSON.stringify(resultat), { expirationTtl: 90 * 86400 });
+          await env.TELECHARGEMENTS?.delete(`printful-echec:${resume.id}`);
+          console.log(JSON.stringify({ printful: resultat.statut, commande: resultat.id, externalId: resultat.externalId, brouillon: resultat.brouillon, session: resume.id }));
+          // Trace dans Stripe : le paiement indique la commande Printful correspondante.
+          if (resultat.id && session.payment_intent) {
+            await stripe(env, `/payment_intents/${session.payment_intent}`, {
+              method: "POST",
+              body: { metadata: { printful_commande: String(resultat.id), printful_external_id: resultat.externalId } },
+            }).catch(() => {});
+          }
+        } catch (error) {
+          const echecCle = `printful-echec:${resume.id}`;
+          const precedent = JSON.parse((await env.TELECHARGEMENTS?.get(echecCle)) ?? "{}");
+          const echec = { tentatives: (precedent.tentatives ?? 0) + 1, erreur: String(error.message).slice(0, 300), date: new Date().toISOString() };
+          await env.TELECHARGEMENTS?.put(echecCle, JSON.stringify(echec), { expirationTtl: 30 * 86400 });
+          console.error(JSON.stringify({ alerte: "COMMANDE PRINTFUL NON CRÉÉE", session: resume.id, ...echec }));
+          // 500 : Stripe renverra l'événement plus tard (reprise automatique).
+          return reply("Commande Printful non créée, nouvel essai à venir.", 500);
+        }
       }
     }
   }
+
+  await env.TELECHARGEMENTS?.put(vu, "1", { expirationTtl: SEPT_JOURS });
   return reply("OK", 200);
 }

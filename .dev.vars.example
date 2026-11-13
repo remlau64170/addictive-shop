@@ -7,3 +7,13 @@ STRIPE_WEBHOOK_SECRET=
 DOWNLOAD_SIGNING_SECRET=
 # CHECKOUT_ENABLED : « true » autorise la création d'un paiement. Absent ou autre valeur : le paiement est refusé côté serveur.
 CHECKOUT_ENABLED=true
+# Printful : jeton de la boutique API (Paramètres Printful > API). Jamais dans git.
+PRINTFUL_API_TOKEN=
+# Fichiers du blason : adresse publique du PNG ou « id:12345 » (bibliothèque Printful). À remplir quand le blason est validé.
+PRINTFUL_FICHIER_BLASON_NOIR=
+PRINTFUL_FICHIER_BLASON_BLANC=
+# Brouillons de test seulement : fichier public quelconque, utilisé si le blason n'est pas encore branché.
+PRINTFUL_FICHIER_ESSAI_URL=
+# Confirmation automatique des commandes Printful (fabrication et facturation). Laisser à false :
+# même à true, elle est refusée tant que Stripe est en mode test.
+PRINTFUL_CONFIRM_ORDERS=false

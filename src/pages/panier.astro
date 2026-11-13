@@ -1,11 +1,400 @@
 ---
+import { Download } from "@lucide/astro";
 import Base from "../layouts/Base.astro";
+import { BOUTIQUE_OUVERTE } from "../data/site";
+import { LIVRAISON, PHYSIQUES_EN_VENTE, formatEuros } from "../data/boutique.js";
+import { CONSENTEMENT_RETRACTATION, CONSENTEMENT_RETRACTATION_MIXTE, CONSENTEMENT_VALEUR, RETRACTATION_PHYSIQUE } from "../data/consentement.js";
+import { getProduits, productName, thumbnail } from "../lib/produits";
+
+// Catalogue affiché par le panier (le serveur revérifie tout au moment de payer).
+const catalogue = Object.fromEntries(
+  (await getProduits())
+    .filter((p) => p.data.price !== null && (p.data.shelf === "numeriques" || p.id in PHYSIQUES_EN_VENTE))
+    .map((p) => [
+      p.id,
+      {
+        nom: productName(p),
+        prix: Math.round((p.data.price ?? 0) * 100),
+        numerique: p.data.shelf === "numeriques",
+        image: thumbnail(p.data.images[0].src),
+        couleurs: Object.fromEntries((PHYSIQUES_EN_VENTE[p.id as keyof typeof PHYSIQUES_EN_VENTE]?.couleurs ?? []).map((c) => [c.id, c.nom])),
+      },
+    ]),
+);
+const donnees = JSON.stringify({ catalogue, livraison: LIVRAISON });
 ---
 
-<Base title="Panier" description="Votre panier Addictive : la boutique ouvre bientôt." noindex>
-  <div class="empty">
-    <h1>Panier</h1>
-    <p class="lead">Votre panier est vide : la boutique ouvre bientôt.</p>
-    <p class="section"><a class="button" href="/boutique/">Voir la boutique</a></p>
-  </div>
+<Base title="Panier" description="Votre panier Addictive : produits numériques et produits physiques, paiement sécurisé sur la page Stripe." noindex>
+  {
+    BOUTIQUE_OUVERTE ? (
+      <div class="wrap-panier">
+        <h1>Panier</h1>
+        <div class="vide" hidden>
+          <p class="lead">Votre panier est vide.</p>
+          <p class="section"><a class="button" href="/boutique/">Voir la boutique</a></p>
+        </div>
+
+        <form class="panier" method="post" action="/api/checkout" novalidate hidden>
+          <ul class="lignes" aria-label="Articles du panier"></ul>
+
+          <dl class="totaux">
+            <div><dt>Sous-total</dt><dd data-sous-total></dd></div>
+            <div data-ligne-livraison hidden><dt>Livraison ({LIVRAISON.delaiJours.min} à {LIVRAISON.delaiJours.max} jours)</dt><dd data-livraison></dd></div>
+            <div class="total"><dt>Total</dt><dd data-total></dd></div>
+          </dl>
+          <p class="offer" data-offre hidden>Livraison offerte en ajoutant un guide PDF.</p>
+          <p class="note" data-offerte hidden>Livraison offerte : votre panier contient un guide PDF et un article livré.</p>
+          <p class="note" data-physique hidden>{RETRACTATION_PHYSIQUE} L'adresse de livraison vous sera demandée sur la page de paiement.</p>
+
+          <fieldset class="consent" data-consent hidden>
+            <legend class="consent-title">
+              <Download size={16} aria-hidden="true" />
+              Accès dès le paiement
+            </legend>
+            <label class="consent-choice">
+              <input type="checkbox" name="consentement" value={CONSENTEMENT_VALEUR} aria-describedby="consent-hint" />
+              <span data-texte-seul>{CONSENTEMENT_RETRACTATION}</span>
+              <span data-texte-mixte hidden>{CONSENTEMENT_RETRACTATION_MIXTE}</span>
+            </label>
+            <p class="consent-hint" id="consent-hint" hidden>Cochez la case pour recevoir votre guide immédiatement.</p>
+          </fieldset>
+
+          <input type="hidden" name="panier" />
+          <button class="button pay" type="submit">Payer</button>
+          <p class="note">Paiement sécurisé sur la page Stripe.</p>
+          <p class="pay-message" role="status" hidden></p>
+        </form>
+        <script type="application/json" id="donnees-panier" set:html={donnees} />
+      </div>
+    ) : (
+      <div class="empty">
+        <h1>Panier</h1>
+        <p class="lead">Votre panier est vide : la boutique ouvre bientôt.</p>
+        <p class="section"><a class="button" href="/boutique/">Voir la boutique</a></p>
+      </div>
+    )
+  }
 </Base>
+
+<style>
+  .wrap-panier {
+    max-width: 42rem;
+    margin-inline: auto;
+  }
+
+  .lignes {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .lignes :global(li) {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: 0.75rem 1rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--card);
+  }
+
+  .lignes :global(img) {
+    width: 4.5rem;
+    height: 4.5rem;
+    object-fit: cover;
+    border-radius: var(--radius-inner);
+  }
+
+  .lignes :global(.nom) {
+    font-weight: 600;
+  }
+
+  .lignes :global(.detail),
+  .lignes :global(.prix-ligne) {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .lignes :global(.actions) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .lignes :global(.qte) {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+  }
+
+  .lignes :global(.qte button) {
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    background: none;
+    color: var(--foreground);
+    font-size: 1.125rem;
+    cursor: pointer;
+  }
+
+  .lignes :global(.qte span) {
+    min-width: 1.5rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lignes :global(.retirer) {
+    min-height: 2.75rem;
+    padding: 0 0.5rem;
+    border: 0;
+    background: none;
+    color: var(--muted-foreground);
+    font: inherit;
+    font-size: 0.875rem;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .totaux {
+    display: grid;
+    gap: 0.5rem;
+    margin: 1.5rem 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .totaux div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .totaux div[hidden] {
+    display: none;
+  }
+
+  .totaux dd {
+    margin: 0;
+  }
+
+  .totaux .total {
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+
+  .offer,
+  .note {
+    margin-top: 0.5rem;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .consent {
+    margin: 1.5rem 0 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .consent-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+    padding: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .consent-title :global(svg) {
+    color: var(--primary);
+  }
+
+  .consent-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+
+  .consent-choice input {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0.15rem 0 0;
+    accent-color: var(--primary);
+    cursor: pointer;
+  }
+
+  .consent-hint {
+    margin: 0.5rem 0 0 1.75rem;
+    font-size: 0.875rem;
+  }
+
+  .pay {
+    width: 100%;
+    min-height: 3.25rem;
+    margin-top: 1.25rem;
+  }
+
+  .pay-message {
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-inner);
+    background: var(--card);
+    font-size: 0.9375rem;
+  }
+
+  @media (min-width: 768px) {
+    .pay {
+      width: auto;
+      min-width: 18rem;
+    }
+  }
+</style>
+
+<script>
+  import { ecrirePanier, lirePanier, surChangementPanier, type LignePanier } from "../scripts/panier";
+  import { formatEuros, livraisonOfferte } from "../data/boutique.js";
+
+  type Produit = { nom: string; prix: number; numerique: boolean; image: string; couleurs: Record<string, string> };
+  const brut = document.getElementById("donnees-panier");
+  if (brut) {
+    const { catalogue, livraison } = JSON.parse(brut.textContent ?? "{}") as { catalogue: Record<string, Produit>; livraison: { montant: number } };
+    const form = document.querySelector<HTMLFormElement>("form.panier")!;
+    const vide = document.querySelector<HTMLElement>(".vide")!;
+    const liste = form.querySelector<HTMLUListElement>(".lignes")!;
+    const champ = form.querySelector<HTMLInputElement>('input[name="panier"]')!;
+    const consent = form.querySelector<HTMLElement>("[data-consent]")!;
+    const caseAccord = consent.querySelector<HTMLInputElement>('input[name="consentement"]')!;
+    const indice = consent.querySelector<HTMLElement>(".consent-hint")!;
+    const montrer = (selecteur: string, visible: boolean) => {
+      const el = form.querySelector<HTMLElement>(selecteur);
+      if (el) el.hidden = !visible;
+    };
+    const texte = (selecteur: string, valeur: string) => {
+      const el = form.querySelector<HTMLElement>(selecteur);
+      if (el) el.textContent = valeur;
+    };
+
+    const rendre = () => {
+      // Seuls les produits encore en vente restent dans le panier.
+      const panier = lirePanier().filter((l) => catalogue[l.id]);
+      vide.hidden = panier.length > 0;
+      form.hidden = panier.length === 0;
+      liste.replaceChildren(
+        ...panier.map((ligne, index) => {
+          const p = catalogue[ligne.id];
+          const li = document.createElement("li");
+          const img = document.createElement("img");
+          img.src = p.image;
+          img.alt = "";
+          img.width = 72;
+          img.height = 72;
+          const corps = document.createElement("div");
+          const nom = document.createElement("p");
+          nom.className = "nom";
+          nom.textContent = p.nom;
+          const detail = document.createElement("p");
+          detail.className = "detail";
+          detail.textContent = p.numerique ? "Guide PDF, téléchargement après le paiement" : `${p.couleurs[ligne.couleur ?? ""] ?? ""}, taille ${ligne.taille ?? ""}`;
+          const prix = document.createElement("p");
+          prix.className = "prix-ligne";
+          prix.textContent = `${formatEuros(p.prix)}${ligne.quantite > 1 ? ` × ${ligne.quantite}` : ""}`;
+          const actions = document.createElement("div");
+          actions.className = "actions";
+          if (!p.numerique) {
+            const qte = document.createElement("div");
+            qte.className = "qte";
+            const moins = document.createElement("button");
+            moins.type = "button";
+            moins.textContent = "−";
+            moins.setAttribute("aria-label", `Retirer un ${p.nom}`);
+            const n = document.createElement("span");
+            n.textContent = String(ligne.quantite);
+            const plus = document.createElement("button");
+            plus.type = "button";
+            plus.textContent = "+";
+            plus.setAttribute("aria-label", `Ajouter un ${p.nom}`);
+            moins.addEventListener("click", () => changer(index, -1));
+            plus.addEventListener("click", () => changer(index, 1));
+            qte.append(moins, n, plus);
+            actions.append(qte);
+          }
+          const retirer = document.createElement("button");
+          retirer.type = "button";
+          retirer.className = "retirer";
+          retirer.textContent = "Retirer";
+          retirer.addEventListener("click", () => changer(index, -ligne.quantite));
+          actions.append(retirer);
+          corps.append(nom, detail, prix, actions);
+          li.append(img, corps);
+          return li;
+        }),
+      );
+
+      const numerique = panier.filter((l) => catalogue[l.id].numerique).length;
+      const physique = panier.filter((l) => !catalogue[l.id].numerique).length;
+      const sousTotal = panier.reduce((t, l) => t + catalogue[l.id].prix * l.quantite, 0);
+      const offerte = livraisonOfferte({ numerique, physique });
+      const port = physique > 0 && !offerte ? livraison.montant : 0;
+      texte("[data-sous-total]", formatEuros(sousTotal));
+      montrer("[data-ligne-livraison]", physique > 0);
+      texte("[data-livraison]", offerte ? "Offerte" : formatEuros(port));
+      texte("[data-total]", formatEuros(sousTotal + port));
+      montrer("[data-offre]", physique > 0 && numerique === 0);
+      montrer("[data-offerte]", offerte);
+      montrer("[data-physique]", physique > 0);
+      consent.hidden = numerique === 0;
+      montrer("[data-texte-seul]", physique === 0);
+      montrer("[data-texte-mixte]", physique > 0);
+      champ.value = JSON.stringify(panier);
+    };
+
+    const changer = (index: number, delta: number) => {
+      const panier = lirePanier().filter((l) => catalogue[l.id]);
+      const ligne = panier[index];
+      if (!ligne) return;
+      ligne.quantite = Math.min(10, ligne.quantite + delta);
+      ecrirePanier(panier.filter((l: LignePanier) => l.quantite > 0));
+    };
+
+    form.addEventListener("submit", (event) => {
+      rendre();
+      if (!consent.hidden && !caseAccord.checked) {
+        event.preventDefault();
+        indice.hidden = false;
+        caseAccord.focus();
+      }
+    });
+    caseAccord.addEventListener("change", () => {
+      if (caseAccord.checked) indice.hidden = true;
+    });
+
+    // Retour de Stripe ou du serveur : un message court sous le bouton.
+    const MESSAGES: Record<string, string> = {
+      annule: "Paiement annulé : rien n'a été débité. Votre panier est toujours là.",
+      indisponible: "Un article du panier n'est pas encore disponible. Retirez-le pour continuer.",
+      erreur: "Le paiement n'a pas pu démarrer. Réessayez dans un instant.",
+      invalide: "Le panier n'a pas été reconnu. Retirez puis rajoutez vos articles.",
+    };
+    const motif = new URLSearchParams(location.search).get("paiement");
+    const zone = form.querySelector<HTMLElement>(".pay-message")!;
+    if (motif === "consentement") indice.hidden = false;
+    else if (motif && MESSAGES[motif]) {
+      zone.textContent = MESSAGES[motif];
+      zone.hidden = false;
+    }
+
+    rendre();
+    surChangementPanier(rendre);
+  }
+</script>

@@ -83,12 +83,36 @@ const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" :
 
     <div class="actions">
       <a class="icon search-link" href="/recherche/" aria-label="Recherche"><Search size={22} aria-hidden="true" /></a>
-      <a class="icon" href="/panier/" aria-label="Panier"><ShoppingCart size={22} aria-hidden="true" /></a>
+      <a class="icon cart" href="/panier/" aria-label="Panier"><ShoppingCart size={22} aria-hidden="true" /><span class="cart-count" hidden></span></a>
     </div>
   </div>
 </header>
 
 <style>
+  .cart {
+    position: relative;
+  }
+
+  .cart-count {
+    position: absolute;
+    top: 0.2rem;
+    right: 0.1rem;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    padding: 0 0.3rem;
+    border-radius: var(--radius-pill);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 1.15rem;
+    text-align: center;
+  }
+
+  .cart-count[hidden] {
+    display: none;
+  }
+
   header {
     border-bottom: 1px solid var(--border);
   }
@@ -370,4 +394,21 @@ const current = (href: string) => (path.startsWith(href.slice(0, -1)) ? "page" :
     event.preventDefault();
     go();
   });
+</script>
+
+<script>
+  import { nombreArticles, surChangementPanier } from "../scripts/panier";
+
+  // Nombre d'articles du panier sur l'icône, et dans le nom lu par les lecteurs d'écran.
+  const lien = document.querySelector<HTMLAnchorElement>("header .cart");
+  const pastille = lien?.querySelector<HTMLElement>(".cart-count");
+  const afficher = () => {
+    if (!lien || !pastille) return;
+    const n = nombreArticles();
+    pastille.textContent = String(n);
+    pastille.hidden = n === 0;
+    lien.setAttribute("aria-label", n === 0 ? "Panier" : `Panier, ${n} article${n > 1 ? "s" : ""}`);
+  };
+  afficher();
+  surChangementPanier(afficher);
 </script>

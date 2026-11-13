@@ -10,13 +10,20 @@ import Base from "../layouts/Base.astro";
       <p class="lead" data-show="verification">Vérification de votre paiement…</p>
 
       <div data-show="paye" hidden>
-        <p class="lead">Votre paiement est confirmé. <strong data-produit></strong> est prêt.</p>
-        <p class="section"><a class="button" data-lien href="#">Télécharger mon PDF</a></p>
+        <p class="lead">Votre paiement est confirmé.</p>
+        <div data-guides hidden>
+          <ul class="downloads" data-liste-guides></ul>
+        </div>
+        <div class="shipped" data-articles hidden>
+          <p class="lead">Vos articles sont fabriqués à la commande puis expédiés : livraison en 4 à 7 jours ouvrés.</p>
+          <ul data-liste-articles></ul>
+          <p class="note">Vous gardez 14 jours de rétractation à compter de la réception de vos articles.</p>
+        </div>
         <p class="note accord" data-accord-zone hidden>
           Votre accord lors de l'achat, le <span data-accord-date></span> : « <span data-accord></span> » Il figure aussi sur
           votre facture.
         </p>
-        <p class="note">
+        <p class="note" data-note-liens>
           Ce lien personnel fonctionne une seule fois, pendant <span data-minutes>15</span> minutes. Besoin d'un nouveau lien ? Rechargez
           cette page (encore <span data-restants></span> possible(s)). Le reçu de Stripe vous est envoyé par e-mail.
         </p>
@@ -44,6 +51,18 @@ import Base from "../layouts/Base.astro";
 </Base>
 
 <style>
+  .downloads,
+  .shipped ul {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: center;
+    margin-top: 1.25rem;
+  }
+
+  .shipped {
+    margin-top: 1.5rem;
+  }
+
   .merci .note {
     max-width: 34rem;
     margin: 1rem auto 0;
@@ -53,6 +72,7 @@ import Base from "../layouts/Base.astro";
 </style>
 
 <script>
+  import { ecrirePanier } from "../scripts/panier";
   const root = document.querySelector<HTMLElement>(".state")!;
   const show = (state: string) => {
     for (const block of root.querySelectorAll<HTMLElement>("[data-show]")) block.hidden = block.dataset.show !== state;
@@ -66,8 +86,32 @@ import Base from "../layouts/Base.astro";
       .then((response) => response.json())
       .then((data) => {
         if (data.etat === "paye") {
-          root.querySelector("[data-produit]")!.textContent = data.produit;
-          root.querySelector<HTMLAnchorElement>("[data-lien]")!.href = data.lien;
+          // Paiement confirmé : le panier de ce navigateur est vidé.
+          ecrirePanier([]);
+          const guides: { produit: string; lien: string }[] = data.liens ?? [];
+          const articles: { produit: string; quantite: number }[] = data.articles ?? [];
+          const listeGuides = root.querySelector("[data-liste-guides]")!;
+          listeGuides.replaceChildren(
+            ...guides.map((g) => {
+              const li = document.createElement("li");
+              const a = document.createElement("a");
+              a.className = "button";
+              a.href = g.lien;
+              a.textContent = `Télécharger « ${g.produit} »`;
+              li.append(a);
+              return li;
+            }),
+          );
+          root.querySelector<HTMLElement>("[data-guides]")!.hidden = guides.length === 0;
+          root.querySelector<HTMLElement>("[data-note-liens]")!.hidden = guides.length === 0;
+          root.querySelector("[data-liste-articles]")!.replaceChildren(
+            ...articles.map((a) => {
+              const li = document.createElement("li");
+              li.textContent = a.quantite > 1 ? `${a.produit} × ${a.quantite}` : a.produit;
+              return li;
+            }),
+          );
+          root.querySelector<HTMLElement>("[data-articles]")!.hidden = articles.length === 0;
           root.querySelector("[data-minutes]")!.textContent = String(data.minutes);
           root.querySelector("[data-restants]")!.textContent = String(data.liensRestants);
           if (data.accord) {

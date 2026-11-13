@@ -6,7 +6,7 @@
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { hmacSha256, signToken } from "../functions/_lib/stripe.js";
-import { CONSENTEMENT_RETRACTATION } from "../src/data/consentement.js";
+import { CONSENTEMENT_RETRACTATION, CONSENTEMENT_RETRACTATION_MIXTE } from "../src/data/consentement.js";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:8788";
 const racine = resolve(import.meta.dirname, "..");
@@ -81,8 +81,6 @@ r = await fetch(`${BASE}/api/commande?session_id=nimporte-quoi`);
 verifier("commande : identifiant de session invalide refusé", r.status === 400, r.status);
 r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "../etc" }), redirect: "manual" });
 verifier("paiement : produit invalide refusé", r.status === 303 && /paiement=invalide/.test(r.headers.get("location") ?? ""), r.status);
-r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "t-shirt-sois-addict", consentement: "oui" }), redirect: "manual" });
-verifier("paiement : produit physique pas encore achetable", r.status === 303 && /paiement=(indisponible|erreur)/.test(r.headers.get("location") ?? ""), r.headers.get("location"));
 
 // 4 bis. Case « Accès dès le paiement »
 r = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ produit: "serie-30" }), redirect: "manual" });
@@ -102,6 +100,42 @@ if (idSession && vars.STRIPE_SECRET_KEY) {
   verifier("pied de facture : date et heure de l'accord", /le \d{1,2} \S+ \d{4} à \d{2}:\d{2} \(heure de Paris\)/.test(pied), pied.match(/le .*?\(heure de Paris\)/)?.[0]);
   verifier("pied de facture : mention de TVA", pied.includes("TVA non applicable, art. 293 B du CGI"));
   await fetch(`https://api.stripe.com/v1/checkout/sessions/${idSession}/expire`, { method: "POST", headers: { Authorization: `Bearer ${vars.STRIPE_SECRET_KEY}` } });
+}
+
+// 4 ter. Panier : t-shirt seul, t-shirt + PDF, PDF seul, gourde (pas en vente)
+const sessionDe = async (panier, consentement) => {
+  const corps = new URLSearchParams({ panier: JSON.stringify(panier) });
+  if (consentement) corps.set("consentement", "oui");
+  const rep = await fetch(`${BASE}/api/checkout`, { method: "POST", body: corps, redirect: "manual" });
+  const id = (rep.headers.get("location") ?? "").match(/cs_test_[A-Za-z0-9]+/)?.[0];
+  if (!id) return { rep };
+  const s = await fetch(`https://api.stripe.com/v1/checkout/sessions/${id}?expand[]=shipping_options.shipping_rate&expand[]=line_items`, { headers: { Authorization: `Bearer ${vars.STRIPE_SECRET_KEY}` } }).then((x) => x.json());
+  await fetch(`https://api.stripe.com/v1/checkout/sessions/${id}/expire`, { method: "POST", headers: { Authorization: `Bearer ${vars.STRIPE_SECRET_KEY}` } });
+  return { rep, s };
+};
+const tshirt = { id: "t-shirt-sois-addict", couleur: "noir", taille: "M", quantite: 1 };
+if (vars.STRIPE_SECRET_KEY) {
+  let { s } = await sessionDe([tshirt]);
+  const port = (x) => x?.shipping_options?.[0]?.shipping_amount;
+  verifier("t-shirt seul : livraison 4,90 €", port(s) === 490, port(s));
+  verifier("t-shirt seul : adresse obligatoire, Suisse exclue", (s?.shipping_address_collection?.allowed_countries ?? []).length === 8 && !s.shipping_address_collection.allowed_countries.includes("CH"), s?.shipping_address_collection?.allowed_countries?.join(","));
+  verifier("t-shirt seul : 29 € et variante dans le nom", s?.line_items?.data?.[0]?.amount_total === 2900 && /Noir, taille M/.test(s?.line_items?.data?.[0]?.description ?? ""), s?.line_items?.data?.[0]?.description);
+  verifier("t-shirt seul : pas de case, mention des 14 jours", !s?.metadata?.consentement_retractation && /14 jours/.test(s?.invoice_creation?.invoice_data?.footer ?? ""));
+
+  ({ s } = await sessionDe([tshirt, { id: "serie-30", quantite: 1 }], true));
+  verifier("t-shirt + PDF : livraison offerte (0 €)", port(s) === 0, port(s));
+  verifier("t-shirt + PDF : accord limité aux contenus numériques", s?.metadata?.consentement_retractation === CONSENTEMENT_RETRACTATION_MIXTE);
+  verifier("t-shirt + PDF : facture avec l'accord et les 14 jours", (s?.invoice_creation?.invoice_data?.footer ?? "").includes(CONSENTEMENT_RETRACTATION_MIXTE) && /14 jours/.test(s?.invoice_creation?.invoice_data?.footer ?? ""));
+  const mixteSansCase = await fetch(`${BASE}/api/checkout`, { method: "POST", body: new URLSearchParams({ panier: JSON.stringify([tshirt, { id: "serie-30", quantite: 1 }]) }), redirect: "manual" });
+  verifier("t-shirt + PDF sans la case : refusé", /paiement=consentement/.test(mixteSansCase.headers.get("location") ?? ""));
+
+  ({ s } = await sessionDe([{ id: "serie-30", quantite: 1 }], true));
+  verifier("PDF seul : ni adresse ni livraison", !s?.shipping_address_collection && !(s?.shipping_options ?? []).length);
+
+  const { rep } = await sessionDe([{ id: "gourde-addictive", quantite: 1 }]);
+  verifier("gourde (pas en vente) : refusée", /paiement=(invalide|indisponible)/.test(rep.headers.get("location") ?? ""), rep.headers.get("location"));
+  const faux = await sessionDe([{ ...tshirt, taille: "XXXXL" }]);
+  verifier("taille inconnue : refusée", /paiement=invalide/.test(faux.rep.headers.get("location") ?? ""));
 }
 
 // 5. Commande réelle de test (après un paiement avec la carte 4242…)
