@@ -8,8 +8,8 @@ import Breadcrumb from "../components/Breadcrumb.astro";
 const VALEURS = [
   { title: "Bienveillance", text: "Nous vous encourageons à chaque étape, à votre rythme. Une journée difficile n'efface jamais le chemin parcouru.", Icon: HeartHandshake },
   { title: "Sans jugement, sans blabla", text: "Des repères simples et concrets, pour avancer à votre rythme, sans leçon de morale.", Icon: Sparkles },
-  { title: "Aucun jugement", text: "Quel que soit votre point de départ, vous avez votre place ici. Nous parlons de progression, jamais de faute.", Icon: MessageCircleHeart },
-];
+  { title: "100 % à l'écoute", text: "Une question, un retour, un coup de mou ? Écrivez-moi, je réponds à chaque message.", Icon: MessageCircleHeart, lien: { href: "/contact/", label: "Écrire à Addictive" } },
+] as const;
 ---
 
 <Base title="À propos : notre mission" description="Addictive aide à construire de meilleures habitudes : développement personnel, discipline, remise au sport et sobriété, avec bienveillance et sans jugement.">
@@ -24,13 +24,6 @@ const VALEURS = [
   <p class="lead">Nous croyons que les grands changements se construisent avec de petites habitudes, répétées chaque jour.</p>
 
   <div class="prose">
-    <h2>Pourquoi Addictive existe</h2>
-    <p>
-      Changer une habitude, retrouver de la discipline ou se remettre au sport demande de l'énergie, et on se retrouve vite seul
-      face à ses objectifs. Addictive est née de cette idée simple : la progression se construit jour après jour, et chaque
-      pas mérite d'être célébré.
-    </p>
-
     <h2>Notre mission</h2>
     <p>
       Vous aider à prendre le contrôle de votre quotidien : installer de bonnes habitudes, renforcer votre mental, bouger
@@ -50,10 +43,11 @@ const VALEURS = [
 
   <ul class="values">
     {
-      VALEURS.map(({ title, text, Icon }) => (
+      VALEURS.map((valeur) => (
         <li class="card">
-          <h3 class="card-title"><Icon size={22} color="var(--success)" aria-hidden="true" />{title}</h3>
-          <p>{text}</p>
+          <h3 class="card-title"><valeur.Icon size={22} color="var(--success)" aria-hidden="true" />{valeur.title}</h3>
+          <p>{valeur.text}</p>
+          {"lien" in valeur && <a class="value-link" href={valeur.lien.href}>{valeur.lien.label}</a>}
         </li>
       ))
     }
@@ -87,4 +81,19 @@ const VALEURS = [
     gap: 0.75rem;
     margin-top: 1rem;
   }
+
+  .values .card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .value-link {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    min-height: 2.75rem;
+    margin-top: auto;
+    font-weight: 600;
+  }
+
 </style>
