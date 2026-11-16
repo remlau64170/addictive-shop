@@ -1,12 +1,13 @@
 ---
 // À relire par Rémy : tous les textes de cette page sont des propositions.
-import { HeartHandshake, MessageCircleHeart, ShieldCheck } from "@lucide/astro";
+import { HeartHandshake, MessageCircleHeart, Sparkles } from "@lucide/astro";
+import { POURQUOI_PARAGRAPHES, POURQUOI_TITRE } from "../data/pourquoi";
 import Base from "../layouts/Base.astro";
 import Breadcrumb from "../components/Breadcrumb.astro";
 
 const VALEURS = [
   { title: "Bienveillance", text: "Nous vous encourageons à chaque étape, à votre rythme. Une journée difficile n'efface jamais le chemin parcouru.", Icon: HeartHandshake },
-  { title: "Sources vérifiées", text: "Les ressources que nous proposons sont vérifiées avant publication, et les numéros d'aide sont contrôlés.", Icon: ShieldCheck },
+  { title: "Sans jugement, sans blabla", text: "Des repères simples et concrets, pour avancer à votre rythme, sans leçon de morale.", Icon: Sparkles },
   { title: "Aucun jugement", text: "Quel que soit votre point de départ, vous avez votre place ici. Nous parlons de progression, jamais de faute.", Icon: MessageCircleHeart },
 ];
 ---
@@ -14,6 +15,12 @@ const VALEURS = [
 <Base title="À propos : notre mission" description="Addictive aide à construire de meilleures habitudes : développement personnel, discipline, remise au sport et sobriété, avec bienveillance et sans jugement.">
   <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "À propos" }]} />
   <h1>À propos d'Addictive</h1>
+
+  <section class="pourquoi" aria-labelledby="pourquoi-title">
+    <h2 id="pourquoi-title">{POURQUOI_TITRE}</h2>
+    {POURQUOI_PARAGRAPHES.map((paragraphe) => <p>{paragraphe}</p>)}
+  </section>
+
   <p class="lead">Nous croyons que les grands changements se construisent avec de petites habitudes, répétées chaque jour.</p>
 
   <div class="prose">
@@ -59,6 +66,22 @@ const VALEURS = [
 </Base>
 
 <style>
+  .pourquoi {
+    max-width: 40rem;
+    margin-top: 1rem;
+  }
+
+  .pourquoi p {
+    margin-top: 1rem;
+    color: var(--muted-foreground);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  .pourquoi p:first-of-type {
+    color: var(--foreground);
+  }
+
   .values {
     display: grid;
     gap: 0.75rem;

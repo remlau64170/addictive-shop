@@ -117,6 +117,19 @@ for (const f of readdirSync(dossierProduits).filter((x) => x.endsWith(".md"))) {
     </div><div class="visuel"><img src="${image}" alt=""></div></div>`, join(PUBLIC, "partage/produits", `${id}.jpg`));
 }
 
+// Calculateurs : titres lus dans src/data/calculateurs.ts, plus la page qui les liste.
+const sourceCalculateurs = readFileSync(join(ROOT, "src/data/calculateurs.ts"), "utf8");
+const calculateurs = [...sourceCalculateurs.matchAll(/slug: "([^"]+)",\s*titre: "([^"]+)"/g)].map((m) => ({ slug: m[1], titre: m[2] }));
+const pageCalculateur = (titre, etiquette) => `<div class="page"><div class="texte">
+      <div class="marque"><img src="logo.png" alt=""> Addictive</div>
+      <span class="etiquette">${echapper(etiquette)}</span>
+      <h1 class="${taille(titre)}">${echapper(titre)}</h1>
+      <div class="ligne"></div>
+      <p class="adresse">Gratuit, sans inscription · shop.addictive-app.com</p>
+    </div></div>`;
+await produire("calculateurs", pageCalculateur("Calculateurs gratuits : l'argent et le temps que vous récupérez", "Outils gratuits"), join(PUBLIC, "partage/calculateurs", "index.jpg"));
+for (const c of calculateurs) await produire(`calculateur-${c.slug}`, pageCalculateur(c.titre, "Calculateur gratuit"), join(PUBLIC, "partage/calculateurs", `${c.slug}.jpg`));
+
 // Articles : catégorie et titre ; l'illustration de l'article à droite quand elle existe.
 const dossierArticles = join(ROOT, "src/content/articles");
 for (const f of readdirSync(dossierArticles).filter((x) => x.endsWith(".md"))) {

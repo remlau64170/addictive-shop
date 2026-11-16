@@ -4,6 +4,7 @@ import Base from "../../layouts/Base.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import JsonLd from "../../components/JsonLd.astro";
 import { ARTICLE_CATEGORIES } from "../../data/site";
+import { calculateurDeLArticle } from "../../data/calculateurs";
 import { faqFromBody, formatDate, getVisibleArticles, lastModified, relatedArticles } from "../../lib/articles";
 import { getProduits, productName } from "../../lib/produits";
 import { DEFAULT_IMAGE, PUBLISHER, absolute } from "../../lib/seo";
@@ -26,6 +27,7 @@ const iso = (date: Date) => date.toISOString().slice(0, 10);
 const readMore = relatedArticles(article, all);
 const faq = faqFromBody(article.body);
 const categoryHref = `/articles/#${article.data.category}`;
+const calculateur = calculateurDeLArticle(article.id);
 const structured = {
   "@type": "Article",
   headline: article.data.title,
@@ -85,6 +87,7 @@ const faqStructured = faq.length
   <aside class="more" aria-labelledby="more-title">
     <h2 id="more-title">Pour aller plus loin</h2>
     <ul class="link-list">
+      {calculateur && <li><a href={`/calculateurs/${calculateur.slug}/`}>Calculateur gratuit : {calculateur.titreCourt.toLowerCase()}</a></li>}
       {related && <li><a href={`/boutique/${related.id}/`}>{productName(related)}</a></li>}
       <li><a href="/appli/">Suivez vos habitudes avec l'appli Addictive</a></li>
       <li><a href="/articles/">Tous les articles</a></li>

@@ -3,6 +3,7 @@ import { ARTICLE_CATEGORIES, PLAY_STORE_URL, SLOGAN, WEB_APP_URL } from "../data
 import { getVisibleArticles } from "../lib/articles";
 import { getProduits, productName } from "../lib/produits";
 import { absolute } from "../lib/seo";
+import { CALCULATEURS } from "../data/calculateurs";
 
 /** Format llmstxt.org : présentation courte, puis liens commentés vers les pages principales et chaque article. Généré au build. */
 export const GET: APIRoute = async () => {
@@ -26,6 +27,11 @@ ${[
   line("Besoin d'aide ?", "/aide/", "numéros d'urgence et services d'écoute gratuits"),
   line("Contact", "/contact/", "écrire à l'équipe"),
 ].join("\n")}`,
+    `## Calculateurs gratuits
+
+Calculs faits dans le navigateur, sans inscription ni données enregistrées, à partir de références officielles citées sur chaque page.
+
+${[line("Tous les calculateurs", "/calculateurs/", "liste des outils gratuits"), ...CALCULATEURS.map((calc) => line(calc.titre, `/calculateurs/${calc.slug}/`, calc.description))].join("\n")}`,
     `## Boutique
 
 ${produits.map((produit) => line(productName(produit), `/boutique/${produit.id}/`, produit.data.summary)).join("\n")}`,

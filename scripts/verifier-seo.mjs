@@ -32,6 +32,8 @@ const REQUIRED = {
   FAQPage: ["mainEntity"],
   MobileApplication: ["name", "operatingSystem", "applicationCategory", "offers", "url"],
   BreadcrumbList: ["itemListElement"],
+  WebApplication: ["name", "url", "applicationCategory", "operatingSystem", "offers", "description"],
+  ItemList: ["itemListElement"],
 };
 
 export function checkStructured(page, html) {

@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { getVisibleArticles, lastModified } from "../lib/articles";
 import { getProduits } from "../lib/produits";
 import { absolute } from "../lib/seo";
+import { CALCULATEURS } from "../data/calculateurs";
 
 /** Seules les pages utiles aux moteurs de recherche : ni panier, ni recherche, ni pages à rédiger, ni brouillons. */
 export const GET: APIRoute = async () => {
@@ -19,6 +20,8 @@ export const GET: APIRoute = async () => {
     "/faq/",
     "/contact/",
     "/aide/",
+    "/calculateurs/",
+    ...CALCULATEURS.map((calc) => `/calculateurs/${calc.slug}/`),
     "/mentions-legales/",
     "/cgv/",
     "/confidentialite/",

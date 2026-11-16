@@ -2,6 +2,7 @@
 import {
   ArrowRight,
   Brain,
+  Calculator,
   Download,
   Dumbbell,
   Flame,
@@ -22,6 +23,7 @@ import AppVideo from "../components/AppVideo.astro";
 import { ARTICLE_CATEGORIES, SHOP_SHELVES } from "../data/site";
 import { getVisibleArticles } from "../lib/articles";
 import { getProduits } from "../lib/produits";
+import { POURQUOI_PARAGRAPHES, POURQUOI_TITRE } from "../data/pourquoi";
 import { CONTACT_EMAIL, PUBLISHER, absolute } from "../lib/seo";
 
 const produits = await getProduits();
@@ -173,9 +175,72 @@ const TUILES = [
   </section>
     )
   }
+
+  <section class="band" aria-labelledby="outils-title">
+    <div class="wrap">
+      <a class="card outils" href="/calculateurs/">
+        <Calculator size={24} color="var(--success)" aria-hidden="true" />
+        <span>
+          <span class="outils-titre" id="outils-title">Outils gratuits</span>
+          <span class="outils-texte">Calculez l'argent et le temps que vous récupérez, ou ce que quelques minutes par jour représentent.</span>
+        </span>
+        <ArrowRight size={18} aria-hidden="true" />
+      </a>
+    </div>
+  </section>
+
+  <section class="band pourquoi" aria-labelledby="pourquoi-title">
+    <div class="wrap pourquoi-texte">
+      <h2 id="pourquoi-title">{POURQUOI_TITRE}</h2>
+      {POURQUOI_PARAGRAPHES.map((paragraphe) => <p>{paragraphe}</p>)}
+    </div>
+  </section>
 </Base>
 
 <style>
+  .outils {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .outils > span {
+    display: grid;
+    flex: 1;
+    gap: 0.25rem;
+  }
+
+  .outils-titre {
+    font-weight: 700;
+  }
+
+  .outils-texte {
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+  }
+
+  .outils :global(svg) {
+    flex: none;
+  }
+
+  /* « Pourquoi Addictive » : du texte simple, comme quelqu'un qui parle. */
+  .pourquoi-texte {
+    max-width: 40rem;
+  }
+
+  .pourquoi-texte p {
+    margin-top: 1rem;
+    color: var(--muted-foreground);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  .pourquoi-texte p:first-of-type {
+    color: var(--foreground);
+  }
+
   .band {
     padding-block: var(--space-block);
   }

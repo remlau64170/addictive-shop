@@ -1,0 +1,82 @@
+---
+import { ArrowRight, Calculator, ShieldCheck } from "@lucide/astro";
+import Base from "../../layouts/Base.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+import JsonLd from "../../components/JsonLd.astro";
+import { CALCULATEURS } from "../../data/calculateurs";
+import { absolute } from "../../lib/seo";
+
+const DESCRIPTION =
+  "4 calculateurs gratuits : économies cigarette, vape et alcool, temps d'écran récupéré, temps investi dans un projet. Sans inscription, rien n'est enregistré.";
+const structured = {
+  "@type": "ItemList",
+  name: "Calculateurs gratuits Addictive",
+  itemListElement: CALCULATEURS.map((calc, index) => ({ "@type": "ListItem", position: index + 1, name: calc.titre, url: absolute(`/calculateurs/${calc.slug}/`) })),
+};
+---
+
+<Base title="Calculateurs gratuits : argent et temps récupérés" description={DESCRIPTION} image="/partage/calculateurs/index.jpg">
+  <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Calculateurs" }]} />
+  <h1>Calculateurs gratuits</h1>
+  <p class="lead">Combien vous récupérez en arrêtant ou en réduisant, et ce que quelques minutes par jour représentent. Gratuit, sans inscription.</p>
+  <p class="vie-privee"><ShieldCheck size={16} aria-hidden="true" />Tout se calcule sur votre appareil : rien n'est envoyé ni enregistré, aucun cookie.</p>
+
+  <ul class="liste">
+    {
+      CALCULATEURS.map((calc) => (
+        <li class="card">
+          <h2 class="card-title"><Calculator size={20} aria-hidden="true" />{calc.titreCourt}</h2>
+          <p>{calc.description}</p>
+          <a class="lien" href={`/calculateurs/${calc.slug}/`}>
+            Calculer<span class="sr-only"> : {calc.titreCourt}</span><ArrowRight size={16} aria-hidden="true" />
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p class="note section">Les résultats sont des estimations simples, à partir de vos chiffres et de références officielles citées sur chaque page.</p>
+  <JsonLd data={structured} />
+</Base>
+
+<style>
+  .vie-privee {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+  }
+
+  .vie-privee :global(svg) {
+    flex: none;
+    color: var(--success);
+  }
+
+  .liste {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .liste .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .card-title :global(svg) {
+    color: var(--primary);
+  }
+
+  .lien {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    margin-top: auto;
+    font-weight: 700;
+  }
+</style>

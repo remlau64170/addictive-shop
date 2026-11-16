@@ -1,0 +1,450 @@
+---
+// Un calculateur gratuit : formulaire, résultat en direct (calculé dans le navigateur), en bref, méthode, FAQ, sources,
+// puis le livre adapté et l'appli. Aucune donnée n'est envoyée ni conservée.
+import { Calculator, ExternalLink, ShieldCheck, Smartphone } from "@lucide/astro";
+import Base from "../../layouts/Base.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+import JsonLd from "../../components/JsonLd.astro";
+import ProductCard from "../../components/ProductCard.astro";
+import StoreLinks from "../../components/StoreLinks.astro";
+import { CALCULATEURS, type Calculateur } from "../../data/calculateurs";
+import { CALCULS } from "../../lib/calculs";
+import { getProduits } from "../../lib/produits";
+import { absolute } from "../../lib/seo";
+
+export function getStaticPaths() {
+  return CALCULATEURS.map((calc) => ({ params: { slug: calc.slug }, props: { calc } }));
+}
+
+const { calc } = Astro.props as { calc: Calculateur };
+const produits = (await getProduits()).filter((p) => calc.livres.includes(p.id));
+const modeInitial = calc.modes?.[0]?.id;
+const valeursInitiales = Object.fromEntries([["mode", modeInitial ?? ""], ...calc.champs.map((c) => [c.id, c.valeur])]);
+const initial = CALCULS[calc.slug]!(valeursInitiales);
+const url = absolute(`/calculateurs/${calc.slug}/`);
+
+const structured = {
+  "@type": "WebApplication",
+  name: calc.titre,
+  url,
+  description: calc.description,
+  applicationCategory: calc.categorie,
+  operatingSystem: "Tous (navigateur web)",
+  browserRequirements: "Fonctionne dans tout navigateur récent, sans inscription",
+  inLanguage: "fr",
+  isAccessibleForFree: true,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+  publisher: { "@type": "Organization", name: "Addictive", url: absolute("/") },
+};
+const faqStructured = {
+  "@type": "FAQPage",
+  mainEntity: calc.faq.map((item) => ({ "@type": "Question", name: item.question, acceptedAnswer: { "@type": "Answer", text: item.reponse } })),
+};
+---
+
+<Base title={calc.seoTitle} description={calc.description} image={`/partage/calculateurs/${calc.slug}.jpg`}>
+  <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Calculateurs", href: "/calculateurs/" }, { label: calc.titreCourt }]} />
+  <h1>{calc.titre}</h1>
+  <p class="lead">{calc.intro}</p>
+
+  <div class="outil" data-calculateur={calc.slug}>
+    <form class="champs" aria-label="Vos chiffres" onsubmit="return false">
+      {
+        calc.modes && (
+          <fieldset class="modes">
+            <legend>Vous utilisez</legend>
+            <div class="modes-choix">
+              {calc.modes.map((mode, index) => (
+                <label class="mode">
+                  <input type="radio" name="mode" value={mode.id} checked={index === 0} />
+                  <span>{mode.libelle}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        )
+      }
+      {
+        calc.champs.map((champ) => (
+          <div class="champ" data-mode={champ.mode} hidden={champ.mode !== undefined && champ.mode !== modeInitial}>
+            <label for={`champ-${champ.id}`}>{champ.libelle}</label>
+            <div class="saisie">
+              <input
+                id={`champ-${champ.id}`}
+                name={champ.id}
+                type="number"
+                inputmode="decimal"
+                value={champ.valeur}
+                min={champ.min}
+                max={champ.max}
+                step={champ.pas}
+                aria-describedby={champ.aide ? `aide-${champ.id}` : undefined}
+              />
+              <span class="unite">{champ.unite}</span>
+            </div>
+            {champ.aide && <p class="aide" id={`aide-${champ.id}`}>{champ.aide}</p>}
+          </div>
+        ))
+      }
+    </form>
+
+    <div class="resultat" aria-live="polite">
+      <p class="principal" data-principal>{initial.principal.valeur}</p>
+      <p class="legende" data-legende>{initial.principal.legende}</p>
+      <dl class="lignes" data-lignes>
+        {initial.lignes.map((l) => <div><dt>{l.libelle}</dt><dd>{l.valeur}</dd></div>)}
+      </dl>
+      <ul class="notes" data-notes>
+        {initial.notes.map((n) => <li>{n}</li>)}
+      </ul>
+      {
+        calc.repere && (
+          <p class="repere">
+            {calc.repere.texte}{" "}
+            <a href={calc.repere.lien} target="_blank" rel="noopener">{calc.repere.libelleLien}<span class="sr-only"> (s'ouvre dans un nouvel onglet)</span></a>
+          </p>
+        )
+      }
+      <p class="vie-privee"><ShieldCheck size={16} aria-hidden="true" />Calculé sur votre appareil : rien n'est envoyé ni enregistré.</p>
+    </div>
+  </div>
+  <noscript><p class="note">Le résultat en direct a besoin de JavaScript. Les chiffres affichés correspondent aux valeurs d'exemple.</p></noscript>
+
+  <div class="prose">
+    <h2>En bref</h2>
+    <ul>{calc.enBref.map((ligne) => <li>{ligne}</li>)}</ul>
+
+    <h2>Comment c'est calculé</h2>
+    {calc.calcul.map((ligne) => <p>{ligne}</p>)}
+
+    <h2>Questions fréquentes</h2>
+    {
+      calc.faq.map((item) => (
+        <>
+          <h3>{item.question}</h3>
+          <p>{item.reponse}</p>
+        </>
+      ))
+    }
+
+    <h2>Sources</h2>
+    <ul class="sources">
+      {
+        calc.sources.map((source) => (
+          <li>
+            <a href={source.url} target="_blank" rel="noopener">{source.libelle}<span class="sr-only"> (s'ouvre dans un nouvel onglet)</span></a>
+            <ExternalLink size={14} aria-hidden="true" /> <span class="date">({source.date})</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <section class="suite" aria-labelledby="suite-titre">
+    <h2 id="suite-titre">Pour aller plus loin</h2>
+    <p>
+      {calc.livres.length > 1 ? "Ces livres de la Série 60 proposent" : "Ce livre de la Série 60 propose"} une action par jour pendant 60 jours, de 5 à 10 minutes.
+    </p>
+    <ul class="livres">{produits.map((produit) => <li><ProductCard produit={produit} /></li>)}</ul>
+
+    <div class="appli">
+      <h3><Smartphone size={20} aria-hidden="true" />L'appli Addictive</h3>
+      <p>Comptez vos jours, suivez vos séries et gardez un œil sur votre progression, gratuitement.</p>
+      <StoreLinks />
+      <p class="lien-appli"><a href="/appli/">Découvrir l'appli</a></p>
+    </div>
+
+    <p class="autres"><Calculator size={18} aria-hidden="true" /><a href="/calculateurs/">Tous les calculateurs gratuits</a></p>
+  </section>
+
+  <JsonLd data={structured} />
+  <JsonLd data={faqStructured} />
+</Base>
+
+<style>
+  .outil {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .champs,
+  .resultat {
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background: color-mix(in oklch, var(--card) 70%, transparent);
+  }
+
+  .champs {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+
+  .modes {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .modes legend {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .modes-choix {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .mode {
+    position: relative;
+  }
+
+  .mode input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+  }
+
+  .mode span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .mode input:checked + span {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+    color: var(--primary-soft-foreground);
+  }
+
+  .mode input:focus-visible + span {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .champ label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-weight: 600;
+  }
+
+  .saisie {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .saisie input {
+    width: 8rem;
+    min-height: 2.75rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--background);
+    color: var(--foreground);
+    font: inherit;
+    font-size: 1.125rem;
+  }
+
+  .saisie input:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 1px;
+  }
+
+  .unite,
+  .aide {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .aide {
+    margin-top: 0.375rem;
+  }
+
+  .principal {
+    font-size: clamp(2.5rem, 2rem + 4vw, 3.75rem);
+    font-weight: 800;
+    line-height: 1.05;
+    color: var(--success);
+    overflow-wrap: anywhere;
+  }
+
+  .legende {
+    margin-top: 0.25rem;
+    font-weight: 600;
+  }
+
+  .lignes {
+    display: grid;
+    gap: 0.5rem;
+    margin: 1rem 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .lignes div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .lignes dt {
+    color: var(--muted-foreground);
+  }
+
+  .lignes dd {
+    margin: 0;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .notes {
+    display: grid;
+    gap: 0.375rem;
+    margin-top: 1rem;
+    padding-left: 1.125rem;
+    font-size: 0.9375rem;
+  }
+
+  .repere,
+  .vie-privee {
+    margin-top: 1rem;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .vie-privee {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .vie-privee :global(svg) {
+    flex: none;
+    color: var(--success);
+  }
+
+  .sources li {
+    overflow-wrap: anywhere;
+  }
+
+  .sources :global(svg) {
+    vertical-align: -2px;
+    color: var(--muted-foreground);
+  }
+
+  .date {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .suite {
+    margin-top: var(--space-block);
+  }
+
+  .livres {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .appli {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    text-align: center;
+  }
+
+  .appli h3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .appli > p {
+    margin: 0.5rem 0 1rem;
+  }
+
+  .lien-appli {
+    margin-top: 0.75rem;
+  }
+
+  .autres {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    font-weight: 600;
+  }
+
+  .autres a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  @media (min-width: 900px) {
+    .outil {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+</style>
+
+<script>
+  import { CALCULS, type Valeurs } from "../../lib/calculs";
+
+  for (const outil of document.querySelectorAll<HTMLElement>("[data-calculateur]")) {
+    const calcul = CALCULS[outil.dataset.calculateur ?? ""];
+    const form = outil.querySelector("form");
+    if (!calcul || !form) continue;
+    const principal = outil.querySelector<HTMLElement>("[data-principal]")!;
+    const legende = outil.querySelector<HTMLElement>("[data-legende]")!;
+    const lignes = outil.querySelector<HTMLElement>("[data-lignes]")!;
+    const notes = outil.querySelector<HTMLElement>("[data-notes]")!;
+
+    const rendre = () => {
+      const valeurs: Valeurs = {};
+      for (const [cle, valeur] of new FormData(form)) valeurs[cle] = String(valeur);
+      const mode = String(valeurs.mode ?? "");
+      for (const champ of outil.querySelectorAll<HTMLElement>(".champ[data-mode]")) champ.hidden = champ.dataset.mode !== mode;
+      const r = calcul(valeurs);
+      principal.textContent = r.principal.valeur;
+      legende.textContent = r.principal.legende;
+      lignes.replaceChildren(
+        ...r.lignes.map((l) => {
+          const div = document.createElement("div");
+          const dt = document.createElement("dt");
+          const dd = document.createElement("dd");
+          dt.textContent = l.libelle;
+          dd.textContent = l.valeur;
+          div.append(dt, dd);
+          return div;
+        }),
+      );
+      notes.replaceChildren(
+        ...r.notes.map((n) => {
+          const li = document.createElement("li");
+          li.textContent = n;
+          return li;
+        }),
+      );
+    };
+    form.addEventListener("input", rendre);
+    form.addEventListener("change", rendre);
+    rendre();
+  }
+</script>
