@@ -24,7 +24,7 @@ const forfait = (LIVRAISON.montant / 100).toFixed(2).replace(".", ",");
     <li>E-mail : <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a></li>
     <li>SIRET : {EDITEUR.siret} (SIREN {EDITEUR.siren})</li>
     <li>Code APE : {EDITEUR.ape}</li>
-    <li>Immatriculation : {EDITEUR.immatriculation}</li>
+    <li>Immatriculation : {EDITEUR.immatriculation}. {EDITEUR.rcs}.</li>
   </ul>
   <p>Les présentes conditions s'appliquent aux achats faits sur la boutique par des particuliers (consommateurs).</p>
 

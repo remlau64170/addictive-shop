@@ -12,6 +12,8 @@ export const EDITEUR = {
   siren: "941 433 369",
   ape: "4791B",
   immatriculation: "Inscrit au Registre national des entreprises (RNE)",
+  /** À remplacer par la ligne exacte (« RCS <ville> <numéro> ») dès que le greffe la donne. */
+  rcs: "Immatriculation au RCS en cours",
   email: "contact@addictive-app.com",
 };
 
