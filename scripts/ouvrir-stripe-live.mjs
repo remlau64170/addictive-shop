@@ -81,19 +81,30 @@ for (const slug of SLUGS) {
   modeles.push({ id: j.id, name: j.name, metadata: j.metadata, montant: j.default_price.unit_amount, devise: j.default_price.currency });
 }
 
-console.log("Ouverture Stripe en mode réel. Collez la clé secrète LIVE (sk_live_…) puis Entrée : rien ne s'affiche, c'est normal.\n");
-const cle = await demanderSecret("Clé secrète live : ");
-if (!/^sk_live_/.test(cle)) {
-  console.log("Ce n'est pas une clé secrète live (elle commence par sk_live_). Rien n'a été fait.");
+console.log("Ouverture Stripe en mode réel. Collez la clé LIVE (rk_live_… ou sk_live_…) puis Entrée : rien ne s'affiche, c'est normal.\n");
+const cle = await demanderSecret("Clé live : ");
+if (!/^(sk|rk)_live_/.test(cle)) {
+  console.log("Ce n'est pas une clé live (elle commence par rk_live_ ou sk_live_). Rien n'a été fait.");
+  process.exit(1);
+}
+// Une clé limitée (rk_live_) n'a pas toujours le droit de lire le compte : on vérifie la clé sur les produits.
+const essai = await stripe(cle, "GET", "/products?limit=1");
+if (essai.statut === 401) {
+  console.log("Clé refusée par Stripe (clé inconnue ou révoquée). Rien n'a été fait.");
+  process.exit(1);
+}
+if (essai.statut === 403) {
+  console.log("Cette clé limitée n'a pas le droit de lire les produits. Ajoutez les droits listés dans docs/ouverture-paiements.md, puis relancez. Rien n'a été fait.");
   process.exit(1);
 }
 const compte = await stripe(cle, "GET", "/account");
-if (compte.statut !== 200) {
-  console.log(`Clé refusée par Stripe : ${compte.j.error?.message ?? compte.statut}. Rien n'a été fait.`);
-  process.exit(1);
+if (compte.statut === 200) {
+  console.log(`Compte Stripe : ${compte.j.settings?.dashboard?.display_name ?? compte.j.business_profile?.name ?? "(sans nom)"}, paiements ${compte.j.charges_enabled ? "activés" : "PAS ENCORE ACTIVÉS"}.\n`);
+} else {
+  console.log("Clé live acceptée (clé limitée : le compte n'est pas lisible, ce n'est pas gênant).\n");
 }
-console.log(`Compte Stripe : ${compte.j.settings?.dashboard?.display_name ?? compte.j.business_profile?.name ?? "(sans nom)"}, paiements ${compte.j.charges_enabled ? "activés" : "PAS ENCORE ACTIVÉS"}.\n`);
 
+let erreurs = 0;
 console.log("1. Produits");
 for (const m of modeles) {
   const existe = await stripe(cle, "GET", `/products/${m.id}`);
@@ -105,6 +116,14 @@ for (const m of modeles) {
   for (const [k, v] of Object.entries(m.metadata)) corps[`metadata[${k}]`] = v;
   const cree = await stripe(cle, "POST", "/products", corps);
   console.log(cree.statut === 200 ? `  créé : ${m.id} (${(m.montant / 100).toFixed(2).replace(".", ",")} €)` : `  ERREUR ${m.id} : ${cree.j.error?.message}`);
+  if (cree.statut !== 200) erreurs++;
+}
+
+// Le secret d'un webhook n'est lisible qu'à sa création : on ne le crée que si les produits sont tous en place.
+if (erreurs > 0) {
+  console.log("\nLes produits ne sont pas tous créés (souvent un droit manquant sur la clé limitée) : arrêt avant le webhook, rien n'est enregistré dans Cloudflare.");
+  console.log("Ajoutez les droits manquants à la clé dans Stripe, puis relancez la même commande.");
+  process.exit(1);
 }
 
 console.log("\n2. Webhook");
@@ -120,7 +139,20 @@ if (existant) {
   if (cree.statut === 200) {
     secretWebhook = cree.j.secret;
     console.log(`  créé vers ${URL_WEBHOOK} (${EVENEMENTS.join(", ")})`);
-  } else console.log(`  ERREUR : ${cree.j.error?.message}`);
+  } else {
+    console.log(`  ERREUR : ${cree.j.error?.message}`);
+    erreurs++;
+  }
+}
+if (liste.statut !== 200) {
+  console.log(`  ERREUR : liste des webhooks illisible (${liste.j.error?.message ?? liste.statut})`);
+  erreurs++;
+}
+
+if (erreurs > 0) {
+  console.log("\nCertaines étapes n'ont pas abouti (souvent un droit manquant sur la clé limitée) : rien n'est enregistré dans Cloudflare.");
+  console.log("Ajoutez les droits manquants à la clé dans Stripe, puis relancez la même commande (les éléments déjà créés sont conservés).");
+  process.exit(1);
 }
 
 console.log("\n3. Secrets Cloudflare");

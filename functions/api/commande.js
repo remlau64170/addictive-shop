@@ -2,7 +2,7 @@
 // vérifie auprès de Stripe que la session est payée, puis remet un lien de téléchargement personnel par fichier
 // (version téléphone et version A4 de chaque livre, 6 fichiers pour le pack) et le récapitulatif des articles livrés.
 // Conservé chez nous : un compteur par commande, l'identifiant de chaque lien, la correspondance ref → session.
-import { json, signToken, stripe } from "../_lib/stripe.js";
+import { json, modeReel, signToken, stripe } from "../_lib/stripe.js";
 import { fichiersDuProduit } from "../../src/data/livres.js";
 
 const TOKEN_MINUTES = 15;
@@ -32,8 +32,8 @@ export async function onRequestGet({ request, env }) {
     return json({ etat: error.status === 404 ? "invalide" : "erreur" }, error.status === 404 ? 404 : 502);
   }
 
-  // Jamais de livraison sur une session du mode réel pendant la phase de test.
-  if (session.livemode) return json({ etat: "invalide" }, 400);
+  // Une session doit appartenir au mode en service (réel en production, test en local).
+  if (session.livemode !== modeReel(env)) return json({ etat: "invalide" }, 400);
   if (session.mode !== "payment") return json({ etat: "invalide" }, 400);
   if (session.status === "expired") return json({ etat: "expiree" }, 410);
   if (session.payment_status !== "paid" || session.status !== "complete") return json({ etat: "non_paye" }, 402);

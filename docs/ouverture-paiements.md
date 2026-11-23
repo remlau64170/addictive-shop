@@ -36,9 +36,32 @@ Tableau de bord Stripe, **mode test désactivé** :
 4. Paramètres > **Moyens de paiement** : vérifier la liste (carte au minimum). Les moyens à débit différé (prélèvement
    SEPA…) sont à laisser désactivés : le site donne l'accès aux livres au moment du paiement.
 
-## 2. Produits Stripe en mode réel
+## 2. Produits, webhook et clé : en une commande
 
-Le site lit les produits par leur identifiant (le slug). Le script les recrée à l'identique du mode test :
+Commande unique (elle remplace les étapes 2, 3 et le début de 4) :
+
+```bash
+node scripts/ouvrir-stripe-live.mjs
+```
+
+Elle demande la clé live (`rk_live_…` ou `sk_live_…`, rien ne s'affiche), crée les 5 produits puis le webhook live,
+et enregistre `STRIPE_SECRET_KEY` et `STRIPE_WEBHOOK_SECRET` dans Cloudflare. En cas de droit manquant, elle s'arrête
+sans rien enregistrer et peut être relancée.
+
+**Clé limitée (`rk_live_…`) : droits nécessaires** (Stripe > Développeurs > Clés API > la clé > Modifier) :
+
+| Ressource | Droit | Pour |
+| --- | --- | --- |
+| Products | Écriture | créer les produits, les relire au paiement |
+| Prices | Écriture | créer les prix |
+| Checkout Sessions | Écriture | créer la page de paiement, relire la commande |
+| PaymentIntents | Écriture | inscrire le numéro Printful sur le paiement |
+| Invoices | Écriture | facture créée par Checkout |
+| Customers | Écriture | client de la facture |
+| Webhook Endpoints | Écriture | créer le webhook (peut être retiré ensuite) |
+| Refunds | Écriture | rembourser le premier achat de contrôle |
+
+Ancienne méthode, produits seulement :
 
 ```bash
 node scripts/produits-stripe-live.mjs --essai

@@ -17,3 +17,5 @@ PRINTFUL_FICHIER_ESSAI_URL=
 # Confirmation automatique des commandes Printful (fabrication et facturation). Laisser à false :
 # même à true, elle est refusée tant que Stripe est en mode test.
 PRINTFUL_CONFIRM_ORDERS=false
+# STRIPE_MODE_REEL : « true » seulement en production (wrangler.toml). En local, laisser à false.
+STRIPE_MODE_REEL=false

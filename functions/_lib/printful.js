@@ -31,7 +31,7 @@ export async function externalId(sessionId) {
 /** Confirmation automatique : seulement si le réglage est activé ET que Stripe est en mode réel. */
 export function confirmationAutorisee(env, session) {
   const demandee = env.PRINTFUL_CONFIRM_ORDERS === "true";
-  const modeReel = session.livemode === true && String(env.STRIPE_SECRET_KEY ?? "").startsWith("sk_live_");
+  const modeReel = session.livemode === true && env.STRIPE_MODE_REEL === "true" && /^(sk|rk)_live_/.test(String(env.STRIPE_SECRET_KEY ?? ""));
   if (demandee && !modeReel) console.warn("PRINTFUL_CONFIRM_ORDERS refusé : Stripe est en mode test, commande laissée en brouillon.");
   return demandee && modeReel;
 }

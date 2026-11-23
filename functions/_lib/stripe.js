@@ -10,11 +10,21 @@ export function json(data, status = 200) {
   });
 }
 
-/** Phase de test : on refuse toute clé qui n'est pas une clé de test, pour ne jamais toucher au mode réel. */
+/**
+ * Mode réel : seulement si STRIPE_MODE_REEL vaut « true » (wrangler.toml en production ; .dev.vars le met à « false » en local).
+ * Sans ce réglage, tout reste en mode test : une clé live est refusée et les événements ou sessions du mode réel sont ignorés.
+ */
+export function modeReel(env) {
+  return env.STRIPE_MODE_REEL === "true";
+}
+
+/** Clé Stripe : de test (sk_test_, rk_test_), ou live (sk_live_, rk_live_) uniquement quand le mode réel est activé. */
 export function stripeKey(env) {
   const key = env.STRIPE_SECRET_KEY ?? "";
-  if (!key.startsWith("sk_test_") && !key.startsWith("rk_test_")) {
-    throw new Error("Clé Stripe absente ou qui n'est pas une clé de test : le paiement reste désactivé.");
+  const test = key.startsWith("sk_test_") || key.startsWith("rk_test_");
+  const live = key.startsWith("sk_live_") || key.startsWith("rk_live_");
+  if (modeReel(env) ? !live : !test) {
+    throw new Error(modeReel(env) ? "Mode réel activé, mais la clé Stripe n'est pas une clé live." : "Clé Stripe absente ou qui n'est pas une clé de test.");
   }
   return key;
 }

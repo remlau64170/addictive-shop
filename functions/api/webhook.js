@@ -2,7 +2,7 @@
 // Commande payée avec un article livré : création de la commande Printful (brouillon tant que Stripe est en test).
 // En cas d'échec Printful, on répond 500 : Stripe renvoie l'événement automatiquement (pendant 3 jours, de plus en plus
 // espacé) et prévient le titulaire du compte Stripe par e-mail si les échecs durent. L'échec est aussi journalisé.
-import { stripe, verifyWebhook } from "../_lib/stripe.js";
+import { modeReel, stripe, verifyWebhook } from "../_lib/stripe.js";
 import { creerCommandePrintful } from "../_lib/printful.js";
 
 const reply = (message, status) => new Response(message, { status, headers: { "Cache-Control": "no-store" } });
@@ -23,8 +23,8 @@ export async function onRequestPost({ request, env }) {
   } catch {
     return reply("Corps illisible.", 400);
   }
-  // Mode test uniquement pendant cette phase.
-  if (event.livemode) return reply("Événement du mode réel ignoré.", 200);
+  // Seuls les événements du mode en service sont traités (réel en production, test en local).
+  if (Boolean(event.livemode) !== modeReel(env)) return reply("Événement d'un autre mode ignoré.", 200);
 
   // Stripe peut renvoyer le même événement : chaque identifiant n'est traité qu'une fois (marqué seulement après succès).
   const vu = `evenement:${event.id}`;
