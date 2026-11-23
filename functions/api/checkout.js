@@ -6,7 +6,7 @@ import { CONSENTEMENT_VALEUR, RETRACTATION_PHYSIQUE, texteConsentement } from ".
 import { LIGNES_MAX, LIVRAISON, PHYSIQUES_EN_VENTE, QUANTITE_MAX, livraisonOfferte } from "../../src/data/boutique.js";
 import { fichiersDuProduit, livresEnDouble } from "../../src/data/livres.js";
 
-import { ACCEPTATION_CGV, ACCEPTATION_CGV_VALEUR, CGV_VERSION, CGV_VERSION_TEXTE, MENTION_TVA } from "../../src/data/legal.js";
+import { ACCEPTATION_CGV, ACCEPTATION_CGV_VALEUR, CGV_VERSION, CGV_VERSION_TEXTE, EDITEUR, MENTION_TVA } from "../../src/data/legal.js";
 const SLUG = /^[a-z0-9-]{1,60}$/;
 
 const retour = (origin, raison, page = "/panier/") => Response.redirect(`${origin}${page}?paiement=${raison}`, 303);
@@ -97,7 +97,7 @@ export async function onRequestPost({ request, env }) {
     if (numeriques.length === 1 && physiques.length === 0) metadata.slug = numeriques[0].id;
 
     // Preuve de l'accord (formulation exacte de la case affichée pour ce panier) et date.
-    const pied = [MENTION_TVA];
+    const pied = [`${EDITEUR.nomEI} (${EDITEUR.nomCommercial}), SIRET ${EDITEUR.siret}. ${MENTION_TVA}`];
     if (numeriques.length > 0) {
       const maintenant = new Date();
       const texte = texteConsentement(physiques.length > 0);

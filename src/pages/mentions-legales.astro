@@ -7,18 +7,19 @@ import { DIRECTEUR_PUBLICATION, EDITEUR, HEBERGEUR, MENTION_TVA } from "../data/
 <LegalPage
   title="Mentions légales"
   description="Mentions légales du site Addictive : éditeur, contact, immatriculation, directeur de la publication et hébergeur."
-  miseAJour="13 novembre 2026"
+  miseAJour="23 novembre 2026"
 >
   <h2>Éditeur du site</h2>
   <p>
     Le site shop.addictive-app.com (boutique et articles Addictive) est édité par {EDITEUR.nomEI}, entrepreneur
-    individuel, sous le régime de la micro-entreprise.
+    individuel (nom commercial : {EDITEUR.nomCommercial}), sous le régime de la micro-entreprise.
   </p>
   <ul>
     <li>Adresse : <Info valeur={EDITEUR.adresse} quoi="adresse de l'entreprise" /></li>
     <li>E-mail : <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a></li>
-    <li>SIRET : <Info valeur={EDITEUR.siret} quoi="numéro SIRET" /></li>
-    <li>Immatriculation : <Info valeur={EDITEUR.immatriculation} quoi="registre et numéro d'immatriculation indiqués sur l'attestation" /></li>
+    <li>SIRET : {EDITEUR.siret} (SIREN {EDITEUR.siren})</li>
+    <li>Code APE : {EDITEUR.ape}</li>
+    <li>Immatriculation : {EDITEUR.immatriculation}</li>
     <li>TVA : {MENTION_TVA}.</li>
   </ul>
 

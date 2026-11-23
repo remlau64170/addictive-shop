@@ -7,7 +7,7 @@ import { EDITEUR, HEBERGEUR, MESSAGERIE } from "../data/legal.js";
 <LegalPage
   title="Politique de confidentialité"
   description="Quelles données la boutique Addictive utilise, pourquoi, avec qui elles sont partagées, combien de temps elles sont gardées et vos droits."
-  miseAJour="13 novembre 2026"
+  miseAJour="23 novembre 2026"
 >
   <p>
     Nous collectons le moins de données possible : pas de compte client, pas de cookie, pas de mesure d'audience, pas de publicité.
@@ -16,7 +16,7 @@ import { EDITEUR, HEBERGEUR, MESSAGERIE } from "../data/legal.js";
 
   <h2>Responsable du traitement</h2>
   <p>
-    {EDITEUR.nomEI}, entrepreneur individuel.{" "}
+    {EDITEUR.nomEI}, entrepreneur individuel, SIRET {EDITEUR.siret}.{" "}
     {EDITEUR.adresse}. Contact :
     <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a>.
   </p>

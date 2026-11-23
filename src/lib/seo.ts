@@ -14,4 +14,6 @@ export const PUBLISHER = {
   name: SITE_NAME,
   url: absolute("/"),
   logo: absolute("/icon-only-192.png"),
+  legalName: "Rémy ALLIOD EI",
+  identifier: { "@type": "PropertyValue", propertyID: "SIRET", value: "94143336900027" },
 };

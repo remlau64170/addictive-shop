@@ -28,7 +28,7 @@ Tableau de bord Stripe, **mode test désactivé** :
 1. Paramètres > **Informations sur l'entreprise** > Détails publics : nom affiché « Addictive », adresse e-mail
    d'assistance contact@addictive-app.com, site https://shop.addictive-app.com.
 2. Paramètres > **Facturation** > Factures (modèle de facture) :
-   - nom légal : **Rémy ALLIOD EI** ; SIRET : le numéro reçu (sinon « En cours d'immatriculation ») ;
+   - nom légal : **Rémy ALLIOD EI** ; SIRET **941 433 369 00027** ; nom commercial ADDICTIVE ;
    - préfixe de numérotation fixe (par exemple `ADD-`) : numérotation continue, sans trou ;
    - adresse de l'entreprise : celle déclarée à l'immatriculation (elle figure sur la facture, obligatoire).
    - La mention « TVA non applicable, art. 293 B du CGI » est déjà ajoutée par le site dans le pied de chaque facture.
@@ -205,6 +205,6 @@ Du plus rapide au plus complet :
 ## Après l'ouverture
 
 - Surveiller les premiers jours : Stripe > Webhooks (aucun échec), Printful > Commandes, boîte contact@addictive-app.com.
-- Mettre à jour les mentions légales dès réception du SIRET (`src/data/legal.js`) et changer `CGV_VERSION` si les CGV
+- Informations légales dans `src/data/legal.js` (SIRET reçu le 23 novembre 2026) ; changer `CGV_VERSION` si les CGV
   changent.
 - Médiateur de la consommation : à désigner dès les premières ventes (`MEDIATEUR` dans `src/data/legal.js`).

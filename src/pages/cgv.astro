@@ -16,14 +16,15 @@ const forfait = (LIVRAISON.montant / 100).toFixed(2).replace(".", ",");
 >
   <h2>1. Le vendeur</h2>
   <p>
-    La boutique Addictive est exploitée par {EDITEUR.nomEI}, entrepreneur individuel,
+    La boutique Addictive est exploitée par {EDITEUR.nomEI}, entrepreneur individuel (nom commercial : {EDITEUR.nomCommercial}),
     micro-entreprise.
   </p>
   <ul>
     <li>Adresse : <Info valeur={EDITEUR.adresse} quoi="adresse de l'entreprise" /></li>
     <li>E-mail : <a href={`mailto:${EDITEUR.email}`}>{EDITEUR.email}</a></li>
-    <li>SIRET : <Info valeur={EDITEUR.siret} quoi="numéro SIRET" /></li>
-    <li>Immatriculation : <Info valeur={EDITEUR.immatriculation} quoi="registre et numéro d'immatriculation" /></li>
+    <li>SIRET : {EDITEUR.siret} (SIREN {EDITEUR.siren})</li>
+    <li>Code APE : {EDITEUR.ape}</li>
+    <li>Immatriculation : {EDITEUR.immatriculation}</li>
   </ul>
   <p>Les présentes conditions s'appliquent aux achats faits sur la boutique par des particuliers (consommateurs).</p>
 

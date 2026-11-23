@@ -2,13 +2,16 @@
 // Une valeur à null s'affiche sur le site comme un repère visible « [À COMPLÉTER : …] » : ne jamais inventer ces données.
 // Liste des choix et de ce qui reste à mettre à jour : docs/pages-legales.md.
 
-/** L'entrepreneur individuel (micro-entreprise en cours d'immatriculation). Pas de téléphone affiché (choix de Rémy). */
+/** L'entrepreneur individuel (micro-entreprise), d'après les informations données par Rémy le 23 novembre 2026. Pas de téléphone affiché (choix de Rémy). */
 export const EDITEUR = {
   nom: "Rémy ALLIOD",
   nomEI: "Rémy ALLIOD EI",
+  nomCommercial: "ADDICTIVE",
   adresse: "Adresse communiquée sur demande à contact@addictive-app.com",
-  siret: "En cours d'immatriculation",
-  immatriculation: "Immatriculation en cours au Registre national des entreprises",
+  siret: "941 433 369 00027",
+  siren: "941 433 369",
+  ape: "4791B",
+  immatriculation: "Inscrit au Registre national des entreprises (RNE)",
   email: "contact@addictive-app.com",
 };
 
@@ -35,8 +38,8 @@ export const MESSAGERIE = "service de routage d'e-mails de Cloudflare (Email Rou
 export const MENTION_TVA = "TVA non applicable, art. 293 B du CGI";
 
 /** Version des CGV : à changer à chaque modification. Elle est enregistrée avec chaque commande. */
-export const CGV_VERSION = "2026-11-13";
-export const CGV_VERSION_TEXTE = "13 novembre 2026";
+export const CGV_VERSION = "2026-11-23";
+export const CGV_VERSION_TEXTE = "23 novembre 2026";
 
 /** Case du panier, non cochée par défaut, obligatoire pour payer. */
 export const ACCEPTATION_CGV = "J'ai lu et j'accepte les conditions générales de vente.";
