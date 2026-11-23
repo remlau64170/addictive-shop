@@ -2,10 +2,14 @@
  * Questions fréquentes, alignées sur la fiche produit et le panier. Les réponses sont en texte
  * simple : elles servent aussi aux données structurées FAQPage, qui doivent reprendre exactement ce qui est affiché.
  */
+import { BOUTIQUE_OUVERTE } from "./site";
+
 export const FAQ = [
   {
     question: "Comment passer commande ?",
-    answer: "La boutique ouvre bientôt. Vous ajouterez vos articles au panier, puis vous paierez sur la page sécurisée de Stripe. Aucun compte client n'est nécessaire.",
+    answer: BOUTIQUE_OUVERTE
+      ? "Ajoutez vos articles au panier, puis payez par carte sur la page sécurisée de Stripe. Aucun compte client n'est nécessaire."
+      : "La boutique ouvre bientôt. Vous ajouterez vos articles au panier, puis vous paierez sur la page sécurisée de Stripe. Aucun compte client n'est nécessaire.",
   },
   {
     question: "Comment recevrai-je un produit numérique ?",

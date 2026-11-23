@@ -20,7 +20,7 @@ import StoreLinks from "../components/StoreLinks.astro";
 import ProductCard from "../components/ProductCard.astro";
 import AppBenefits from "../components/AppBenefits.astro";
 import AppVideo from "../components/AppVideo.astro";
-import { ARTICLE_CATEGORIES, SHOP_SHELVES } from "../data/site";
+import { ARTICLE_CATEGORIES, BOUTIQUE_OUVERTE, SHOP_SHELVES } from "../data/site";
 import { getVisibleArticles } from "../lib/articles";
 import { getProduits } from "../lib/produits";
 import { POURQUOI_PARAGRAPHES, POURQUOI_TITRE } from "../data/pourquoi";
@@ -35,7 +35,7 @@ const ENGAGEMENTS = [
   { title: "Contenus vérifiés", text: "Nos ressources sont vérifiées avant publication.", Icon: ShieldCheck },
   { title: "Accès dès le paiement", text: "Pour les produits numériques.", Icon: Download },
   { title: "Fabrication à la demande", text: "Pour les produits physiques.", Icon: Hammer },
-  { title: "Paiement sécurisé", text: "Dès l'ouverture de la boutique.", Icon: Lock },
+  { title: "Paiement sécurisé", text: BOUTIQUE_OUVERTE ? "Par carte, sur la page sécurisée de Stripe." : "Dès l'ouverture de la boutique.", Icon: Lock },
 ];
 
 const SHELF_ICONS = { numeriques: Sparkles, physiques: Package };

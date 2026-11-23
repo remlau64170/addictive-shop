@@ -5,16 +5,23 @@ name = "addictive-shop"
 compatibility_date = "2026-11-01"
 pages_build_output_dir = "./dist"
 
-# Variables publiques de production : boutique visible, paiement BLOQUÉ (« La boutique ouvre bientôt »).
-# Pour ouvrir les paiements, il faudra passer ces deux réglages à "true" ET ajouter les secrets (Stripe, signature,
-# Printful) dans Cloudflare, jamais ici. Version de Node pour la construction : fichier .node-version (Astro 7 demande Node 22.23 ou plus).
+# Variables publiques de production. Boutique OUVERTE depuis le 23 novembre 2026, Stripe en mode réel.
+# Les secrets (clé Stripe, secret du webhook, signature des liens, jeton Printful) sont dans Cloudflare, jamais ici.
+# Retour arrière rapide : CHECKOUT_ENABLED et PUBLIC_BOUTIQUE_OUVERTE à "false" (voir docs/ouverture-paiements.md).
+# PUBLIC_BOUTIQUE_OUVERTE est aussi lu par astro.config.mjs à la construction. En local, .dev.vars remplace ces valeurs.
+# Version de Node pour la construction : fichier .node-version (Astro 7 demande Node 22.23 ou plus).
 [vars]
-PUBLIC_BOUTIQUE_OUVERTE = "false"
-CHECKOUT_ENABLED = "false"
+PUBLIC_BOUTIQUE_OUVERTE = "true"
+CHECKOUT_ENABLED = "true"
+STRIPE_MODE_REEL = "true"
+# Commandes Printful en BROUILLON tant que le premier t-shirt n'a pas été vérifié.
+PRINTFUL_CONFIRM_ORDERS = "false"
+PRINTFUL_FICHIER_BLASON_NOIR = "id:1110619563"
+PRINTFUL_FICHIER_BLASON_BLANC = "id:1110620012"
 
 # Stockages privés (offre gratuite), créés le 13 novembre 2026. Les identifiants ne sont pas secrets.
 [[kv_namespaces]]
-binding = "FICHIERS"        # les PDF vendus : jamais accessibles par une adresse publique (vide tant que la vente est fermée)
+binding = "FICHIERS"        # les 6 PDF vendus : jamais accessibles par une adresse publique
 id = "95519c1efb50445bace07f930e1dc2c0"
 
 [[kv_namespaces]]

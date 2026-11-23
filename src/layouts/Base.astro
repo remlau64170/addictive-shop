@@ -3,6 +3,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { DEFAULT_IMAGE, SITE_NAME, absolute } from "../lib/seo";
 import "../styles/global.css";
+import { BOUTIQUE_OUVERTE } from "../data/site";
 
 interface Props {
   title: string;
@@ -58,7 +59,7 @@ const imageUrl = absolute(image);
     <noscript><style>.needs-js { display: none !important; }</style></noscript>
   </head>
   <body>
-    <p class="announce">La boutique Addictive ouvre bientôt</p>
+    {!BOUTIQUE_OUVERTE && <p class="announce">La boutique Addictive ouvre bientôt</p>}
     <Header />
     <main class:list={wide ? "page-wide" : "page"}>
       <slot />
