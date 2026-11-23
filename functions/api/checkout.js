@@ -118,6 +118,9 @@ export async function onRequestPost({ request, env }) {
 
     const body = {
       mode: "payment",
+      // Carte et Link seulement (Apple Pay et Google Pay passent par la carte) : paiement immédiat, accès aux livres tout de suite.
+      // L'API Stripe n'accepte plus « payment_method_types » pour Checkout (version 2026-09-30) : voici son remplaçant.
+      allowed_payment_method_types: ["card", "link"],
       locale: "fr",
       submit_type: "pay",
       line_items,
