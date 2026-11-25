@@ -103,8 +103,9 @@ import Base from "../layouts/Base.astro";
       .then((response) => response.json())
       .then((data) => {
         if (data.etat === "paye") {
-          // Paiement confirmé : le panier de ce navigateur est vidé.
-          ecrirePanier([]);
+          // Paiement confirmé : le panier de ce navigateur est vidé, sauf après un « Acheter maintenant »
+          // (achat direct depuis une fiche, qui ne concernait pas le panier) ou une visite par le lien de la facture.
+          if (sessionId && !params.has("direct")) ecrirePanier([]);
           const guides: { livre: string; libelle: string; pages: number; lien: string }[] = data.liens ?? [];
           const articles: { produit: string; quantite: number }[] = data.articles ?? [];
           const listeGuides = root.querySelector("[data-liste-guides]")!;

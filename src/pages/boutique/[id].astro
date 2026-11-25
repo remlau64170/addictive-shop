@@ -1,7 +1,9 @@
 ---
 import { render } from "astro:content";
-import { Check, Package, ShieldCheck } from "@lucide/astro";
+import { Check, Download, Package, ShieldCheck } from "@lucide/astro";
 import { LIVRAISON, PHYSIQUES_EN_VENTE, formatEuros } from "../../data/boutique.js";
+import { CONSENTEMENT_RETRACTATION, CONSENTEMENT_VALEUR, RETRACTATION_PHYSIQUE } from "../../data/consentement.js";
+import { ACCEPTATION_CGV_VALEUR } from "../../data/legal.js";
 import Base from "../../layouts/Base.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import ProductCard from "../../components/ProductCard.astro";
@@ -165,7 +167,10 @@ const structured = {
                   </>
                 )
               }
-              <button class="button add" type="submit">Ajouter au panier</button>
+              <div class="buy-actions">
+                <button class="button add" type="submit">Ajouter au panier</button>
+                <button class="button button-secondary now" type="button" data-acheter aria-expanded="false" aria-controls={`direct-${produit.id}`}>Acheter maintenant</button>
+              </div>
               {
                 vente ? (
                   <>
@@ -180,6 +185,46 @@ const structured = {
                 Ajouté au panier. <a href="/panier/">Voir le panier</a>
               </p>
             </form>
+            <form
+              class="direct"
+              id={`direct-${produit.id}`}
+              method="post"
+              action="/api/checkout"
+              data-direct={produit.id}
+              novalidate
+              hidden
+            >
+              <p class="direct-title">Acheter maintenant : {name}</p>
+              <p class="direct-note">Votre panier n'est pas modifié.</p>
+              {
+                numerique && (
+                  <fieldset class="consent">
+                    <legend class="consent-title">
+                      <Download size={16} aria-hidden="true" />
+                      Accès dès le paiement
+                    </legend>
+                    <label class="consent-choice">
+                      <input type="checkbox" name="consentement" value={CONSENTEMENT_VALEUR} aria-describedby={`consent-hint-${produit.id}`} />
+                      <span>{CONSENTEMENT_RETRACTATION}</span>
+                    </label>
+                    <p class="consent-hint" id={`consent-hint-${produit.id}`} data-indice="consentement" hidden>Cochez la case pour accéder tout de suite à vos livres numériques.</p>
+                  </fieldset>
+                )
+              }
+              {!numerique && <p class="note-direct">{RETRACTATION_PHYSIQUE} L'adresse de livraison vous sera demandée sur la page de paiement.</p>}
+              <div class="consent">
+                <label class="consent-choice">
+                  <input type="checkbox" name="cgv" value={ACCEPTATION_CGV_VALEUR} aria-describedby={`cgv-hint-${produit.id}`} />
+                  <span>J'ai lu et j'accepte les <a href="/cgv/" target="_blank" rel="noopener">conditions générales de vente<span class="sr-only"> (s'ouvre dans un nouvel onglet)</span></a>.</span>
+                </label>
+                <p class="consent-hint" id={`cgv-hint-${produit.id}`} data-indice="cgv" hidden>Cochez la case pour accepter les conditions générales de vente.</p>
+              </div>
+              <input type="hidden" name="panier" />
+              <input type="hidden" name="depuis" value={produit.id} />
+              <button class="button pay-now" type="submit">Payer {formatPrice(produit.data.price)}{vente ? ` + ${formatEuros(LIVRAISON.montant)} de livraison` : ""}</button>
+              <p class="soon">Paiement sécurisé par carte sur la page Stripe.</p>
+            </form>
+            <p class="pay-message direct-message" role="status" data-message-direct hidden></p>
           ) : (
             <>
               <button class="button add" type="button" disabled>Ajouter au panier</button>
@@ -365,10 +410,98 @@ const structured = {
     text-align: center;
   }
 
-  .add {
+  /* Deux boutons : côte à côte s'il y a la place, l'un sous l'autre sur un petit téléphone. */
+  .buy-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+    gap: 0.625rem;
+    margin-top: 1.5rem;
+  }
+
+  .buy > .add {
+    margin-top: 1.5rem;
+  }
+
+  .add,
+  .now {
     width: 100%;
     min-height: 3.25rem;
-    margin-top: 1.5rem;
+    padding-inline: 1rem;
+    white-space: nowrap;
+  }
+
+  .direct {
+    margin-top: 1rem;
+    padding: 1rem 1.125rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-card);
+    background: color-mix(in oklch, var(--card) 70%, transparent);
+  }
+
+  .direct-title {
+    font-weight: 700;
+  }
+
+  .direct-note,
+  .note-direct {
+    margin-top: 0.25rem;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+
+  .note-direct {
+    margin-top: 0.75rem;
+  }
+
+  .direct .consent {
+    margin: 1rem 0 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .consent-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+    padding: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .consent-title :global(svg) {
+    color: var(--primary);
+  }
+
+  .consent-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+
+  .consent-choice input {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0.15rem 0 0;
+    accent-color: var(--primary);
+    cursor: pointer;
+  }
+
+  .consent-hint {
+    margin: 0.5rem 0 0 1.75rem;
+    font-size: 0.875rem;
+  }
+
+  .pay-now {
+    width: 100%;
+    min-height: 3.25rem;
+    margin-top: 1.25rem;
   }
 
   .soon {
@@ -655,11 +788,6 @@ const structured = {
       padding-top: 0.5rem;
     }
 
-    .add {
-      width: auto;
-      min-width: min(18rem, 100%);
-    }
-
     .more-links {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 0.75rem;
@@ -725,7 +853,10 @@ const structured = {
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       if (taille && !taille.value) {
-        if (indice) indice.hidden = false;
+        if (indice) {
+          indice.textContent = "Choisissez une taille pour ajouter le t-shirt au panier.";
+          indice.hidden = false;
+        }
         taille.focus();
         return;
       }
@@ -733,5 +864,77 @@ const structured = {
       ajouterAuPanier({ id: form.dataset.produit!, couleur, taille: taille?.value }, form.dataset.numerique === "oui");
       if (message) message.hidden = false;
     });
+
+    // « Acheter maintenant » : paiement de ce seul produit, sans toucher au panier. Les cases obligatoires sont les mêmes
+    // qu'au panier ; le serveur revérifie tout (prix, port, cases) et renvoie ici en cas de souci.
+    const direct = document.querySelector<HTMLFormElement>(`form[data-direct="${form.dataset.produit}"]`);
+    const bouton = form.querySelector<HTMLButtonElement>("[data-acheter]");
+    if (!direct || !bouton) continue;
+    const champPanier = direct.querySelector<HTMLInputElement>('input[name="panier"]')!;
+    const messageDirect = document.querySelector<HTMLElement>("[data-message-direct]");
+    const ouvrir = () => {
+      direct.hidden = false;
+      bouton.setAttribute("aria-expanded", "true");
+    };
+    const ligne = () => {
+      const couleur = form.querySelector<HTMLInputElement>('input[name="couleur"]:checked')?.value;
+      return taille ? { id: form.dataset.produit!, couleur, taille: taille.value, quantite: 1 } : { id: form.dataset.produit!, quantite: 1 };
+    };
+    bouton.addEventListener("click", () => {
+      if (taille && !taille.value) {
+        if (indice) {
+          indice.textContent = "Choisissez une taille pour acheter le t-shirt.";
+          indice.hidden = false;
+        }
+        taille.focus();
+        return;
+      }
+      ouvrir();
+      direct.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      direct.querySelector<HTMLInputElement>('input[type="checkbox"]')?.focus({ preventScroll: true });
+    });
+    direct.addEventListener("submit", (event) => {
+      if (taille && !taille.value) {
+        event.preventDefault();
+        if (indice) indice.hidden = false;
+        taille.focus();
+        return;
+      }
+      let premiere: HTMLInputElement | null = null;
+      for (const caseObligatoire of direct.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')) {
+        const aide = direct.querySelector<HTMLElement>(`[data-indice="${caseObligatoire.name}"]`);
+        if (aide) aide.hidden = caseObligatoire.checked;
+        if (!caseObligatoire.checked && !premiere) premiere = caseObligatoire;
+      }
+      if (premiere) {
+        event.preventDefault();
+        premiere.focus();
+        return;
+      }
+      champPanier.value = JSON.stringify([ligne()]);
+    });
+    for (const caseObligatoire of direct.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')) {
+      caseObligatoire.addEventListener("change", () => {
+        const aide = direct.querySelector<HTMLElement>(`[data-indice="${caseObligatoire.name}"]`);
+        if (aide && caseObligatoire.checked) aide.hidden = true;
+      });
+    }
+
+    // Retour du serveur ou de Stripe sur la fiche : un message court, et les cases à cocher si elles manquaient.
+    const MESSAGES: Record<string, string> = {
+      annule: "Paiement annulé : rien n'a été débité.",
+      indisponible: "Ce produit n'est pas disponible pour le moment.",
+      erreur: "Le paiement n'a pas pu démarrer. Réessayez dans un instant.",
+      invalide: "Le choix n'a pas été reconnu. Vérifiez la couleur et la taille, puis réessayez.",
+    };
+    const motif = new URLSearchParams(location.search).get("paiement");
+    if (motif === "cgv" || motif === "consentement") {
+      ouvrir();
+      const aide = direct.querySelector<HTMLElement>(`[data-indice="${motif}"]`);
+      if (aide) aide.hidden = false;
+    } else if (motif && MESSAGES[motif] && messageDirect) {
+      messageDirect.textContent = MESSAGES[motif];
+      messageDirect.hidden = false;
+    }
   }
 </script>

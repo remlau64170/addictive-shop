@@ -100,7 +100,7 @@ if (idSession && vars.STRIPE_SECRET_KEY) {
   verifier("preuve dans Stripe : version des CGV acceptées", s.metadata?.cgv_version === CGV_VERSION, s.metadata?.cgv_version);
   verifier("pied de facture : lien vers les CGV", (s.invoice_creation?.invoice_data?.footer ?? "").includes("/cgv/"));
   verifier("facture créée par Checkout (invoice_creation)", s.invoice_creation?.enabled === true);
-  verifier("moyens de paiement : carte et Link seulement", JSON.stringify(s.payment_method_types) === JSON.stringify(["card", "link"]), JSON.stringify(s.payment_method_types));
+  verifier("moyens de paiement : carte seulement", JSON.stringify(s.payment_method_types) === JSON.stringify(["card"]), JSON.stringify(s.payment_method_types));
   const pied = s.invoice_creation?.invoice_data?.footer ?? "";
   verifier("pied de facture : phrase exacte de la case", pied.includes(`« ${CONSENTEMENT_RETRACTATION} »`));
   verifier("pied de facture : date et heure de l'accord", /le \d{1,2} \S+ \d{4} à \d{2}:\d{2} \(heure de Paris\)/.test(pied), pied.match(/le .*?\(heure de Paris\)/)?.[0]);
@@ -127,6 +127,25 @@ if (vars.STRIPE_SECRET_KEY) {
   verifier("t-shirt seul : adresse obligatoire, Suisse exclue", (s?.shipping_address_collection?.allowed_countries ?? []).length === 8 && !s.shipping_address_collection.allowed_countries.includes("CH"), s?.shipping_address_collection?.allowed_countries?.join(","));
   verifier("t-shirt seul : 29 € et variante dans le nom", s?.line_items?.data?.[0]?.amount_total === 2900 && /Noir, taille M/.test(s?.line_items?.data?.[0]?.description ?? ""), s?.line_items?.data?.[0]?.description);
   verifier("t-shirt seul : pas de case, mention des 14 jours", !s?.metadata?.consentement_retractation && /14 jours/.test(s?.invoice_creation?.invoice_data?.footer ?? ""));
+
+  // « Acheter maintenant » depuis une fiche : même règles, retours vers la fiche, panier conservé après paiement.
+  const direct = async (panier, champs) => {
+    const corps = new URLSearchParams({ panier: JSON.stringify(panier), depuis: panier[0].id, ...champs });
+    return fetch(`${BASE}/api/checkout`, { method: "POST", body: corps, redirect: "manual" });
+  };
+  let repDirect = await direct([tshirt], { cgv: "oui" });
+  const idDirect = (repDirect.headers.get("location") ?? "").match(/cs_test_[A-Za-z0-9]+/)?.[0];
+  if (idDirect) {
+    const sd = await fetch(`https://api.stripe.com/v1/checkout/sessions/${idDirect}?expand[]=shipping_options.shipping_rate`, { headers: { Authorization: `Bearer ${vars.STRIPE_SECRET_KEY}` } }).then((x) => x.json());
+    await fetch(`https://api.stripe.com/v1/checkout/sessions/${idDirect}/expire`, { method: "POST", headers: { Authorization: `Bearer ${vars.STRIPE_SECRET_KEY}` } });
+    verifier("achat direct t-shirt : livraison 4,90 €", port(sd) === 490, port(sd));
+    verifier("achat direct : panier conservé après paiement (direct=1)", /[?&]direct=1/.test(sd.success_url ?? ""), sd.success_url);
+    verifier("achat direct : annulation renvoie sur la fiche", (sd.cancel_url ?? "").endsWith("/boutique/t-shirt-sois-addict/?paiement=annule"), sd.cancel_url);
+  } else verifier("achat direct t-shirt : page Stripe", false, repDirect.status);
+  repDirect = await direct([tshirt], {});
+  verifier("achat direct sans CGV : refusé, retour sur la fiche", /\/boutique\/t-shirt-sois-addict\/\?paiement=cgv$/.test(repDirect.headers.get("location") ?? ""), repDirect.headers.get("location"));
+  repDirect = await direct([{ id: "ose-ton-projet", quantite: 1 }], { cgv: "oui" });
+  verifier("achat direct livre sans la case d'accès : refusé, retour sur la fiche", /\/boutique\/ose-ton-projet\/\?paiement=consentement$/.test(repDirect.headers.get("location") ?? ""), repDirect.headers.get("location"));
 
   ({ s } = await sessionDe([tshirt, { id: "sors-de-ton-addiction", quantite: 1 }], true));
   verifier("t-shirt + PDF : livraison offerte (0 €)", port(s) === 0, port(s));

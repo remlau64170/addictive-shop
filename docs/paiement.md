@@ -35,7 +35,9 @@ Le t-shirt brodé est le seul produit physique de la boutique. Le prix vient tou
 - Gardé dans le navigateur (localStorage), sans compte client ; nombre d'articles sur l'icône de l'en-tête.
 - Un livre numérique ne s'achète qu'une fois par commande ; un article livré jusqu'à 10 fois par ligne (couleur, taille).
 - Le navigateur n'envoie que des choix. `/api/checkout` revérifie tout : produits, couleurs, tailles, quantités, prix.
-- Le panier est vidé sur la page de remerciement, une fois le paiement confirmé.
+- Le panier est vidé sur la page de remerciement, une fois le paiement confirmé (pas après un « Acheter maintenant »).
+- « Acheter maintenant » (fiches produits) : paiement direct du seul produit affiché, mêmes cases et même port ; les
+  erreurs et l'annulation reviennent sur la fiche (`depuis` dans le formulaire). Moyen de paiement : carte seulement.
 
 ## Livraison
 

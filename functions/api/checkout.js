@@ -27,18 +27,23 @@ export async function onRequestPost({ request, env }) {
   const origin = new URL(request.url).origin;
   const form = await request.formData().catch(() => null);
   const lignes = lirePanier(form);
-  if (!lignes || lignes.length === 0 || lignes.length > LIGNES_MAX) return retour(origin, "invalide");
-  if (!checkoutEnabled(env)) return retour(origin, "indisponible");
+  // « Acheter maintenant » depuis une fiche : un seul produit, et les retours (erreur, annulation) reviennent sur la fiche.
+  const depuis = String(form?.get("depuis") ?? "").toLowerCase();
+  const direct = SLUG.test(depuis) && lignes?.length === 1 && String(lignes[0]?.id ?? "").toLowerCase() === depuis;
+  const page = direct ? `/boutique/${depuis}/` : "/panier/";
+  const retourner = (raison) => retour(origin, raison, page);
+  if (!lignes || lignes.length === 0 || lignes.length > LIGNES_MAX) return retourner("invalide");
+  if (!checkoutEnabled(env)) return retourner("indisponible");
 
   // Validation stricte de chaque ligne, avant tout appel à Stripe.
   const propres = [];
   for (const ligne of lignes) {
     const id = String(ligne?.id ?? "").toLowerCase();
     const quantite = Number(ligne?.quantite ?? 1);
-    if (!SLUG.test(id) || !Number.isInteger(quantite) || quantite < 1 || quantite > QUANTITE_MAX) return retour(origin, "invalide");
+    if (!SLUG.test(id) || !Number.isInteger(quantite) || quantite < 1 || quantite > QUANTITE_MAX) return retourner("invalide");
     const vente = PHYSIQUES_EN_VENTE[id];
     if (vente) {
-      if (!vente.couleurs.some((c) => c.id === ligne.couleur) || !vente.tailles.includes(ligne.taille)) return retour(origin, "invalide");
+      if (!vente.couleurs.some((c) => c.id === ligne.couleur) || !vente.tailles.includes(ligne.taille)) return retourner("invalide");
       propres.push({ id, quantite, couleur: ligne.couleur, taille: ligne.taille });
     } else if (!propres.some((p) => p.id === id)) {
       propres.push({ id, quantite: 1 }); // un livre numérique ne s'achète qu'une fois
@@ -46,7 +51,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   // Un livre déjà contenu dans le pack du panier : on ne le fait pas payer deux fois, le panier propose de le retirer.
-  if (livresEnDouble(propres.map((p) => p.id)).length > 0) return retour(origin, "doublon");
+  if (livresEnDouble(propres.map((p) => p.id)).length > 0) return retourner("doublon");
 
   try {
     // Produits Stripe (prix et nature lus chez Stripe, jamais dans le navigateur).
@@ -55,10 +60,10 @@ export async function onRequestPost({ request, env }) {
       const produit = await stripe(env, `/products/${id}`, { query: { expand: ["default_price"] } });
       const prix = produit.default_price;
       const nature = produit.metadata?.delivery;
-      if (!produit.active || !["digital", "physical"].includes(nature)) return retour(origin, "indisponible");
-      if (nature === "physical" && !PHYSIQUES_EN_VENTE[id]) return retour(origin, "indisponible");
-      if (nature === "digital" && (PHYSIQUES_EN_VENTE[id] || fichiersDuProduit(id).length === 0)) return retour(origin, "indisponible");
-      if (!prix?.active || prix.currency !== "eur" || !prix.unit_amount) return retour(origin, "indisponible");
+      if (!produit.active || !["digital", "physical"].includes(nature)) return retourner("indisponible");
+      if (nature === "physical" && !PHYSIQUES_EN_VENTE[id]) return retourner("indisponible");
+      if (nature === "digital" && (PHYSIQUES_EN_VENTE[id] || fichiersDuProduit(id).length === 0)) return retourner("indisponible");
+      if (!prix?.active || prix.currency !== "eur" || !prix.unit_amount) return retourner("indisponible");
       produits.set(id, produit);
     }
 
@@ -67,9 +72,9 @@ export async function onRequestPost({ request, env }) {
     const offerte = livraisonOfferte({ numerique: numeriques.length, physique: physiques.length });
 
     // Contenu numérique : la case « Accès dès le paiement » doit être cochée (vérifié ici aussi, pas seulement dans la page).
-    if (numeriques.length > 0 && form?.get("consentement") !== CONSENTEMENT_VALEUR) return retour(origin, "consentement");
+    if (numeriques.length > 0 && form?.get("consentement") !== CONSENTEMENT_VALEUR) return retourner("consentement");
     // Conditions générales de vente : case du panier obligatoire pour toute commande (vérifiée ici aussi).
-    if (form?.get("cgv") !== ACCEPTATION_CGV_VALEUR) return retour(origin, "cgv");
+    if (form?.get("cgv") !== ACCEPTATION_CGV_VALEUR) return retourner("cgv");
 
     const line_items = [
       ...numeriques.map((p) => ({ price: produits.get(p.id).default_price.id, quantity: 1 })),
@@ -118,9 +123,9 @@ export async function onRequestPost({ request, env }) {
 
     const body = {
       mode: "payment",
-      // Carte et Link seulement (Apple Pay et Google Pay passent par la carte) : paiement immédiat, accès aux livres tout de suite.
+      // Carte seulement (Apple Pay et Google Pay passent par la carte) : paiement immédiat, accès aux livres tout de suite.
       // L'API Stripe n'accepte plus « payment_method_types » pour Checkout (version 2026-09-30) : voici son remplaçant.
-      allowed_payment_method_types: ["card", "link"],
+      allowed_payment_method_types: ["card"],
       locale: "fr",
       submit_type: "pay",
       line_items,
@@ -138,8 +143,8 @@ export async function onRequestPost({ request, env }) {
       payment_intent_data: { description: "Commande Addictive", metadata },
       adaptive_pricing: { enabled: false },
       metadata,
-      success_url: `${origin}/merci/?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/panier/?paiement=annule`,
+      success_url: `${origin}/merci/?session_id={CHECKOUT_SESSION_ID}${direct ? "&direct=1" : ""}`,
+      cancel_url: `${origin}${page}?paiement=annule`,
     };
 
     // Article livré : adresse obligatoire (pays desservis) et un seul forfait de livraison par commande.
@@ -164,9 +169,9 @@ export async function onRequestPost({ request, env }) {
     return Response.redirect(session.url, 303);
   } catch (error) {
     // Produit inconnu de Stripe : simplement indisponible.
-    if (error.status === 404) return retour(origin, "indisponible");
+    if (error.status === 404) return retourner("indisponible");
     console.error("checkout", error.status ?? "", error.stripeCode ?? "", error.message);
-    return retour(origin, "erreur");
+    return retourner("erreur");
   }
 }
 
