@@ -1,5 +1,5 @@
 /**
- * Apple Pay et Google Pay sur la configuration de moyens de paiement PAR DÉFAUT du compte Stripe.
+ * Apple Pay et Google Pay activés, Link désactivé, sur la configuration de moyens de paiement PAR DÉFAUT du compte Stripe.
  * Le site n'autorise que la carte : Apple Pay et Google Pay passent par la carte et s'affichent sur les appareils
  * compatibles, à condition d'être activés ici.
  *
@@ -89,11 +89,14 @@ if (!config) {
   process.exit(1);
 }
 console.log(`Configuration « ${config.name} » (par défaut)`);
-console.log(`  avant : carte ${etat(config, "card")}, Apple Pay ${etat(config, "apple_pay")}, Google Pay ${etat(config, "google_pay")}`);
+const resume = (c) => `carte ${etat(c, "card")}, Apple Pay ${etat(c, "apple_pay")}, Google Pay ${etat(c, "google_pay")}, Link ${etat(c, "link")}`;
+console.log(`  avant : ${resume(config)}`);
 
-const aActiver = ["apple_pay", "google_pay"].filter((m) => config[m]?.display_preference?.value !== "on");
-if (aActiver.length > 0) {
-  const corps = Object.fromEntries(aActiver.map((m) => [`${m}[display_preference][preference]`, "on"]));
+// Carte, Apple Pay et Google Pay activés ; Link désactivé (ni moyen de paiement, ni « Enregistrer mes informations »).
+const voulu = { card: "on", apple_pay: "on", google_pay: "on", link: "off" };
+const aChanger = Object.entries(voulu).filter(([m, v]) => config[m]?.display_preference?.preference !== v);
+if (aChanger.length > 0) {
+  const corps = Object.fromEntries(aChanger.map(([m, v]) => [`${m}[display_preference][preference]`, v]));
   const r = await stripe(cle, "POST", `/payment_method_configurations/${config.id}`, corps);
   if (r.statut === 403) {
     console.log(`Droit manquant pour modifier : ${DROIT}. Ajoutez-le, puis relancez.`);
@@ -103,6 +106,8 @@ if (aActiver.length > 0) {
     console.log(`Modification refusée : ${r.j.error?.message ?? r.statut}`);
     process.exit(1);
   }
-  console.log(`  après : carte ${etat(r.j, "card")}, Apple Pay ${etat(r.j, "apple_pay")}, Google Pay ${etat(r.j, "google_pay")}`);
-} else console.log("  Apple Pay et Google Pay sont déjà activés : rien à modifier.");
+  console.log(`  après : ${resume(r.j)}`);
+  const ecarts = Object.entries(voulu).filter(([m, v]) => r.j[m]?.display_preference?.value !== v);
+  if (ecarts.length > 0) console.log(`  ATTENTION : Stripe n'applique pas encore ${ecarts.map(([m]) => m).join(", ")} (voir le détail ci-dessus).`);
+} else console.log("  Carte, Apple Pay et Google Pay activés, Link désactivé : rien à modifier.");
 console.log("\nTerminé. Vous pouvez fermer cette fenêtre.");
