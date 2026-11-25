@@ -231,3 +231,12 @@ Du plus rapide au plus complet :
 - Informations légales dans `src/data/legal.js` (SIRET reçu le 23 novembre 2026) ; changer `CGV_VERSION` si les CGV
   changent.
 - Médiateur de la consommation : à désigner dès les premières ventes (`MEDIATEUR` dans `src/data/legal.js`).
+
+## Moyens de paiement (mode réel)
+
+- Le site n'autorise que la carte (`allowed_payment_method_types: ["card"]` dans `functions/api/checkout.js`).
+- Link est désactivé en mode réel depuis le 25/11/2026, à la main dans le tableau de bord Stripe (Paramètres > Moyens
+  de paiement) : plus d'option « Enregistrer mes informations » sur la page de paiement. Carte, Apple Pay et Google Pay
+  restent activés.
+- `scripts/portefeuilles-stripe.mjs` ne sert qu'au mode test (`--test`, clé de `.dev.vars`) ou à une future clé live
+  dédiée : il n'a pas été lancé en réel, et aucune clé live n'est conservée.
