@@ -43,7 +43,8 @@ export function faqFromBody(body: string | undefined) {
     .slice(1)
     .map((block) => {
       const [question, ...answer] = block.split("\n");
-      const text = answer.filter((line) => !line.startsWith("*Cet article donne")).join("\n");
+      // Les notes en italique après la FAQ (avertissement santé, mention de partenariat) ne font pas partie de la réponse.
+      const text = answer.filter((line) => !/^\*[^*].*\*\s*$/.test(line.trim())).join("\n");
       return { question: plain(question), answer: plain(text) };
     })
     .filter((item) => item.question && item.answer);
