@@ -1,6 +1,6 @@
 ---
 title: "Visualiser, écrire, agir : la routine qui forge le mental"
-description: "Journal de gratitude, visualisation, régularité : ce que la recherche dit vraiment de ces pratiques, et comment les combiner en une routine de quelques minutes par jour."
+description: "Gratitude, visualisation, régularité : ce que la recherche dit de ces pratiques, et comment en faire une routine de quelques minutes par jour."
 category: mental-discipline
 date: 2026-11-27
 draft: false
@@ -109,4 +109,4 @@ Ce n'est pas obligatoire, mais un carnet papier éloigne du téléphone et rend 
 - Oettingen G., Mayer D., « The motivating function of thinking about the future: Expectations versus fantasies », *Journal of Personality and Social Psychology*, 2002.
 - Hill N., *Think and Grow Rich*, 1937 ; Haanel C. F., *The Master Key System*, 1912 ; Goddard N., *Feeling Is the Secret*, 1944.
 - Gollwitzer P. M., Sheeran P., « Implementation intentions and goal achievement: A meta-analysis of effects and processes », *Advances in Experimental Social Psychology*, 2006.
-- Lally P. et al., « How are habits formed: Modelling habit formation in the real world », *European Journal of Social Psychology*, 2010 ([UCL](https://www.ucl.ac.uk/news/2009/aug/how-long-does-it-take-form-habit)).
+- Lally P. et al., « How are habits formed: Modelling habit formation in the real world », *European Journal of Social Psychology*, 2010 ([DOI](https://doi.org/10.1002/ejsp.674)).

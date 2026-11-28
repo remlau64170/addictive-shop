@@ -61,7 +61,8 @@ const structured = {
     url: absolute(Astro.url.pathname),
     priceCurrency: "EUR",
     price: produit.data.price?.toFixed(2),
-    availability: "https://schema.org/OutOfStock",
+    // Même règle que le bouton d'achat : en vente si la boutique est ouverte (le t-shirt est fabriqué à la commande).
+    availability: achat ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
   },
   ...(avis.length > 0
     ? {
